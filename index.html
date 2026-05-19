@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wheredidmymoneygo</title>
+
+
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#fdf8f2;--color-surface:#fff9f3;--color-surface-2:#fffcf8;
+  --color-surface-offset:#f5ede0;--color-surface-offset-2:#eedcca;
+  --color-divider:#ddd0c0;--color-border:#d0c0aa;
+  --color-text:#2c1f0e;--color-text-muted:#7a6452;--color-text-faint:#b8a491;
+  --color-primary:#c0622a;--color-primary-hover:#a04d1e;
+  --color-primary-highlight:#f0d9ca;
+  --color-success:#4a7c3f;--color-success-bg:#d8ebcf;
+  --color-warning:#b87d1a;--color-warning-bg:#f5e6c3;
+  --color-error:#c0392b;--color-error-bg:#f5d4d0;
+  --color-blue:#2e6fa3;--color-blue-bg:#d4e8f5;
+  --radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;
+  --radius-2xl:1.5rem;--radius-full:9999px;
+  --shadow-sm:0 1px 3px rgba(44,31,14,.08);
+  --shadow-md:0 4px 12px rgba(44,31,14,.12);
+  --shadow-lg:0 12px 32px rgba(44,31,14,.16);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-16:4rem;
+  --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+  --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+  --text-base:clamp(1rem,.95rem + .25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --font-display:Georgia,'Times New Roman',serif;
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="dark"]{
+  --color-bg:#1a1208;--color-surface:#1f1610;--color-surface-2:#241a13;
+  --color-surface-offset:#2b1f15;--color-surface-offset-2:#35271a;
+  --color-divider:#3a2a1a;--color-border:#4a3825;
+  --color-text:#f0e4d4;--color-text-muted:#9c836a;--color-text-faint:#6b5542;
+  --color-primary:#e8845a;--color-primary-hover:#d46e44;--color-primary-highlight:#4a2510;
+  --color-success:#7ab86a;--color-success-bg:#1e3518;
+  --color-warning:#e8a840;--color-warning-bg:#3a2a10;
+  --color-error:#e05c4a;--color-error-bg:#3a1510;
+  --color-blue:#6aabdd;--color-blue-bg:#102030;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 32px rgba(0,0,0,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+input,select,textarea{font:inherit;color:inherit;}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm);}
+.app-shell{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100dvh;}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-6);background:var(--color-surface);border-bottom:1px solid var(--color-divider);position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);}
+.sidebar{background:var(--color-surface);border-right:1px solid var(--color-divider);padding:var(--space-6) 0;overflow-y:auto;position:sticky;top:61px;height:calc(100dvh - 61px);}
+.main-content{background:var(--color-bg);overflow-y:auto;padding:var(--space-8);}
+.logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--color-text);}
+.logo-icon{width:36px;height:36px;}
+.logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;color:var(--color-primary);}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-3);}
+.theme-toggle{width:38px;height:38px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);transition:background var(--transition);}
+.theme-toggle:hover{background:var(--color-surface-offset);}
+.btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-full);font-size:var(--text-sm);font-weight:500;transition:all var(--transition);border:none;cursor:pointer;}
+.btn-primary{background:var(--color-primary);color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{background:var(--color-primary-hover);box-shadow:var(--shadow-md);}
+.btn-ghost{color:var(--color-text-muted);padding:var(--space-2) var(--space-3);}
+.btn-ghost:hover{background:var(--color-surface-offset);color:var(--color-text);}
+.btn-danger{background:var(--color-error-bg);color:var(--color-error);}
+.btn-danger:hover{background:var(--color-error);color:#fff;}
+.btn-sm{padding:var(--space-1) var(--space-3);font-size:var(--text-xs);}
+.sidebar-label{font-size:var(--text-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-faint);padding:var(--space-2) var(--space-6);margin-bottom:var(--space-1);}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);color:var(--color-text-muted);cursor:pointer;transition:all var(--transition);border-left:3px solid transparent;user-select:none;}
+.nav-item:hover{background:var(--color-surface-offset);color:var(--color-text);}
+.nav-item.active{background:var(--color-primary-highlight);color:var(--color-primary);border-left-color:var(--color-primary);font-weight:600;}
+.nav-icon{width:18px;height:18px;flex-shrink:0;}
+.nav-divider{height:1px;background:var(--color-divider);margin:var(--space-4) var(--space-6);}
+.nav-badge{margin-left:auto;background:var(--color-surface-offset-2);color:var(--color-text-muted);font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);font-weight:600;}
+.nav-badge.alert{background:var(--color-warning-bg);color:var(--color-warning);}
+.page{display:none;}.page.active{display:block;}
+.page-header{margin-bottom:var(--space-8);}
+.page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;color:var(--color-text);margin-bottom:var(--space-2);}
+.page-subtitle{font-size:var(--text-sm);color:var(--color-text-muted);}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-6);box-shadow:var(--shadow-sm);}
+.card-title{font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-4);color:var(--color-text);}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4);margin-bottom:var(--space-8);}
+.kpi-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--shadow-sm);min-width:0;overflow:hidden;}
+.kpi-label{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);margin-bottom:var(--space-2);}
+.kpi-value{font-family:var(--font-display);font-weight:700;color:var(--color-text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value.accent{color:var(--color-primary);}
+.kpi-value.warning{color:var(--color-warning);}
+.kpi-sub{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1);}
+.fx-banner{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;padding:var(--space-3) var(--space-5);background:var(--color-primary-highlight);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-6);font-size:var(--text-xs);}
+.fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;}
+.fx-chip{display:inline-flex;align-items:center;gap:6px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:3px 12px;font-size:var(--text-xs);font-weight:600;}
+.fx-date{margin-left:auto;color:var(--color-text-muted);font-size:var(--text-xs);}
+.fx-edit-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);background:var(--color-primary);color:#fff;font-size:var(--text-xs);font-weight:600;border:none;cursor:pointer;transition:background var(--transition);}
+.fx-edit-btn:hover{background:var(--color-primary-hover);}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-xl);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);}
+table{width:100%;border-collapse:collapse;font-size:var(--text-sm);background:var(--color-surface);}
+thead{background:var(--color-surface-offset);}
+th{padding:var(--space-3) var(--space-4);text-align:left;font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);white-space:nowrap;border-bottom:1px solid var(--color-divider);}
+td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-divider);vertical-align:middle;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--color-surface-offset);}
+.tfoot-row td{background:var(--color-surface-offset);font-weight:700;border-top:2px solid var(--color-border);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600;white-space:nowrap;}
+.badge-success{background:var(--color-success-bg);color:var(--color-success);}
+.badge-warning{background:var(--color-warning-bg);color:var(--color-warning);}
+.badge-error{background:var(--color-error-bg);color:var(--color-error);}
+.badge-neutral{background:var(--color-surface-offset-2);color:var(--color-text-muted);}
+.expense-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:var(--radius-md);font-size:14px;flex-shrink:0;}
+.expense-icon.hotel{background:#fde8d4;}.expense-icon.flight{background:#d4e8fd;}
+.expense-icon.car{background:#d4fde8;}.expense-icon.food{background:#fdfdd4;}
+.expense-icon.misc{background:var(--color-surface-offset-2);}
+.settlement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--space-4);}
+.settlement-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-5);}
+.settlement-person{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);}
+.person-avatar{width:40px;height:40px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--text-base);color:#fff;flex-shrink:0;}
+.person-name{font-weight:600;}
+.person-role{font-size:var(--text-xs);color:var(--color-text-muted);}
+.settlement-row{display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);}
+.settlement-row:last-child{border-bottom:none;}
+.settlement-amount{font-weight:700;font-variant-numeric:tabular-nums;}
+.amount-owed{color:var(--color-error);}.amount-clear{color:var(--color-success);}
+.filter-bar{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);flex-wrap:wrap;}
+.filter-select{padding:var(--space-2) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-full);background:var(--color-surface);font-size:var(--text-sm);color:var(--color-text);min-width:120px;}
+.filter-select:focus{border-color:var(--color-primary);outline:none;}
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,18,8,.55);z-index:100;display:none;align-items:center;justify-content:center;padding:var(--space-4);backdrop-filter:blur(4px);}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--color-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-lg);padding:var(--space-8);width:100%;max-width:720px;max-height:95dvh;overflow-y:auto;animation:slideUp 220ms cubic-bezier(0.16,1,0.3,1);}
+.modal.sm{max-width:720px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-title{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-6);color:var(--color-text);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);}
+.form-group{display:flex;flex-direction:column;gap:var(--space-2);}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:var(--text-sm);font-weight:500;color:var(--color-text);}
+.form-input,.form-select,.form-textarea{padding:var(--space-3) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);transition:border-color var(--transition);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--color-primary);outline:none;box-shadow:0 0 0 3px rgba(192,98,42,.15);}
+.form-textarea{resize:vertical;min-height:80px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--color-divider);}
+.trips-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-6);margin-top:var(--space-6);}
+.trip-overview-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-2xl);overflow:hidden;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition);}
+.trip-overview-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.trip-card-header{padding:var(--space-6);color:#fff;}
+.trip-card-header.vietnam{background:linear-gradient(135deg,#d45c2a,#b84a1e);}
+.trip-card-header.australia{background:linear-gradient(135deg,#2a7ab8,#1e5a8e);}
+.trip-card-header.korea{background:linear-gradient(135deg,#b82a6a,#8e1e50);}
+.trip-card-flag{font-size:2rem;margin-bottom:var(--space-2);}
+.trip-card-name{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-1);}
+.trip-card-dates{font-size:var(--text-xs);opacity:.85;}
+.trip-card-body{padding:var(--space-5);}
+.trip-stat-row{display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) 0;border-bottom:1px solid var(--color-divider);font-size:var(--text-sm);}
+.trip-stat-row:last-child{border-bottom:none;}
+.trip-stat-label{color:var(--color-text-muted);}
+.trip-stat-value{font-weight:600;font-variant-numeric:tabular-nums;}
+.booking-code{font-family:'Courier New',monospace;font-size:var(--text-xs);background:var(--color-surface-offset);padding:2px 8px;border-radius:var(--radius-sm);color:var(--color-text-muted);letter-spacing:.06em;}
+.location-text{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
+.tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:var(--radius-full);font-size:var(--text-xs);background:var(--color-surface-offset);color:var(--color-text-muted);font-weight:500;}
+.sgd-foreign{color:var(--color-blue);font-weight:600;}
+.fx-note{font-size:10px;color:var(--color-text-faint);display:block;}
+.fx-rate-row{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0;border-bottom:1px solid var(--color-divider);}
+.fx-rate-row:last-child{border-bottom:none;}
+.fx-input{width:130px;padding:var(--space-2) var(--space-3);border:1.5px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);background:var(--color-bg);text-align:right;}
+.fx-input:focus{border-color:var(--color-primary);outline:none;}
+.flex{display:flex;}.items-center{align-items:center;}.gap-2{gap:var(--space-2);}.gap-3{gap:var(--space-3);}
+.justify-between{justify-content:space-between;}
+.text-muted{color:var(--color-text-muted);}.text-sm{font-size:var(--text-sm);}.text-xs{font-size:var(--text-xs);}
+.fw-600{font-weight:600;}.fw-700{font-weight:700;}
+.mb-4{margin-bottom:var(--space-4);}.mb-6{margin-bottom:var(--space-6);}.mb-8{margin-bottom:var(--space-8);}
+.mt-8{margin-top:var(--space-8);}
+.tabular{font-variant-numeric:tabular-nums;}
+.mobile-menu-btn{display:none;}
+@media(max-width:768px){
+  .app-shell{grid-template-columns:1fr;}
+  .sidebar{display:none;position:fixed;left:0;top:61px;bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:auto;}
+  .sidebar.open{display:block;transform:translateX(0);}
+  .main-content{padding:var(--space-5) var(--space-4);}
+  .form-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .mobile-menu-btn{display:flex;}
+}
+
+.nav-item-wrap{position:relative;display:flex;align-items:center;}
+.nav-del-btn{opacity:0;position:absolute;right:var(--space-3);width:22px;height:22px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--color-error-bg);color:var(--color-error);transition:opacity var(--transition),background var(--transition);flex-shrink:0;border:none;cursor:pointer;z-index:1;}
+.nav-item:hover ~ .nav-del-btn, .nav-del-btn:hover{opacity:1;}
+.nav-item-wrap:hover .nav-del-btn{opacity:1;}
+.nav-item-wrap .nav-item{flex:1;}
+
+
+.trip-card-header.custom-green{background:linear-gradient(135deg,#2e7d4a,#1e5e36);}
+.trip-card-header.custom-gold{background:linear-gradient(135deg,#c8880a,#a06a05);}
+/* Pastel colours */
+.trip-card-header.pastel-rose{background:linear-gradient(135deg,#e8a0b0,#d4788a);color:#5a1a28;}
+.trip-card-header.pastel-peach{background:linear-gradient(135deg,#f0c090,#e0a06a);color:#5a2e0a;}
+.trip-card-header.pastel-mint{background:linear-gradient(135deg,#90d4b8,#60b898);color:#0a3a28;}
+.trip-card-header.pastel-sky{background:linear-gradient(135deg,#90c8f0,#60a8e0);color:#0a2a4a;}
+.trip-card-header.pastel-lavender{background:linear-gradient(135deg,#c0a8e8,#a080d0);color:#2a0a5a;}
+.trip-card-header.pastel-lemon{background:linear-gradient(135deg,#f0e080,#d8c850);color:#3a3000;}
+.trip-card-header.pastel-lilac{background:linear-gradient(135deg,#d8b8e8,#c090d0);color:#3a1050;}
+.trip-card-header.pastel-sage{background:linear-gradient(135deg,#a8c8a0,#80a878);color:#182810;}
+.trip-card-header.pastel-blush{background:linear-gradient(135deg,#f0c8c8,#e0a0a0);color:#5a1818;}
+.trip-card-header.pastel-powder{background:linear-gradient(135deg,#a8c8e8,#7aaac8);color:#0a2840;}
+.trip-card-header.pastel-butter{background:linear-gradient(135deg,#f8e8a8,#e8d080);color:#483800;}
+.trip-card-header.pastel-coral{background:linear-gradient(135deg,#f0a888,#d88060);color:#4a1808;}
+
+
+.pb-select{padding:3px 8px;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600;border:1.5px solid var(--color-border);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;transition:all var(--transition);}
+.pb-select.paid{background-color:var(--color-success-bg);color:var(--color-success);border-color:var(--color-success);}
+.pb-select.notyet{background-color:var(--color-error-bg);color:var(--color-error);border-color:var(--color-error);}
+.pb-select.neutral{background-color:var(--color-surface-offset);color:var(--color-text-muted);}
+.pb-select:focus{outline:none;box-shadow:0 0 0 3px rgba(192,98,42,.15);}
+
+
+.lock-btn{width:28px;height:28px;border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;font-size:14px;border:none;cursor:pointer;transition:all var(--transition);background:var(--color-surface-offset);color:var(--color-text-muted);}
+.lock-btn:hover{background:var(--color-warning-bg);color:var(--color-warning);}
+.lock-btn.locked{background:var(--color-warning-bg);color:var(--color-warning);}
+.locked-cell{opacity:0.5;pointer-events:none;user-select:none;}
+.locked-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--color-warning);font-weight:600;background:var(--color-warning-bg);padding:1px 7px;border-radius:var(--radius-full);}
+.form-input:disabled,.form-select:disabled{opacity:0.5;cursor:not-allowed;background:var(--color-surface-offset);}
+
+
+.suggestion-item{padding:var(--space-2) var(--space-4);cursor:pointer;font-size:var(--text-sm);display:flex;align-items:center;gap:var(--space-3);transition:background var(--transition);}
+.suggestion-item:hover,.suggestion-item.active{background:var(--color-primary-highlight);color:var(--color-primary);}
+.suggestion-flag{font-size:1.2rem;min-width:24px;}
+
+</style>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WDMMG">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#b5622a">
+  <meta name="description" content="Track travel expenses and split bills across multiple trips">
+  <!-- Apple touch icons for home screen -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23b5622a' width='180' height='180'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='100' font-weight='bold' fill='white' font-family='system-ui'>💸</text></svg>">
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIldoZXJlIERpZCBNeSBNb25leSBHbyIsICJzaG9ydF9uYW1lIjogIldETU1HIiwgInN0YXJ0X3VybCI6ICIuIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmNWYwZTgiLCAidGhlbWVfY29sb3IiOiAiI2I1NjIyYSIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsPHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48cmVjdCBmaWxsPScjYjU2MjJhJyB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcvPjx0ZXh0IHk9Jy45ZW0nIGZvbnQtc2l6ZT0nOTAnIGZvbnQtd2VpZ2h0PSdib2xkJyBmaWxsPSd3aGl0ZScgZm9udC1mYW1pbHk9J3N5c3RlbS11aSc+8J+QuzwvdGV4dD48L3N2Zz4iLCAic2l6ZXMiOiAiYW55IiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9XX0=">
+</head>
+<body>
+<div class="app-shell">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="flex items-center gap-3">
+    <button class="btn btn-ghost mobile-menu-btn" id="menuToggle"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"></svg></button>
+    <a href="#" class="logo">
+      <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="16" fill="currentColor" opacity="0.12"/>
+        <path d="M18 6C12 12 8 16 8 20c0 5 4.5 8 10 8s10-3 10-8c0-4-4-8-10-14z" fill="var(--color-primary)" opacity="0.9"/>
+        <circle cx="18" cy="20" r="4" fill="var(--color-surface)"/>
+        <path d="M14 10Q18 6 22 10" stroke="var(--color-surface)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">wheredidmymoneygo</span>
+    </a>
+  </div>
+  <div class="topbar-actions">
+    <input type="text" id="username-input" placeholder="Your name" value="Mandy" maxlength="20" style="padding:6px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);width:140px;" onchange="updateUsername()" onkeyup="if(event.key==='Enter') updateUsername()">
+    <button class="btn btn-ghost btn-sm" onclick="openFxModal()">💱 FX Rates</button>
+    <button class="btn btn-primary" onclick="openAddModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
+    <button class="theme-toggle" data-theme-toggle><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></svg></button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <p class="sidebar-label">Navigation</p>
+  <div class="nav-item active" onclick="showPage('overview')" data-page="overview"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"></svg>Overview</div>
+  <div class="nav-divider"></div>
+  <p class="sidebar-label">Trips</p>
+  <div class="nav-item-wrap"><div class="nav-item" onclick="showPage('vietnam')" data-page="vietnam"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>🇻🇳 Vietnam<span class="nav-badge" id="badge-vietnam">7</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('vietnam')" title="Delete trip">✕</button></div>
+  <div class="nav-item-wrap"><div class="nav-item" onclick="showPage('australia')" data-page="australia"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>🇦🇺 Australia<span class="nav-badge" id="badge-australia">12</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('australia')" title="Delete trip">✕</button></div>
+  <div class="nav-item-wrap"><div class="nav-item" onclick="showPage('korea')" data-page="korea"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>🇰🇷 Korea<span class="nav-badge" id="badge-korea">2</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('korea')" title="Delete trip">✕</button></div>
+  <div class="nav-divider"></div>
+  <div style="padding:0 var(--space-6)"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openAddTripModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Trip</button></div>
+  <div class="nav-divider"></div>
+  <p class="sidebar-label">Tools</p>
+  <div class="nav-item" onclick="showPage('settlement')" data-page="settlement"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
+</nav>
+
+<!-- MAIN -->
+<main class="main-content">
+  <div class="page active" id="page-overview">
+    <div class="page-header"><h1 class="page-title">Your Trips ✈️</h1><p class="page-subtitle">All your travels in one place</p></div>
+    <div id="overview-fx-banner"></div>
+    <div class="kpi-grid" id="overview-kpis"></div>
+    <div class="trips-overview" id="trips-overview-cards"></div>
+  </div>
+
+  <div class="page" id="page-vietnam">
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">🇻🇳 Vietnam</h1><p class="page-subtitle" id="vn-subtitle"></p></div>
+      <button class="btn btn-primary" onclick="openAddModal('vietnam')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
+    </div>
+    <div id="vn-fx-banner"></div>
+    <div class="kpi-grid" id="vn-kpis"></div>
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterTable('vietnam','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
+      <select class="filter-select" onchange="filterTable('vietnam','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
+    </div>
+    <div class="table-wrap" id="vn-table-wrap"></div>
+  </div>
+
+  <div class="page" id="page-australia">
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">🇦🇺 Australia</h1><p class="page-subtitle" id="au-subtitle"></p></div>
+      <button class="btn btn-primary" onclick="openAddModal('australia')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
+    </div>
+    <div id="au-fx-banner"></div>
+    <div class="kpi-grid" id="au-kpis"></div>
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterTable('australia','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
+      <select class="filter-select" onchange="filterTable('australia','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
+    </div>
+    <div class="table-wrap" id="au-table-wrap"></div>
+  </div>
+
+  <div class="page" id="page-korea">
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">🇰🇷 Korea</h1><p class="page-subtitle" id="kr-subtitle"></p></div>
+      <button class="btn btn-primary" onclick="openAddModal('korea')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
+    </div>
+    <div id="kr-fx-banner"></div>
+    <div class="kpi-grid" id="kr-kpis"></div>
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterTable('korea','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
+      <select class="filter-select" onchange="filterTable('korea','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
+    </div>
+    <div class="table-wrap" id="kr-table-wrap"></div>
+  </div>
+
+  <div class="page" id="page-settlement">
+    <div class="page-header"><h1 class="page-title">💸 Settlement</h1><p class="page-subtitle">Who owes what across all trips</p></div>
+    <div id="settlement-content"></div>
+  </div>
+</main>
+</div>
+
+
+<!-- DELETE TRIP MODAL -->
+<div class="modal-backdrop" id="del-trip-modal" onclick="if(event.target===this)closeDelTripModal()">
+  <div class="modal sm">
+    <h2 class="modal-title">🗑 Delete Trip</h2>
+    <p class="text-sm text-muted mb-4">Are you sure you want to delete the <strong id="del-trip-name"></strong> trip and all its expenses? This cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeDelTripModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeDeleteTrip()" id="del-trip-confirm-btn">Yes, Delete Trip</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TRIP MODAL -->
+<div class="modal-backdrop" id="add-trip-modal" onclick="if(event.target===this)closeAddTripModal()">
+  <div class="modal sm">
+    <h2 class="modal-title">✈️ Add New Trip</h2>
+    <form onsubmit="saveNewTrip(event)">
+      <div class="form-grid">
+        <div class="form-group full" style="position:relative">
+          <label class="form-label">Country</label>
+          <div style="display:flex;gap:var(--space-2);align-items:center">
+            <span id="nt-flag-preview" style="font-size:1.8rem;line-height:1;min-width:36px;text-align:center">🌍</span>
+            <input class="form-input" type="text" id="nt-name" placeholder="e.g. Japan" required autocomplete="off" oninput="onCountryInput(this.value)" onkeydown="onCountryKey(event)" style="flex:1">
+          </div>
+          <div id="nt-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--color-surface);border:1.5px solid var(--color-primary);border-radius:var(--radius-md);box-shadow:var(--shadow-md);z-index:200;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
+        </div>
+        <div class="form-group full"><label class="form-label">Date Range</label><input class="form-input" type="text" id="nt-dates" placeholder="e.g. Jul 1–10, 2026"></div>
+        <div class="form-group full"><label class="form-label">Travellers (comma-separated)</label><input class="form-input" type="text" id="nt-people" placeholder="e.g. Mandy, Wei Long" required></div>
+        <div class="form-group"><label class="form-label">Card Colour</label>
+          <select class="form-select" id="nt-colour">
+            <optgroup label="Bold">
+              <option value="vietnam">🔴 Warm Red</option>
+              <option value="australia">🔵 Ocean Blue</option>
+              <option value="korea">🟣 Deep Pink</option>
+              <option value="custom-green">🟢 Forest Green</option>
+              <option value="custom-gold">🟡 Sunset Gold</option>
+            </optgroup>
+            <optgroup label="Pastel">
+              <option value="pastel-rose">🌸 Pastel Rose</option>
+              <option value="pastel-peach">🍑 Pastel Peach</option>
+              <option value="pastel-mint">🌿 Pastel Mint</option>
+              <option value="pastel-sky">🩵 Pastel Sky</option>
+              <option value="pastel-lavender">💜 Pastel Lavender</option>
+              <option value="pastel-lemon">🍋 Pastel Lemon</option>
+              <option value="pastel-lilac">🪻 Pastel Lilac</option>
+              <option value="pastel-sage">🌱 Pastel Sage</option>
+              <option value="pastel-blush">🌷 Pastel Blush</option>
+              <option value="pastel-powder">🫐 Pastel Powder Blue</option>
+              <option value="pastel-butter">🧈 Pastel Butter</option>
+              <option value="pastel-coral">🪸 Pastel Coral</option>
+            </optgroup>
+          </select></div>
+        <div class="form-group"><label class="form-label">Default Currency</label>
+          <select class="form-select" id="nt-currency">
+            <optgroup label="Asia Pacific">
+              <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
+              <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
+              <option value="NZD">🇳🇿 NZD – New Zealand Dollar</option>
+              <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
+              <option value="KRW">🇰🇷 KRW – Korean Won</option>
+              <option value="CNY">🇨🇳 CNY – Chinese Yuan</option>
+              <option value="HKD">🇭🇰 HKD – Hong Kong Dollar</option>
+              <option value="TWD">🇹🇼 TWD – New Taiwan Dollar</option>
+              <option value="THB">🇹🇭 THB – Thai Baht</option>
+              <option value="MYR">🇲🇾 MYR – Malaysian Ringgit</option>
+              <option value="IDR">🇮🇩 IDR – Indonesian Rupiah</option>
+              <option value="PHP">🇵🇭 PHP – Philippine Peso</option>
+              <option value="VND">🇻🇳 VND – Vietnamese Dong</option>
+              <option value="INR">🇮🇳 INR – Indian Rupee</option>
+              <option value="BDT">🇧🇩 BDT – Bangladeshi Taka</option>
+              <option value="LKR">🇱🇰 LKR – Sri Lankan Rupee</option>
+              <option value="PKR">🇵🇰 PKR – Pakistani Rupee</option>
+              <option value="MMK">🇲🇲 MMK – Myanmar Kyat</option>
+              <option value="KHR">🇰🇭 KHR – Cambodian Riel</option>
+              <option value="LAK">🇱🇦 LAK – Lao Kip</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="USD">🇺🇸 USD – US Dollar</option>
+              <option value="CAD">🇨🇦 CAD – Canadian Dollar</option>
+              <option value="BRL">🇧🇷 BRL – Brazilian Real</option>
+              <option value="MXN">🇲🇽 MXN – Mexican Peso</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="EUR">🇪🇺 EUR – Euro</option>
+              <option value="GBP">🇬🇧 GBP – British Pound</option>
+              <option value="CHF">🇨🇭 CHF – Swiss Franc</option>
+              <option value="SEK">🇸🇪 SEK – Swedish Krona</option>
+              <option value="NOK">🇳🇴 NOK – Norwegian Krone</option>
+              <option value="DKK">🇩🇰 DKK – Danish Krone</option>
+              <option value="TRY">🇹🇷 TRY – Turkish Lira</option>
+            </optgroup>
+            <optgroup label="Middle East & Africa">
+              <option value="AED">🇦🇪 AED – UAE Dirham</option>
+              <option value="SAR">🇸🇦 SAR – Saudi Riyal</option>
+              <option value="QAR">🇶🇦 QAR – Qatari Riyal</option>
+              <option value="EGP">🇪🇬 EGP – Egyptian Pound</option>
+              <option value="ZAR">🇿🇦 ZAR – South African Rand</option>
+            </optgroup>
+          </select></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeAddTripModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Trip</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-title">Add Expense</h2>
+    <form onsubmit="saveExpense(event)">
+      <div id="lock-note" style="display:none;padding:var(--space-3) var(--space-4);background:var(--color-warning-bg);border:1px solid var(--color-warning);border-radius:var(--radius-md);margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-warning);font-weight:600;">
+        🔒 This transaction is locked. Amount and currency cannot be edited. Unlock it first from the table to make changes.
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">From Date</label><input class="form-input" type="date" id="f-from" required></div>
+        <div class="form-group"><label class="form-label">To Date</label><input class="form-input" type="date" id="f-to"></div>
+        <div class="form-group"><label class="form-label">Type</label>
+          <select class="form-select" id="f-type" required>
+            <option value="Hotel">🏨 Hotel</option><option value="Flight">✈️ Flight</option>
+            <option value="Car/Fuel">🚗 Car/Fuel</option><option value="Food">🍜 Food</option><option value="Misc">📦 Misc</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Trip</label>
+          <select class="form-select" id="f-trip" required onchange="updateExpenseModalPeople()">
+          </select></div>
+        <div class="form-group full"><label class="form-label">Location / Property</label><input class="form-input" type="text" id="f-location"></div>
+        <div class="form-group"><label class="form-label">Amount (original currency)</label><input class="form-input" type="number" id="f-cost" step="0.01" min="0" required oninput="autoCalcSGD()"></div>
+        <div class="form-group"><label class="form-label">Currency</label>
+          <select class="form-select" id="f-currency" onchange="autoCalcSGD()">
+            <optgroup label="Asia Pacific">
+              <option value="SGD">🇸🇬 SGD</option>
+              <option value="AUD">🇦🇺 AUD</option>
+              <option value="NZD">🇳🇿 NZD</option>
+              <option value="JPY">🇯🇵 JPY</option>
+              <option value="KRW">🇰🇷 KRW</option>
+              <option value="CNY">🇨🇳 CNY</option>
+              <option value="HKD">🇭🇰 HKD</option>
+              <option value="TWD">🇹🇼 TWD</option>
+              <option value="THB">🇹🇭 THB</option>
+              <option value="MYR">🇲🇾 MYR</option>
+              <option value="IDR">🇮🇩 IDR</option>
+              <option value="PHP">🇵🇭 PHP</option>
+              <option value="VND">🇻🇳 VND</option>
+              <option value="INR">🇮🇳 INR</option>
+              <option value="BDT">🇧🇩 BDT</option>
+              <option value="LKR">🇱🇰 LKR</option>
+              <option value="PKR">🇵🇰 PKR</option>
+              <option value="MMK">🇲🇲 MMK</option>
+              <option value="KHR">🇰🇭 KHR</option>
+              <option value="LAK">🇱🇦 LAK</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="USD">🇺🇸 USD</option>
+              <option value="CAD">🇨🇦 CAD</option>
+              <option value="BRL">🇧🇷 BRL</option>
+              <option value="MXN">🇲🇽 MXN</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="EUR">🇪🇺 EUR</option>
+              <option value="GBP">🇬🇧 GBP</option>
+              <option value="CHF">🇨🇭 CHF</option>
+              <option value="SEK">🇸🇪 SEK</option>
+              <option value="NOK">🇳🇴 NOK</option>
+              <option value="DKK">🇩🇰 DKK</option>
+              <option value="TRY">🇹🇷 TRY</option>
+            </optgroup>
+            <optgroup label="Middle East & Africa">
+              <option value="AED">🇦🇪 AED</option>
+              <option value="SAR">🇸🇦 SAR</option>
+              <option value="QAR">🇶🇦 QAR</option>
+              <option value="EGP">🇪🇬 EGP</option>
+              <option value="ZAR">🇿🇦 ZAR</option>
+            </optgroup>
+          </select></div>
+        <div class="form-group full">
+          <label class="form-label">In SGD <span id="fx-hint" style="font-weight:400;color:var(--color-blue);font-size:var(--text-xs)"></span></label>
+          <input class="form-input" type="number" id="f-sgd" step="0.01" min="0" required style="background:var(--color-primary-highlight)">
+        </div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-select" id="f-status"><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
+        <div class="form-group"><label class="form-label">Paid by</label>
+          <select class="form-select" id="f-paidby"></select></div>
+        <div class="form-group"><label class="form-label">Split?</label>
+          <select class="form-select" id="f-split"><option value="YES">Yes</option><option value="NO">No</option></select></div>
+        <div class="form-group"><label class="form-label">For Whom</label>
+          <select class="form-select" id="f-forwhom"></select></div>
+        <div class="form-group"><label class="form-label">Platform</label>
+          <select class="form-select" id="f-platform"><option>AGODA</option><option>SCOOT</option><option>TRIP.COM</option><option>Misc</option></select></div>
+        <div class="form-group"><label class="form-label">Booking Code</label><input class="form-input" type="text" id="f-code"></div>
+        <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="f-notes"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="modal-submit-btn">Save Expense</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- FX MODAL -->
+<div class="modal-backdrop" id="fx-modal" onclick="if(event.target===this)closeFxModal()">
+  <div class="modal sm">
+    <h2 class="modal-title">💱 Exchange Rates → SGD</h2>
+    <p class="text-sm text-muted mb-4">Source: OFX / AlaChand mid-market, May 2026. Edit any rate and click Apply to recalculate all amounts instantly.</p>
+    <div id="fx-rows"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
+      <button class="btn btn-primary" onclick="applyFx()">Apply & Recalculate</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== STORAGE =====================
+function saveTripsToStorage(){
+  localStorage.setItem('tripsData', JSON.stringify(trips));
+}
+
+function loadTripsFromStorage(){
+  const stored = localStorage.getItem('tripsData');
+  if(stored){
+    try {
+      trips = JSON.parse(stored);
+    } catch(e) {
+      console.error('Failed to load trips from storage', e);
+    }
+  }
+}
+
+// ===================== FX RATES =====================
+// Sources: AlaChand May 6 2026 (AUD), OFX May 14 2026 (KRW), OFX May 12 2026 (VND)
+const DEFAULT_FX = {
+  SGD:1.0,
+  AUD:0.9217,    USD:1.35,      JPY:0.00924,   EUR:1.52,
+  GBP:1.80,      THB:0.0401,    MYR:0.303,     IDR:0.0000822,
+  PHP:0.0238,    TWD:0.0444,    HKD:0.173,     KRW:0.000858,
+  VND:0.0000484, CNY:0.186,     INR:0.0160,    NZD:0.830,
+  CAD:0.985,     CHF:1.495,     SEK:0.0704,    NOK:0.0676,
+  DKK:0.204,     BRL:0.182,     MXN:0.0500,    TRY:0.0293,
+  ZAR:0.0540,    EGP:0.0205,    AED:0.368,     SAR:0.360,
+  QAR:0.371,     BDT:0.00912,   PKR:0.00360,   LKR:0.00333,
+  MMK:0.000353,  KHR:0.000245,  LAK:0.0000362,
+};
+const FX_META = {
+  AUD:{ flag:'🇦🇺', name:'Australian Dollar',    note:'1 SGD = 1.085 AUD · May 2026' },
+  KRW:{ flag:'🇰🇷', name:'Korean Won',           note:'1 SGD = 1,164.95 KRW · May 2026' },
+  VND:{ flag:'🇻🇳', name:'Vietnamese Dong',      note:'1 SGD = 20,652 VND · May 2026' },
+  USD:{ flag:'🇺🇸', name:'US Dollar',             note:'Market reference rate · May 2026' },
+  JPY:{ flag:'🇯🇵', name:'Japanese Yen',          note:'1 SGD = 108.2 JPY · May 2026' },
+  EUR:{ flag:'🇪🇺', name:'Euro',                  note:'1 SGD = 0.658 EUR · May 2026' },
+  GBP:{ flag:'🇬🇧', name:'British Pound',         note:'1 SGD = 0.556 GBP · May 2026' },
+  THB:{ flag:'🇹🇭', name:'Thai Baht',             note:'1 SGD = 24.9 THB · May 2026' },
+  MYR:{ flag:'🇲🇾', name:'Malaysian Ringgit',     note:'1 SGD = 3.30 MYR · May 2026' },
+  IDR:{ flag:'🇮🇩', name:'Indonesian Rupiah',     note:'1 SGD = 12,165 IDR · May 2026' },
+  PHP:{ flag:'🇵🇭', name:'Philippine Peso',       note:'1 SGD = 42.0 PHP · May 2026' },
+  TWD:{ flag:'🇹🇼', name:'New Taiwan Dollar',     note:'1 SGD = 22.5 TWD · May 2026' },
+  HKD:{ flag:'🇭🇰', name:'Hong Kong Dollar',      note:'1 SGD = 5.78 HKD · May 2026' },
+  CNY:{ flag:'🇨🇳', name:'Chinese Yuan',          note:'1 SGD = 5.38 CNY · May 2026' },
+  INR:{ flag:'🇮🇳', name:'Indian Rupee',          note:'1 SGD = 62.5 INR · May 2026' },
+  NZD:{ flag:'🇳🇿', name:'New Zealand Dollar',    note:'1 SGD = 1.205 NZD · May 2026' },
+  CAD:{ flag:'🇨🇦', name:'Canadian Dollar',       note:'1 SGD = 1.015 CAD · May 2026' },
+  CHF:{ flag:'🇨🇭', name:'Swiss Franc',           note:'1 SGD = 0.669 CHF · May 2026' },
+  SEK:{ flag:'🇸🇪', name:'Swedish Krona',         note:'1 SGD = 14.2 SEK · May 2026' },
+  NOK:{ flag:'🇳🇴', name:'Norwegian Krone',       note:'1 SGD = 14.8 NOK · May 2026' },
+  DKK:{ flag:'🇩🇰', name:'Danish Krone',          note:'1 SGD = 9.0 DKK · May 2026' },
+  BRL:{ flag:'🇧🇷', name:'Brazilian Real',        note:'1 SGD = 7.4 BRL · May 2026' },
+  MXN:{ flag:'🇲🇽', name:'Mexican Peso',          note:'1 SGD = 27.0 MXN · May 2026' },
+  TRY:{ flag:'🇹🇷', name:'Turkish Lira',          note:'1 SGD = 46.0 TRY · May 2026' },
+  ZAR:{ flag:'🇿🇦', name:'South African Rand',    note:'1 SGD = 24.8 ZAR · May 2026' },
+  EGP:{ flag:'🇪🇬', name:'Egyptian Pound',        note:'1 SGD = 66.0 EGP · May 2026' },
+  AED:{ flag:'🇦🇪', name:'UAE Dirham',            note:'1 SGD = 4.96 AED · May 2026' },
+  SAR:{ flag:'🇸🇦', name:'Saudi Riyal',           note:'1 SGD = 5.06 SAR · May 2026' },
+  QAR:{ flag:'🇶🇦', name:'Qatari Riyal',          note:'1 SGD = 4.91 QAR · May 2026' },
+  BDT:{ flag:'🇧🇩', name:'Bangladeshi Taka',      note:'1 SGD = 148 BDT · May 2026' },
+  PKR:{ flag:'🇵🇰', name:'Pakistani Rupee',       note:'1 SGD = 375 PKR · May 2026' },
+  LKR:{ flag:'🇱🇰', name:'Sri Lankan Rupee',      note:'1 SGD = 405 LKR · May 2026' },
+  MMK:{ flag:'🇲🇲', name:'Myanmar Kyat',          note:'1 SGD = 2835 MMK · May 2026' },
+  KHR:{ flag:'🇰🇭', name:'Cambodian Riel',        note:'1 SGD = 5500 KHR · May 2026' },
+  LAK:{ flag:'🇱🇦', name:'Lao Kip',               note:'1 SGD = 27600 LAK · May 2026' },
+};
+let fx = { ...DEFAULT_FX };
+
+function toSGD(cost, cur) { return Number(cost) * (fx[cur] || 1); }
+
+// ===================== TRIP DATA =====================
+let trips = {
+  vietnam:{
+    name:'Vietnam', flag:'🇻🇳', style:'vietnam', dates:'May 18–24, 2026', people:['Mandy','Wei Long'],
+    expenses:[
+      {id:1,from:'2026-05-18',to:'2026-05-18',type:'Flight',location:'Terminal 4 - Singapore-Changi',cost:165.32,cur:'SGD',status:'Paid',split:'NO',forWhom:'Wei Long',paidBy:'Mandy',code:'7YTGCR',platform:'AGODA',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'VJ970'},
+      {id:2,from:'2026-05-18',to:'2026-05-21',type:'Hotel',location:'Golden Lotus Hotel Da Nang',cost:230.56,cur:'SGD',status:'Paid',split:'NO',forWhom:'Wei Long',paidBy:'Mandy',code:'2010915724',platform:'AGODA',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'Check in 2pm, Check out 12pm'},
+      {id:3,from:'2026-05-21',to:'2026-05-21',type:'Flight',location:'Da Nang Airport',cost:70,cur:'SGD',status:'Paid',split:'NO',forWhom:'Wei Long',paidBy:'Mandy',code:'E5YFTO',platform:'AGODA',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'QH173'},
+      {id:4,from:'2026-05-21',to:'2026-05-21',type:'Flight',location:'Changi Airport Terminal 3',cost:174.88,cur:'SGD',status:'Paid',split:'NO',forWhom:'Mandy',paidBy:'Mandy',code:'E5KYVO',platform:'AGODA',paidBack:{Mandy:'','Wei Long':''},notes:'VN656'},
+      {id:5,from:'2026-05-21',to:'2026-05-24',type:'Hotel',location:'M Village Hotel Tôn Thất Đạm',cost:298.43,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2010919781',platform:'AGODA',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'Check in 2pm, Check out 12pm'},
+      {id:6,from:'2026-05-24',to:'2026-05-24',type:'Flight',location:'Tan Son Nhat Airport (SGN)',cost:157.87,cur:'SGD',status:'Paid',split:'NO',forWhom:'Mandy',paidBy:'Mandy',code:'KB85PJ',platform:'AGODA',paidBack:{Mandy:'','Wei Long':''},notes:'TR517'},
+      {id:7,from:'2026-05-24',to:'2026-05-24',type:'Flight',location:'Tan Son Nhat Airport (SGN)',cost:154.78,cur:'SGD',status:'Paid',split:'NO',forWhom:'Wei Long',paidBy:'Mandy',code:'WCZ4PJ',platform:'AGODA',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'TR517'}
+    ]
+  },
+  australia:{
+    name:'Australia', flag:'🇦🇺', style:'australia', dates:'Jun 6–18, 2026', people:['Mandy','Wei Long'],
+    expenses:[
+      {id:20,from:'2026-06-06',to:'2026-06-07',type:'Hotel',location:'Hotel Bondi',cost:184.37,cur:'AUD',status:'Unpaid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002681306',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pay on 3rd June'},
+      {id:21,from:'2026-06-07',to:'2026-06-08',type:'Hotel',location:'Holiday Inn Express Newcastle by IHG',cost:129.64,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002328576',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Non-refundable'},
+      {id:22,from:'2026-06-08',to:'2026-06-09',type:'Hotel',location:'Sails Port Macquarie by Rydges',cost:184.48,cur:'AUD',status:'Unpaid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002320922',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pay on 5th June'},
+      {id:23,from:'2026-06-09',to:'2026-06-10',type:'Hotel',location:'Surf Beach Motel',cost:140.25,cur:'AUD',status:'Unpaid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002667109',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pay on 5th June'},
+      {id:24,from:'2026-06-10',to:'2026-06-12',type:'Hotel',location:'Byron Bayside Central Studio Apartments',cost:322.56,cur:'AUD',status:'Unpaid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2011036313',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pay at property'},
+      {id:25,from:'2026-06-12',to:'2026-06-15',type:'Hotel',location:'Novotel Surfers Paradise',cost:484.64,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002325821',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Non-refundable'},
+      {id:26,from:'2026-06-15',to:'2026-06-16',type:'Hotel',location:'Yamba Central',cost:151.2,cur:'AUD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002327480',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Non-refundable'},
+      {id:27,from:'2026-06-16',to:'2026-06-17',type:'Hotel',location:'Ingenia Holidays One Mile Beach',cost:130.15,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002322201',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Refundable till 12th June'},
+      {id:28,from:'2026-06-17',to:'2026-06-18',type:'Hotel',location:'Little Drifter Bondi Beach',cost:138.22,cur:'AUD',status:'Unpaid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'2002671038',platform:'AGODA',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pay on 13th June'},
+      {id:29,from:'2026-06-06',to:'2026-06-06',type:'Flight',location:'Changi Airport (SIN)',cost:748.68,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'L8CEYS',platform:'SCOOT',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'Departure 2.10am'},
+      {id:30,from:'2026-06-18',to:'2026-06-19',type:'Flight',location:'SYD Terminal 1',cost:1089.14,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'L8CEYS',platform:'SCOOT',paidBack:{Mandy:'Paid Back','Wei Long':''},notes:'Departure 8.35pm'},
+      {id:31,from:'2026-06-06',to:'2026-06-18',type:'Car/Fuel',location:'Bargain Car Rentals Sydney Airport',cost:475.31,cur:'SGD',status:'Paid',split:'YES',forWhom:'Both',paidBy:'Mandy',code:'1578946968811167',platform:'TRIP.COM',paidBack:{Mandy:'Not Yet','Wei Long':''},notes:'Pick up 1pm, return by 5.30pm'}
+    ]
+  },
+  korea:{
+    name:'Korea', flag:'🇰🇷', style:'korea', dates:'Jun 24–Aug 11, 2026', people:['Mandy','Chloris','Germaine'],
+    expenses:[
+      {id:40,from:'2026-06-24',to:'2026-08-11',type:'Hotel',location:'Korea Accommodation',cost:4630,cur:'SGD',status:'Paid',split:'YES',forWhom:'All',paidBy:'Mandy',code:'',platform:'Misc',paidBack:{Mandy:'Paid Back',Chloris:'',Germaine:''},notes:''},
+      {id:41,from:'',to:'',type:'Misc',location:'',cost:500,cur:'SGD',status:'Paid',split:'YES',forWhom:'All',paidBy:'Mandy',code:'',platform:'',paidBack:{Mandy:'',Chloris:'Not Yet',Germaine:'Not Yet'},notes:''}
+    ]
+  }
+};
+let nextId=100, editingId=null, editingTrip=null;
+let activeFilters={vietnam:{},australia:{},korea:{}};
+const AVATARS={'Mandy':{color:'#c0622a',i:'M'},'Wei Long':{color:'#2e6fa3',i:'WL'},'Chloris':{color:'#b82a6a',i:'C'},'Germaine':{color:'#4a7c3f',i:'G'}};
+
+// Load saved trips from localStorage (overrides hardcoded defaults)
+loadTripsFromStorage();
+
+// ===================== COMPUTED =====================
+function getSplitPeople(e, people) {
+  if(!e.forWhom || e.forWhom==='Both' || e.forWhom==='All') return people;
+  // Support comma-separated subsets e.g. "Mandy, Chloris"
+  if(e.forWhom.includes(',')) {
+    const names = e.forWhom.split(',').map(s=>s.trim()).filter(s=>people.includes(s));
+    return names.length ? names : people;
+  }
+  return people.includes(e.forWhom) ? [e.forWhom] : [];
+}
+function personCost(e, person, people) {
+  const sgd=toSGD(e.cost,e.cur);
+  const sp=getSplitPeople(e,people);
+  if(!sp.includes(person)) return 0;
+  return e.split==='YES'?sgd/sp.length:sgd;
+}
+function personUnpaid(e, person, people) {
+  // "Unpaid to person" = what others still owe this person (person must be the payer)
+  if(e.paidBy !== person) return 0;
+  const sp = getSplitPeople(e, people);
+  const sgd = toSGD(e.cost, e.cur);
+  const sharePerPerson = e.split === 'YES' ? sgd / sp.length : sgd;
+  let owed = 0;
+  sp.forEach(p => {
+    if(p === person) return; // payer doesn't owe themselves
+    // Check if this co-traveller has paid back TO the payer (person)
+    const pb = (e.paidBack || {})[p];
+    if(pb !== 'Paid Back') owed += sharePerPerson;
+  });
+  return owed;
+}
+
+// ===================== HELPERS =====================
+function fmt(n){if(!n&&n!==0)return'—';return'S$'+Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function fmtN(n){return Number(n).toFixed(2);}
+function eIcon(t){const m={Hotel:'🏨',Flight:'✈️','Car/Fuel':'🚗',Food:'🍜',Misc:'📦'};const c={Hotel:'hotel',Flight:'flight','Car/Fuel':'car',Food:'food',Misc:'misc'};return`<span class="expense-icon ${c[t]||'misc'}">${m[t]||'📦'}</span>`;}
+function sBadge(s){if(s==='Paid')return`<span class="badge badge-success">✓ Paid</span>`;if(s==='Unpaid')return`<span class="badge badge-warning">⏳ Unpaid</span>`;return`<span class="badge badge-neutral">${s}</span>`;}
+function pbBadge(s){if(!s)return`<span class="badge badge-neutral">—</span>`;if(s==='Paid Back')return`<span class="badge badge-success">✓ Paid Back</span>`;if(s==='Not Yet')return`<span class="badge badge-error">⏳ Not Yet</span>`;return`<span class="badge badge-neutral">${s}</span>`;}
+
+function pbDropdown(tripKey, expId, person, currentVal) {
+  const val = currentVal || '';
+  const opts = [
+    {v:'', label:'—'},
+    {v:'Not Yet', label:'⏳ Not Yet'},
+    {v:'Paid Back', label:'✓ Paid Back'},
+  ];
+  const optHTML = opts.map(o => `<option value="${o.v}" ${val===o.v?'selected':''}>${o.label}</option>`).join('');
+  const colorClass = val==='Paid Back' ? 'pb-select paid' : val==='Not Yet' ? 'pb-select notyet' : 'pb-select neutral';
+  return `<select class="${colorClass}" onchange="updatePaidBack('${tripKey}',${expId},'${person}',this.value)">${optHTML}</select>`;
+}
+
+function updatePaidBack(tripKey, expId, person, newVal) {
+  const trip = trips[tripKey];
+  if(!trip) return;
+  const e = trip.expenses.find(x => x.id === expId);
+  if(!e) return;
+  if(!e.paidBack) e.paidBack = {};
+  e.paidBack[person] = newVal;
+  saveTripsToStorage();
+  renderTable(tripKey);
+  updateTripKpis(tripKey);
+  // Also refresh settlement and overview if they are visible
+  if(document.getElementById('page-settlement').classList.contains('active')) renderSettlement();
+  if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
+}
+
+function updateTripKpis(k) {
+  const trip = trips[k];
+  if(!trip) return;
+  const prefixMap={vietnam:'vn',australia:'au',korea:'kr'};
+  const prefix = prefixMap[k] || k;
+  const tSGD = trip.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+  const uCount = trip.expenses.filter(e=>e.status==='Unpaid').length;
+  const tUnpaid = trip.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,trip.people),0);
+  const kpiEl = document.getElementById(prefix+'-kpis');
+  if(kpiEl) kpiEl.innerHTML = `
+    <div class="kpi-card"><div class="kpi-label">Total (SGD)</div><div class="kpi-value accent">${fmt(tSGD)}</div><div class="kpi-sub">At current FX rates</div></div>
+    <div class="kpi-card"><div class="kpi-label">Bookings</div><div class="kpi-value">${trip.expenses.length}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Unpaid Items</div><div class="kpi-value warning">${uCount}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Owed to ${currentUsername}</div><div class="kpi-value" style="color:var(--color-warning)">${fmt(tUnpaid)}</div></div>`;
+}
+function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'2-digit'});}
+
+// ===================== FX BANNER =====================
+function fxBanner(){
+  const chips=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
+    const m=FX_META[c]||{flag:''};
+    const d=r<0.01?r.toFixed(6):r.toFixed(4);
+    return`<span class="fx-chip">${m.flag} 1 ${c} = ${d} SGD</span>`;
+  }).join('');
+  return`<div class="fx-banner"><span class="fx-banner-label">💱 FX Rates</span>${chips}<span class="fx-date">May 2026 · OFX/AlaChand</span><button class="fx-edit-btn" onclick="openFxModal()">✏️ Edit</button></div>`;
+}
+
+// ===================== NAVIGATION =====================
+function showPage(k){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+k).classList.add('active');
+  document.querySelector(`[data-page="${k}"]`).classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+  if(k==='overview') renderOverview();
+  else if(k==='settlement') renderSettlement();
+  else renderTrip(k);
+}
+
+// ===================== USERNAME =====================
+let currentUsername = 'Mandy';
+function updateUsername(){
+  const input = document.getElementById('username-input');
+  currentUsername = input.value.trim() || 'Mandy';
+  input.value = currentUsername;
+  localStorage.setItem('currentUsername', currentUsername);
+  const activePage = document.querySelector('.page.active');
+  if(activePage.id === 'page-overview') renderOverview();
+  else {
+    const pageMatch = activePage.id.match(/page-(.+)/);
+    if(pageMatch) renderTrip(pageMatch[1]);
+  }
+}
+if(localStorage.getItem('currentUsername')) {
+  currentUsername = localStorage.getItem('currentUsername');
+  setTimeout(() => document.getElementById('username-input').value = currentUsername, 100);
+}
+
+// ===================== OVERVIEW =====================
+
+function kpiFont(val){
+  var len=(val||'').toString().length;
+  if(len<=4)  return '2rem';
+  if(len<=6)  return '1.6rem';
+  if(len<=8)  return '1.35rem';
+  if(len<=10) return '1.1rem';
+  return '0.95rem';
+}
+function kpiDiv(label,val,cls,sub){
+  var s=kpiFont(val);
+  var c=cls?' '+cls:'';
+  var subHtml=sub?'<div class="kpi-sub">'+sub+'</div>':'';
+  return '<div class="kpi-card"><div class="kpi-label">'+label+'</div><div class="kpi-value'+c+'" style="font-size:'+s+'">'+val+'</div>'+subHtml+'</div>';
+}
+function renderOverview(){
+  let tSGD=0,tExp=0,tUnpaid=0;
+  Object.entries(trips).forEach(([k,trip])=>{
+    trip.expenses.forEach(e=>{ tSGD+=toSGD(e.cost,e.cur); tExp++; tUnpaid+=personUnpaid(e,currentUsername,trip.people); });
+  });
+  document.getElementById('overview-fx-banner').innerHTML=fxBanner();
+  const tripCount = Object.keys(trips).length;
+  document.getElementById('overview-kpis').innerHTML=
+    kpiDiv('Total Trips',tripCount,'accent','')+
+    kpiDiv('Bookings',tExp,'','Across all trips')+
+    kpiDiv('Total Spent (SGD)',fmt(tSGD),'accent','At current FX rates')+
+    kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','Pending repayment');
+  document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).map(([k,t])=>{
+    const sgd=t.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+    const owed=t.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,t.people),0);
+    return`<div class="trip-overview-card" onclick="showPage('${k}')">
+      <div class="trip-card-header ${t.style}"><div class="trip-card-flag">${t.flag}</div><div class="trip-card-name">${t.name}</div><div class="trip-card-dates">${t.dates}</div></div>
+      <div class="trip-card-body">
+        <div class="trip-stat-row"><span class="trip-stat-label">Travellers</span><span class="trip-stat-value">${t.people.join(', ')}</span></div>
+        <div class="trip-stat-row"><span class="trip-stat-label">Bookings</span><span class="trip-stat-value">${t.expenses.length}</span></div>
+        <div class="trip-stat-row"><span class="trip-stat-label">Total (SGD)</span><span class="trip-stat-value">${fmt(sgd)}</span></div>
+        <div class="trip-stat-row"><span class="trip-stat-label">Owed to ${currentUsername}</span><span class="trip-stat-value" style="color:var(--color-warning)">${fmt(owed)}</span></div>
+      </div></div>`;
+  }).join('');
+  // icons inline
+}
+
+// ===================== TRIP =====================
+function renderTrip(k){
+  const trip=trips[k];
+  const prefixMap={vietnam:'vn',australia:'au',korea:'kr'};
+  const prefix=prefixMap[k]||k;
+  const tSGD=trip.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+  const uCount=trip.expenses.filter(e=>e.status==='Unpaid').length;
+  const tUnpaid=trip.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,trip.people),0);
+  const subtitleEl=document.getElementById(prefix+'-subtitle');
+  if(subtitleEl) subtitleEl.textContent=`${trip.dates} · ${trip.expenses.length} bookings`;
+  const fxEl=document.getElementById(prefix+'-fx-banner');
+  if(fxEl) fxEl.innerHTML=fxBanner();
+  const kpiEl=document.getElementById(prefix+'-kpis');
+  if(kpiEl) kpiEl.innerHTML=
+    kpiDiv('Total (SGD)',fmt(tSGD),'accent','At current FX rates')+
+    kpiDiv('Bookings',trip.expenses.length,'','')+
+    kpiDiv('Unpaid Items',uCount,'warning','')+
+    kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','');
+  renderTable(k);
+  const badge=document.getElementById('badge-'+k);
+  if(badge) badge.textContent=trip.expenses.length;
+}
+
+function renderTable(k){
+  const trip=trips[k]; const people=trip.people;
+  const prefixMap2={vietnam:'vn',australia:'au',korea:'kr'};
+  const prefix=prefixMap2[k]||k;
+  const flt=activeFilters[k]||{};
+  let data=[...trip.expenses];
+  if(flt.type) data=data.filter(e=>e.type===flt.type);
+  if(flt.status) data=data.filter(e=>e.status===flt.status);
+  if(!data.length){
+    document.getElementById(prefix+'-table-wrap').innerHTML=`<div style="padding:4rem;text-align:center;color:var(--color-text-muted)"><p style="font-size:2rem">🔍</p><p style="margin-top:1rem">No expenses match the current filters.</p></div>`;
+    return;
+  }
+  const costH=people.map(p=>`<th>Cost (${p})</th>`).join('');
+  const pbH=people.map(p=>`<th>${p} paid back?</th>`).join('');
+  const upH=people.map(p=>`<th>Unpaid to ${p}</th>`).join('');
+  const rows=data.map(e=>{
+    const sgd=toSGD(e.cost,e.cur);
+    const isFX=e.cur!=='SGD';
+    const rate=fx[e.cur]||1;
+    const lockClass = e.locked ? 'locked-cell' : '';
+    const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
+    const sgdCell=isFX
+      ?`<td class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
+      :`<td class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
+    const cVals=people.map(p=>`<td class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
+    const pbVals=people.map(p=>{ if(p===e.paidBy) return `<td><span class='badge badge-neutral'>Paid upfront</span></td>`; return `<td>${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`; }).join('');
+    const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
+    const costCellClass = e.locked ? 'locked-cell' : '';
+    return`<tr>
+      <td>${fmtDate(e.from)}</td><td>${fmtDate(e.to)}</td>
+      <td><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
+      <td><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
+      <td class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
+      ${sgdCell}
+      <td>${sBadge(e.status)}</td>
+      <td><span class="badge badge-neutral">${e.split||'—'}</span></td>
+      <td><span class="tag">${e.forWhom||'—'}</span></td>
+      <td>${e.paidBy||'—'}</td>
+      ${cVals}${pbVals}${uVals}
+      <td><span class="booking-code">${e.code||'—'}</span></td>
+      <td><span class="tag">${e.platform||'—'}</span></td>
+      <td style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
+      <td><div class="flex gap-2">
+        <button class="${e.locked?'lock-btn locked':'lock-btn'}" onclick="toggleLock('${k}',${e.id})" title="${e.locked?'Unlock transaction':'Lock transaction'}">${e.locked?'🔒':'🔓'}</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked?'disabled title="Unlock to edit"':''}>✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="delExp('${k}',${e.id})" ${e.locked?'disabled title="Unlock to delete"':''}>🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  const tSGD=data.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+  const tCost=people.map(p=>`<td class="tabular fw-700">${fmt(data.reduce((s,e)=>s+personCost(e,p,people),0))}</td>`).join('');
+  const tUp=people.map(p=>{const t=data.reduce((s,e)=>s+personUnpaid(e,p,people),0);return`<td class="tabular fw-700" style="color:${t>0?'var(--color-error)':'var(--color-text-muted)'}">${t>0?fmt(t):'—'}</td>`;}).join('');
+  document.getElementById(prefix+'-table-wrap').innerHTML=`<table>
+    <thead><tr><th>From</th><th>To</th><th>Type</th><th>Location</th><th>Cost</th><th>In SGD ↗</th><th>Status</th><th>Split</th><th>For</th><th>Paid by</th>${costH}${pbH}${upH}<th>Booking Code</th><th>Platform</th><th>Notes</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot>
+  <tr class="tfoot-row">
+    <td colspan="5" class="fw-700">TOTAL</td>
+    <td class="tabular fw-700" style="color:var(--color-primary)">${fmt(tSGD)}</td>
+    <td></td><td></td><td></td><td></td>
+    ${tCost}
+    ${people.map(()=>'<td></td>').join('')}
+    ${tUp}
+    <td></td><td></td><td></td><td></td>
+  </tr>
+</tfoot>
+  </table>`;
+  // icons inline
+}
+
+function filterTable(k,type,val){
+  if(!activeFilters[k]) activeFilters[k]={};
+  activeFilters[k][type]=val;
+  renderTable(k);
+}
+
+// ===================== SETTLEMENT =====================
+function renderSettlement(){
+  const tripSec=Object.entries(trips).map(([k,trip])=>{
+    const cards=trip.people.map(p=>{
+      const cost=trip.expenses.reduce((s,e)=>s+personCost(e,p,trip.people),0);
+      const paid=trip.expenses.filter(e=>e.paidBy===p).reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+      const owed=trip.expenses.reduce((s,e)=>s+personUnpaid(e,p,trip.people),0);
+      const av=AVATARS[p]||{color:'#888',i:p[0]};
+      return`<div class="settlement-card">
+        <div class="settlement-person"><div class="person-avatar" style="background:${av.color}">${av.i}</div>
+          <div><div class="person-name">${p}</div><div class="person-role">${trip.flag} ${trip.name}</div></div></div>
+        <div class="settlement-row"><span class="text-muted text-sm">My share</span><span class="settlement-amount">${fmt(cost)}</span></div>
+        <div class="settlement-row"><span class="text-muted text-sm">Paid upfront</span><span class="settlement-amount">${fmt(paid)}</span></div>
+        <div class="settlement-row"><span class="text-muted text-sm">Owed to ${p}</span><span class="settlement-amount ${owed>0?'amount-owed':'amount-clear'}">${owed>0?fmt(owed):'✓ Clear'}</span></div>
+      </div>`;
+    }).join('');
+    return`<h2 class="card-title mt-8 mb-4">${trip.flag} ${trip.name} Settlement</h2><div class="settlement-grid">${cards}</div>`;
+  }).join('');
+  // Build grand summary dynamically: for each payer, list what each co-traveller owes them
+  const payerOwed = {}; // payerOwed[payer][debtor] = total
+  Object.entries(trips).forEach(([k,trip])=>{
+    trip.expenses.forEach(e=>{
+      const payer = e.paidBy;
+      if(!payer) return;
+      if(!payerOwed[payer]) payerOwed[payer]={};
+      const sp = getSplitPeople(e, trip.people);
+      const sgd = toSGD(e.cost, e.cur);
+      const share = e.split==='YES' ? sgd/sp.length : sgd;
+      sp.forEach(p=>{
+        if(p===payer) return;
+        const pb = (e.paidBack||{})[p];
+        if(pb !== 'Paid Back'){
+          if(!payerOwed[payer][p]) payerOwed[payer][p]=0;
+          payerOwed[payer][p] += share;
+        }
+      });
+    });
+  });
+  const grandRows = Object.entries(payerOwed).map(([payer, debtors])=>{
+    const rows = Object.entries(debtors).map(([debtor, amt])=>{
+      return `<div class="settlement-row"><span class="fw-600">${debtor} → ${payer}</span><span class="settlement-amount ${amt>0?'amount-owed':'amount-clear'}">${amt>0?fmt(amt):'✓ All clear'}</span></div>`;
+    }).join('');
+    return rows;
+  }).join('');
+  document.getElementById('settlement-content').innerHTML=`<div class="card mb-8"><div class="card-title">💳 Grand Summary — Who Owes Whom</div>${grandRows||'<p class="text-muted text-sm">All settled! ✓</p>'}</div>${tripSec}`;
+  // icons inline
+}
+
+// ===================== FX MODAL =====================
+function openFxModal(){
+  const rows=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
+    const m=FX_META[c]||{flag:'',name:c,note:''};
+    const d=r<0.01?r.toFixed(7):r.toFixed(5);
+    return`<div class="fx-rate-row">
+      <div><div style="font-weight:700">${m.flag} ${c} — ${m.name}</div><div class="text-xs text-muted">${m.note}</div></div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-muted">1 ${c} =</span>
+        <input class="fx-input" type="number" step="0.0000001" min="0" id="fxi-${c}" value="${d}">
+        <span class="text-xs">SGD</span>
+      </div></div>`;
+  }).join('');
+  document.getElementById('fx-rows').innerHTML=rows;
+  document.getElementById('fx-modal').classList.add('open');
+}
+function closeFxModal(){ document.getElementById('fx-modal').classList.remove('open'); }
+function applyFx(){
+  Object.keys(fx).filter(c=>c!=='SGD').forEach(c=>{ const el=document.getElementById('fxi-'+c); if(el) fx[c]=parseFloat(el.value)||fx[c]; });
+  closeFxModal();
+  const a=document.querySelector('.nav-item.active');
+  if(a) showPage(a.dataset.page);
+}
+function resetFx(){ fx={...DEFAULT_FX}; openFxModal(); }
+
+// ===================== EXPENSE MODAL =====================
+function openAddModal(tripKey){
+  editingId=null;
+  const defaultTrip = tripKey || Object.keys(trips)[0] || 'vietnam';
+  editingTrip = defaultTrip;
+  document.getElementById('modal-title').textContent='Add Expense';
+  document.getElementById('modal-submit-btn').textContent='Save Expense';
+  document.getElementById('fx-hint').textContent='';
+  const form=document.querySelector('#modal form'); form.reset();
+  populateTripDropdown(defaultTrip);
+  updateExpenseModalPeople();
+  // Reset any disabled fields from previous locked edit
+  ['f-cost','f-currency','f-sgd'].forEach(id=>{ document.getElementById(id).disabled=false; });
+  const lockNote2 = document.getElementById('lock-note');
+  if(lockNote2) lockNote2.style.display='none';
+  document.getElementById('modal').classList.add('open');
+}
+function openEdit(k,id){
+  const e=trips[k].expenses.find(x=>x.id===id); if(!e) return;
+  editingId=id; editingTrip=k;
+  document.getElementById('modal-title').textContent='Edit Expense';
+  document.getElementById('modal-submit-btn').textContent='Update Expense';
+  populateTripDropdown(k);
+  document.getElementById('f-from').value=e.from||'';
+  document.getElementById('f-to').value=e.to||'';
+  document.getElementById('f-type').value=e.type;
+  document.getElementById('f-location').value=e.location||'';
+  document.getElementById('f-cost').value=e.cost;
+  document.getElementById('f-currency').value=e.cur;
+  document.getElementById('f-sgd').value=toSGD(e.cost,e.cur).toFixed(2);
+  document.getElementById('f-status').value=e.status;
+  updateExpenseModalPeople(e.paidBy, e.forWhom);
+  document.getElementById('f-split').value=e.split;
+  document.getElementById('f-platform').value=e.platform;
+  document.getElementById('f-code').value=e.code||'';
+  document.getElementById('f-notes').value=e.notes||'';
+  autoCalcSGD();
+  // Lock financial fields if expense is locked
+  const isLocked = !!e.locked;
+  document.getElementById('f-cost').disabled     = isLocked;
+  document.getElementById('f-currency').disabled = isLocked;
+  document.getElementById('f-sgd').disabled      = isLocked;
+  const lockNote = document.getElementById('lock-note');
+  if(lockNote) lockNote.style.display = isLocked ? 'block' : 'none';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function autoCalcSGD(){
+  const c=parseFloat(document.getElementById('f-cost').value)||0;
+  const cur=document.getElementById('f-currency').value;
+  const r=fx[cur]||1;
+  document.getElementById('f-sgd').value=(c*r).toFixed(2);
+  document.getElementById('fx-hint').textContent=cur!=='SGD'?`(@ 1 ${cur} = ${r.toFixed(5)} SGD)`:'';
+}
+function saveExpense(ev){
+  ev.preventDefault();
+  const k=document.getElementById('f-trip').value;
+  const trip=trips[k]; const people=trip.people;
+  const cost=parseFloat(document.getElementById('f-cost').value)||0;
+  const cur=document.getElementById('f-currency').value;
+  const split=document.getElementById('f-split').value;
+  const forWhom=document.getElementById('f-forwhom').value;
+  const paidBy=document.getElementById('f-paidby').value;
+  const sp = (()=>{
+    if(!forWhom||forWhom==='Both'||forWhom==='All') return people;
+    if(forWhom.includes(',')) return forWhom.split(',').map(s=>s.trim()).filter(s=>people.includes(s));
+    return people.includes(forWhom)?[forWhom]:[];
+  })();
+  const pb={};
+  people.forEach(p=>{ pb[p]=sp.includes(p)&&p!==paidBy?'Not Yet':''; });
+  // If editing a locked expense, preserve original cost/cur
+  let finalCost = cost, finalCur = cur;
+  if(editingId !== null) {
+    const existingExp = trips[k].expenses.find(x => x.id === editingId);
+    if(existingExp && existingExp.locked) {
+      finalCost = existingExp.lockedCost || existingExp.cost;
+      finalCur  = existingExp.lockedCur  || existingExp.cur;
+    }
+  }
+  const ne={id:editingId||nextId++,from:document.getElementById('f-from').value,to:document.getElementById('f-to').value,
+    type:document.getElementById('f-type').value,location:document.getElementById('f-location').value,
+    cost:finalCost,cur:finalCur,status:document.getElementById('f-status').value,split,forWhom,paidBy,
+    code:document.getElementById('f-code').value,platform:document.getElementById('f-platform').value,
+    notes:document.getElementById('f-notes').value,paidBack:pb};
+  if(editingId!==null){
+    const idx=trip.expenses.findIndex(x=>x.id===editingId);
+    if(idx>-1){ ne.paidBack=trips[k].expenses[idx].paidBack; trip.expenses[idx]=ne; }
+  } else { trip.expenses.push(ne); }
+  saveTripsToStorage();
+  closeModal(); renderTrip(k);
+  if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
+}
+function delExp(k,id){
+  if(!confirm('Delete this expense?')) return;
+  trips[k].expenses=trips[k].expenses.filter(e=>e.id!==id);
+  saveTripsToStorage();
+  renderTrip(k);
+}
+
+
+
+// ===================== DYNAMIC EXPENSE MODAL =====================
+function populateTripDropdown(selectedKey) {
+  const sel = document.getElementById('f-trip');
+  sel.innerHTML = Object.entries(trips).map(([k,t]) =>
+    `<option value="${k}" ${k===selectedKey?'selected':''}>${t.flag} ${t.name}</option>`
+  ).join('');
+}
+
+function updateExpenseModalPeople(selectedPaidBy, selectedForWhom) {
+  const k = document.getElementById('f-trip').value;
+  const trip = trips[k];
+  if(!trip) return;
+  const people = trip.people;
+
+  // Update Paid by
+  const pbSel = document.getElementById('f-paidby');
+  const curPb = selectedPaidBy || pbSel.value;
+  pbSel.innerHTML = people.map(p => `<option value="${p}" ${p===curPb?'selected':''}>${p}</option>`).join('');
+  if(!people.includes(curPb)) pbSel.value = people[0];
+
+  // Update For Whom — generate all subsets
+  const fwSel = document.getElementById('f-forwhom');
+  const curFw = selectedForWhom || fwSel.value;
+  const groupLabel = people.length === 2 ? 'Both' : 'All';
+
+  // Build all non-empty subsets sorted by size desc
+  function subsets(arr) {
+    const result = [];
+    for(let i=1;i<(1<<arr.length);i++){
+      const sub=arr.filter((_,j)=>i&(1<<j));
+      result.push(sub);
+    }
+    return result.sort((a,b)=>b.length-a.length);
+  }
+  const subs = subsets(people);
+  const opts = subs.map(sub => {
+    const val = sub.length === people.length ? groupLabel : sub.join(', ');
+    const label = sub.length === people.length ? `Everyone (${groupLabel})` :
+                  sub.length === 1 ? `${sub[0]} only` : sub.join(' & ');
+    const sel = (curFw === val || (!curFw && sub.length === people.length)) ? 'selected' : '';
+    return `<option value="${val}" ${sel}>${label}</option>`;
+  }).join('');
+  fwSel.innerHTML = opts;
+  if(curFw) fwSel.value = curFw;
+
+  // Auto-set currency to trip's default currency
+  if(trip.defaultCur) {
+    const curSel = document.getElementById('f-currency');
+    if(curSel) { curSel.value = trip.defaultCur; autoCalcSGD(); }
+  }
+}
+
+
+// ===================== LOCK / UNLOCK =====================
+function toggleLock(k, id) {
+  const e = trips[k].expenses.find(x => x.id === id);
+  if(!e) return;
+  e.locked = !e.locked;
+  // If locking, snapshot current cost, currency and SGD rate
+  if(e.locked) {
+    e.lockedCost = e.cost;
+    e.lockedCur  = e.cur;
+    e.lockedSGD  = toSGD(e.cost, e.cur);
+    e.lockedRate = fx[e.cur] || 1;
+  } else {
+    // On unlock, clear snapshot
+    delete e.lockedCost; delete e.lockedCur; delete e.lockedSGD; delete e.lockedRate;
+  }
+  saveTripsToStorage();
+  renderTable(k);
+  updateTripKpis(k);
+}
+
+// ===================== THEME =====================
+(function(){
+  const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+  let d=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  r.setAttribute('data-theme',d);
+  const sun='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  const moon='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  t.innerHTML=d==='dark'?sun:moon;
+  t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);t.innerHTML=d==='dark'?sun:moon;});
+})();
+document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+// ===================== DELETE TRIP =====================
+let tripToDelete = null;
+function confirmDeleteTrip(k){
+  tripToDelete = k;
+  document.getElementById('del-trip-name').textContent = trips[k] ? trips[k].flag + ' ' + trips[k].name : k;
+  document.getElementById('del-trip-modal').classList.add('open');
+}
+function closeDelTripModal(){
+  document.getElementById('del-trip-modal').classList.remove('open');
+  tripToDelete = null;
+}
+function executeDeleteTrip(){
+  if(!tripToDelete) return;
+  const k = tripToDelete;
+  // Remove from trips object
+  delete trips[k];
+  saveTripsToStorage();
+  // Remove page element
+  const pg = document.getElementById('page-'+k);
+  if(pg) pg.remove();
+  // Remove sidebar nav wrap
+  document.querySelectorAll('.nav-item-wrap').forEach(wrap => {
+    const ni = wrap.querySelector('.nav-item');
+    if(ni && ni.dataset.page === k) wrap.remove();
+  });
+  // Update activeFilters
+  delete activeFilters[k];
+  closeDelTripModal();
+  showPage('overview');
+}
+
+// ===================== ADD TRIP =====================
+function openAddTripModal(){
+  document.getElementById('add-trip-modal').classList.add('open');
+}
+
+// ===================== COUNTRY AUTOCOMPLETE =====================
+const COUNTRIES = [
+  {name:'Afghanistan',flag:'🇦🇫',cur:'USD'},{name:'Albania',flag:'🇦🇱',cur:'USD'},
+  {name:'Algeria',flag:'🇩🇿',cur:'USD'},{name:'Andorra',flag:'🇦🇩',cur:'EUR'},
+  {name:'Angola',flag:'🇦🇴',cur:'USD'},{name:'Antigua & Barbuda',flag:'🇦🇬',cur:'USD'},
+  {name:'Argentina',flag:'🇦🇷',cur:'USD'},{name:'Armenia',flag:'🇦🇲',cur:'USD'},
+  {name:'Australia',flag:'🇦🇺',cur:'AUD'},{name:'Austria',flag:'🇦🇹',cur:'EUR'},
+  {name:'Azerbaijan',flag:'🇦🇿',cur:'USD'},{name:'Bahamas',flag:'🇧🇸',cur:'USD'},
+  {name:'Bahrain',flag:'🇧🇭',cur:'USD'},{name:'Bangladesh',flag:'🇧🇩',cur:'USD'},
+  {name:'Barbados',flag:'🇧🇧',cur:'USD'},{name:'Belarus',flag:'🇧🇾',cur:'USD'},
+  {name:'Belgium',flag:'🇧🇪',cur:'EUR'},{name:'Belize',flag:'🇧🇿',cur:'USD'},
+  {name:'Bhutan',flag:'🇧🇹',cur:'USD'},{name:'Bolivia',flag:'🇧🇴',cur:'USD'},
+  {name:'Bosnia & Herzegovina',flag:'🇧🇦',cur:'EUR'},{name:'Botswana',flag:'🇧🇼',cur:'USD'},
+  {name:'Brazil',flag:'🇧🇷',cur:'USD'},{name:'Brunei',flag:'🇧🇳',cur:'SGD'},
+  {name:'Bulgaria',flag:'🇧🇬',cur:'EUR'},{name:'Cambodia',flag:'🇰🇭',cur:'USD'},
+  {name:'Canada',flag:'🇨🇦',cur:'CAD'},{name:'Chile',flag:'🇨🇱',cur:'USD'},
+  {name:'China',flag:'🇨🇳',cur:'CNY'},{name:'Colombia',flag:'🇨🇴',cur:'USD'},
+  {name:'Costa Rica',flag:'🇨🇷',cur:'USD'},{name:'Croatia',flag:'🇭🇷',cur:'EUR'},
+  {name:'Cuba',flag:'🇨🇺',cur:'USD'},{name:'Cyprus',flag:'🇨🇾',cur:'EUR'},
+  {name:'Czech Republic',flag:'🇨🇿',cur:'EUR'},{name:'Denmark',flag:'🇩🇰',cur:'EUR'},
+  {name:'Dominican Republic',flag:'🇩🇴',cur:'USD'},{name:'Ecuador',flag:'🇪🇨',cur:'USD'},
+  {name:'Egypt',flag:'🇪🇬',cur:'USD'},{name:'Estonia',flag:'🇪🇪',cur:'EUR'},
+  {name:'Ethiopia',flag:'🇪🇹',cur:'USD'},{name:'Fiji',flag:'🇫🇯',cur:'USD'},
+  {name:'Finland',flag:'🇫🇮',cur:'EUR'},{name:'France',flag:'🇫🇷',cur:'EUR'},
+  {name:'Georgia',flag:'🇬🇪',cur:'USD'},{name:'Germany',flag:'🇩🇪',cur:'EUR'},
+  {name:'Ghana',flag:'🇬🇭',cur:'USD'},{name:'Greece',flag:'🇬🇷',cur:'EUR'},
+  {name:'Guatemala',flag:'🇬🇹',cur:'USD'},{name:'Hong Kong',flag:'🇭🇰',cur:'HKD'},
+  {name:'Hungary',flag:'🇭🇺',cur:'EUR'},{name:'Iceland',flag:'🇮🇸',cur:'EUR'},
+  {name:'India',flag:'🇮🇳',cur:'INR'},{name:'Indonesia',flag:'🇮🇩',cur:'IDR'},
+  {name:'Ireland',flag:'🇮🇪',cur:'EUR'},{name:'Israel',flag:'🇮🇱',cur:'USD'},
+  {name:'Italy',flag:'🇮🇹',cur:'EUR'},{name:'Jamaica',flag:'🇯🇲',cur:'USD'},
+  {name:'Japan',flag:'🇯🇵',cur:'JPY'},{name:'Jordan',flag:'🇯🇴',cur:'USD'},
+  {name:'Kazakhstan',flag:'🇰🇿',cur:'USD'},{name:'Kenya',flag:'🇰🇪',cur:'USD'},
+  {name:'South Korea',flag:'🇰🇷',cur:'KRW'},{name:'Kuwait',flag:'🇰🇼',cur:'USD'},
+  {name:'Kyrgyzstan',flag:'🇰🇬',cur:'USD'},{name:'Laos',flag:'🇱🇦',cur:'USD'},
+  {name:'Latvia',flag:'🇱🇻',cur:'EUR'},{name:'Lebanon',flag:'🇱🇧',cur:'USD'},
+  {name:'Lithuania',flag:'🇱🇹',cur:'EUR'},{name:'Luxembourg',flag:'🇱🇺',cur:'EUR'},
+  {name:'Macau',flag:'🇲🇴',cur:'HKD'},{name:'Malaysia',flag:'🇲🇾',cur:'MYR'},
+  {name:'Maldives',flag:'🇲🇻',cur:'USD'},{name:'Malta',flag:'🇲🇹',cur:'EUR'},
+  {name:'Mexico',flag:'🇲🇽',cur:'USD'},{name:'Moldova',flag:'🇲🇩',cur:'USD'},
+  {name:'Monaco',flag:'🇲🇨',cur:'EUR'},{name:'Mongolia',flag:'🇲🇳',cur:'USD'},
+  {name:'Montenegro',flag:'🇲🇪',cur:'EUR'},{name:'Morocco',flag:'🇲🇦',cur:'USD'},
+  {name:'Mozambique',flag:'🇲🇿',cur:'USD'},{name:'Myanmar',flag:'🇲🇲',cur:'USD'},
+  {name:'Namibia',flag:'🇳🇦',cur:'USD'},{name:'Nepal',flag:'🇳🇵',cur:'USD'},
+  {name:'Netherlands',flag:'🇳🇱',cur:'EUR'},{name:'New Zealand',flag:'🇳🇿',cur:'NZD'},
+  {name:'Nigeria',flag:'🇳🇬',cur:'USD'},{name:'North Macedonia',flag:'🇲🇰',cur:'EUR'},
+  {name:'Norway',flag:'🇳🇴',cur:'EUR'},{name:'Oman',flag:'🇴🇲',cur:'USD'},
+  {name:'Pakistan',flag:'🇵🇰',cur:'USD'},{name:'Panama',flag:'🇵🇦',cur:'USD'},
+  {name:'Peru',flag:'🇵🇪',cur:'USD'},{name:'Philippines',flag:'🇵🇭',cur:'PHP'},
+  {name:'Poland',flag:'🇵🇱',cur:'EUR'},{name:'Portugal',flag:'🇵🇹',cur:'EUR'},
+  {name:'Qatar',flag:'🇶🇦',cur:'USD'},{name:'Romania',flag:'🇷🇴',cur:'EUR'},
+  {name:'Russia',flag:'🇷🇺',cur:'USD'},{name:'Saudi Arabia',flag:'🇸🇦',cur:'USD'},
+  {name:'Serbia',flag:'🇷🇸',cur:'EUR'},{name:'Singapore',flag:'🇸🇬',cur:'SGD'},
+  {name:'Slovakia',flag:'🇸🇰',cur:'EUR'},{name:'Slovenia',flag:'🇸🇮',cur:'EUR'},
+  {name:'South Africa',flag:'🇿🇦',cur:'USD'},{name:'Spain',flag:'🇪🇸',cur:'EUR'},
+  {name:'Sri Lanka',flag:'🇱🇰',cur:'USD'},{name:'Sweden',flag:'🇸🇪',cur:'EUR'},
+  {name:'Switzerland',flag:'🇨🇭',cur:'CHF'},{name:'Taiwan',flag:'🇹🇼',cur:'TWD'},
+  {name:'Tajikistan',flag:'🇹🇯',cur:'USD'},{name:'Tanzania',flag:'🇹🇿',cur:'USD'},
+  {name:'Thailand',flag:'🇹🇭',cur:'THB'},{name:'Trinidad & Tobago',flag:'🇹🇹',cur:'USD'},
+  {name:'Tunisia',flag:'🇹🇳',cur:'USD'},{name:'Turkey',flag:'🇹🇷',cur:'EUR'},
+  {name:'Turkmenistan',flag:'🇹🇲',cur:'USD'},{name:'UAE',flag:'🇦🇪',cur:'USD'},
+  {name:'Uganda',flag:'🇺🇬',cur:'USD'},{name:'Ukraine',flag:'🇺🇦',cur:'USD'},
+  {name:'United Kingdom',flag:'🇬🇧',cur:'GBP'},{name:'United States',flag:'🇺🇸',cur:'USD'},
+  {name:'Uruguay',flag:'🇺🇾',cur:'USD'},{name:'Uzbekistan',flag:'🇺🇿',cur:'USD'},
+  {name:'Venezuela',flag:'🇻🇪',cur:'USD'},{name:'Vietnam',flag:'🇻🇳',cur:'VND'},
+  {name:'Zambia',flag:'🇿🇲',cur:'USD'},{name:'Zimbabwe',flag:'🇿🇼',cur:'USD'},
+];
+
+let suggestionIndex = -1;
+
+function onCountryInput(val) {
+  suggestionIndex = -1;
+  const box = document.getElementById('nt-suggestions');
+  if(!val || val.length < 1) { box.style.display='none'; return; }
+  const matches = COUNTRIES.filter(c => c.name.toLowerCase().startsWith(val.toLowerCase())).slice(0,8);
+  if(!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map((c,i) =>
+    `<div class="suggestion-item" data-flag="${c.flag}" data-name="${c.name}" data-cur="${c.cur}" onmousedown="selectCountry('${c.name}','${c.flag}','${c.cur}')">`+
+    `<span class="suggestion-flag">${c.flag}</span><span>${c.name}</span></div>`
+  ).join('');
+  box.style.display='block';
+}
+
+function onCountryKey(e) {
+  const box = document.getElementById('nt-suggestions');
+  const items = box.querySelectorAll('.suggestion-item');
+  if(e.key === 'ArrowDown') { e.preventDefault(); suggestionIndex=Math.min(suggestionIndex+1,items.length-1); highlightSuggestion(items); }
+  else if(e.key === 'ArrowUp') { e.preventDefault(); suggestionIndex=Math.max(suggestionIndex-1,0); highlightSuggestion(items); }
+  else if(e.key === 'Enter' && suggestionIndex >= 0) { e.preventDefault(); items[suggestionIndex].dispatchEvent(new MouseEvent('mousedown')); }
+  else if(e.key === 'Escape') { box.style.display='none'; }
+}
+
+function highlightSuggestion(items) {
+  items.forEach((el,i) => el.classList.toggle('active', i===suggestionIndex));
+  if(items[suggestionIndex]) items[suggestionIndex].scrollIntoView({block:'nearest'});
+}
+
+function selectCountry(name, flag, cur) {
+  document.getElementById('nt-name').value = name;
+  document.getElementById('nt-flag-preview').textContent = flag;
+  document.getElementById('nt-suggestions').style.display = 'none';
+  // Auto-set currency if it exists in dropdown
+  const curSel = document.getElementById('nt-currency');
+  if(curSel) { for(let o of curSel.options){ if(o.value===cur){ curSel.value=cur; break; } } }
+  // Auto-pick card colour based on region
+  const colMap = {
+    'AUD':'pastel-sky','KRW':'pastel-rose','VND':'pastel-peach',
+    'JPY':'pastel-lemon','EUR':'pastel-lavender','GBP':'pastel-sage',
+    'THB':'pastel-mint','MYR':'pastel-coral','IDR':'pastel-blush',
+    'PHP':'pastel-butter','TWD':'pastel-powder','HKD':'pastel-lilac',
+    'USD':'australia','SGD':'custom-green',
+  };
+  const colSel = document.getElementById('nt-colour');
+  if(colSel && colMap[cur]) colSel.value = colMap[cur];
+}
+
+function closeAddTripModal() {
+  document.getElementById('add-trip-modal').classList.remove('open');
+  document.getElementById('nt-suggestions').style.display = 'none';
+}
+
+function saveNewTrip(ev){
+  ev.preventDefault();
+  const name = document.getElementById('nt-name').value.trim();
+  const flag = document.getElementById('nt-flag-preview').textContent.trim() || '🌍';
+  const dates = document.getElementById('nt-dates').value.trim();
+  const people = document.getElementById('nt-people').value.split(',').map(p=>p.trim()).filter(Boolean);
+  if(!people.length){ alert('Please enter at least one traveller name.'); return; }
+  const colour = document.getElementById('nt-colour').value;
+  const key = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '-' + Date.now();
+
+  // Auto-register currency in FX if not already present
+  const ntCur = document.getElementById('nt-currency') ? document.getElementById('nt-currency').value : 'SGD';
+  if(ntCur && ntCur !== 'SGD' && !fx[ntCur]) {
+    fx[ntCur] = DEFAULT_FX[ntCur] || 1.0;
+    if(!FX_META[ntCur]) FX_META[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
+  }
+  trips[key] = { name, flag, style: colour, dates, people, expenses: [], defaultCur: ntCur };
+  activeFilters[key] = {};
+  saveTripsToStorage();
+
+  // Create page
+  const pg = document.createElement('div');
+  pg.className = 'page';
+  pg.id = 'page-' + key;
+  pg.innerHTML = `
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">${flag} ${name}</h1><p class="page-subtitle" id="${key}-subtitle"></p></div>
+      <button class="btn btn-primary" onclick="openAddModal('${key}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
+    </div>
+    <div id="${key}-fx-banner"></div>
+    <div class="kpi-grid" id="${key}-kpis"></div>
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterTable('${key}','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
+      <select class="filter-select" onchange="filterTable('${key}','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
+    </div>
+    <div class="table-wrap" id="${key}-table-wrap"></div>`;
+  document.querySelector('.main-content').appendChild(pg);
+
+  // Create sidebar entry
+  const nav = document.querySelector('.sidebar');
+  const allDividers = nav.querySelectorAll('.nav-divider');
+  const toolsDivider = allDividers[allDividers.length - 1];
+  const wrap = document.createElement('div');
+  wrap.className = 'nav-item-wrap';
+  wrap.innerHTML = `<div class="nav-item" onclick="showPage('${key}')" data-page="${key}"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>${flag} ${name}<span class="nav-badge" id="badge-${key}">0</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('${key}')" title="Delete trip">✕</button>`;
+  toolsDivider.before(wrap);
+
+  // icons inline
+  closeAddTripModal();
+  document.getElementById('nt-name').value='';
+  document.getElementById('nt-flag-preview').textContent='🌍';
+  document.getElementById('nt-dates').value='';
+  document.getElementById('nt-people').value='';
+  document.getElementById('nt-suggestions').style.display='none';
+
+  // Refresh expense modal trip dropdown so new trip appears
+  populateTripDropdown(key);
+  // Navigate to new trip page
+  try { showPage(key); } catch(err) { console.error('showPage error:', err); }
+}
+
+// icons inline
+renderOverview();
+</script>
+<div id="install-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#b5622a;color:#fff;padding:0.75rem 1.5rem;border-radius:2rem;font-size:0.9rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:9999;align-items:center;gap:1rem;white-space:nowrap;">💸 Add to Home Screen<button onclick="doInstall()" style="background:#fff;color:#b5622a;border:none;border-radius:1rem;padding:0.3rem 0.9rem;font-weight:700;cursor:pointer;margin-left:0.5rem">Install</button><button onclick="document.getElementById('install-banner').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;margin-left:0.25rem">✕</button></div>
+<script>var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});function doInstall(){document.getElementById('install-banner').style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;});}}window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';});</script><script>if('serviceWorker' in navigator){var b=new Blob(['const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));'],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){console.log(e);});}</script>
+</body>
+</html>
