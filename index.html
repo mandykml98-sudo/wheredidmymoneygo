@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>wheredidmymoneygo</title>
 
 
@@ -92,10 +92,9 @@ input,select,textarea{font:inherit;color:inherit;}
 .kpi-value.warning{color:var(--color-warning);}
 .kpi-sub{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1);}
 .fx-banner{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;padding:var(--space-3) var(--space-5);background:var(--color-primary-highlight);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-6);font-size:var(--text-xs);}
-.fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;font-size:clamp(.7rem,.65rem + .2vw,.8rem);}
-.fx-chip{display:inline-flex;align-items:center;gap:3px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px 7px;font-size:clamp(.6rem,.55rem + .2vw,.7rem);font-weight:600;white-space:nowrap;}
-.fx-date{margin-left:auto;color:var(--color-text-muted);font-size:clamp(.55rem,.5rem + .15vw,.65rem);display:none;}
-@media(min-width:768px){.fx-date{display:inline;}.fx-chip{gap:6px;padding:3px 12px;}}
+.fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;}
+.fx-chip{display:inline-flex;align-items:center;gap:6px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:3px 12px;font-size:var(--text-xs);font-weight:600;}
+.fx-date{margin-left:auto;color:var(--color-text-muted);font-size:var(--text-xs);}
 .fx-edit-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);background:var(--color-primary);color:#fff;font-size:var(--text-xs);font-weight:600;border:none;cursor:pointer;transition:background var(--transition);}
 .fx-edit-btn:hover{background:var(--color-primary-hover);}
 .table-wrap{overflow-x:auto;border-radius:var(--radius-xl);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);}
@@ -227,6 +226,258 @@ tbody tr:hover{background:var(--color-surface-offset);}
 .suggestion-item:hover,.suggestion-item.active{background:var(--color-primary-highlight);color:var(--color-primary);}
 .suggestion-flag{font-size:1.2rem;min-width:24px;}
 
+
+/* ═══════════════════════════════════════════
+   IPHONE / MOBILE UX IMPROVEMENTS
+   ═══════════════════════════════════════════ */
+
+/* Touch targets & interaction */
+button, .btn, .nav-item, select, input, .filter-select, .pb-select {
+  touch-action: manipulation;
+}
+
+/* ── Topbar: wrap on small screens ── */
+@media (max-width: 768px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    padding-top: max(var(--space-3), env(safe-area-inset-top, 0px));
+  }
+  .topbar-actions {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  #username-input {
+    width: 90px !important;
+    font-size: var(--text-xs) !important;
+  }
+  .btn-sm {
+    min-height: 38px;
+    padding: var(--space-2) var(--space-3);
+  }
+  .theme-toggle {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ── Safe area insets for iPhone home bar ── */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+  }
+  .sidebar {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* ── KPI grid: force 2 columns on tiny screens ── */
+@media (max-width: 480px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .kpi-value {
+    font-size: clamp(1rem, 4vw, 1.4rem) !important;
+    white-space: normal;
+    word-break: break-all;
+  }
+  .page-title {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+  }
+}
+
+/* ── Modal: bottom sheet on mobile ── */
+@media (max-width: 768px) {
+  .modal-backdrop {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .modal {
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
+    max-height: 92dvh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: var(--space-6) var(--space-5) var(--space-4) !important;
+    animation: slideUpSheet 260ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  /* drag handle pill */
+  .modal::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--color-divider);
+    border-radius: var(--radius-full);
+    margin: 0 auto var(--space-4);
+  }
+  @keyframes slideUpSheet {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-surface);
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 16px));
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-divider);
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+  }
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    font-size: var(--text-base);
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .form-input, .form-select, .form-textarea {
+    min-height: 48px;
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+}
+
+/* ── Table: card layout on mobile ── */
+@media (max-width: 768px) {
+  .table-wrap {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+  .table-wrap table {
+    display: block;
+    width: 100%;
+  }
+  .table-wrap thead {
+    display: none;
+  }
+  .table-wrap tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .table-wrap tbody tr {
+    display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .table-wrap tbody tr:last-child td {
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .table-wrap tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-divider);
+    white-space: normal;
+    font-size: var(--text-xs);
+    gap: var(--space-2);
+    min-height: 36px;
+  }
+  .table-wrap tbody td:last-child {
+    border-bottom: none;
+    padding-top: var(--space-3);
+  }
+  .table-wrap tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .06em;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+  .table-wrap tbody td:empty {
+    display: none;
+  }
+  .table-wrap tfoot {
+    display: block;
+    margin-top: var(--space-2);
+  }
+  .table-wrap tfoot tr {
+    display: flex;
+    justify-content: space-between;
+    background: var(--color-surface-offset);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3) var(--space-4);
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+  .table-wrap tfoot td {
+    border: none !important;
+    padding: 0;
+    white-space: nowrap;
+  }
+  /* hide less important columns on mobile */
+  .table-wrap tbody td[data-label="Platform"],
+  .table-wrap tbody td[data-label="Code"],
+  .table-wrap tbody td[data-label="To"] {
+    display: none;
+  }
+  .location-text {
+    max-width: 160px !important;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  .filter-bar {
+    gap: var(--space-2);
+  }
+  .filter-select {
+    min-height: 44px;
+    font-size: 16px !important;
+    flex: 1;
+  }
+}
+
+/* ── Nav delete buttons: always visible on touch devices ── */
+@media (hover: none) {
+  .nav-del-btn {
+    opacity: 1 !important;
+  }
+  /* Increase lock/action button tap targets */
+  .lock-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  .btn-danger.btn-sm,
+  .btn-ghost.btn-sm {
+    min-height: 40px;
+    min-width: 40px;
+  }
+}
+
+/* ── Trip overview cards: single column on very small screens ── */
+@media (max-width: 480px) {
+  .trips-overview {
+    grid-template-columns: 1fr !important;
+  }
+  .settlement-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── FX banner: scroll horizontally on mobile ── */
+@media (max-width: 768px) {
+  .fx-banner {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: var(--space-2) var(--space-4);
+  }
+  .fx-banner::-webkit-scrollbar { display: none; }
+  .fx-date { display: none; }
+}
 </style>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -884,27 +1135,27 @@ function renderTable(k){
     const lockClass = e.locked ? 'locked-cell' : '';
     const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
     const sgdCell=isFX
-      ?`<td class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
-      :`<td class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
-    const cVals=people.map(p=>`<td class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
-    const pbVals=people.map(p=>{ if(p===e.paidBy) return `<td><span class='badge badge-neutral'>Paid upfront</span></td>`; return `<td>${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`; }).join('');
-    const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
+      ?`<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
+      :`<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
+    const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
+    const pbVals=people.map(p=>{ if(p===e.paidBy) return `<td data-label="Paid back ${p}"><span class='badge badge-neutral'>Paid upfront</span></td>`; return `<td data-label="Paid back ${p}">${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`; }).join('');
+    const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
     const costCellClass = e.locked ? 'locked-cell' : '';
     return`<tr>
-      <td>${fmtDate(e.from)}</td><td>${fmtDate(e.to)}</td>
-      <td><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
-      <td><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
-      <td class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
+      <td data-label="Date">${fmtDate(e.from)}</td><td data-label="To">${fmtDate(e.to)}</td>
+      <td data-label="Type"><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
+      <td data-label="Location"><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
+      <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
       ${sgdCell}
-      <td>${sBadge(e.status)}</td>
-      <td><span class="badge badge-neutral">${e.split||'—'}</span></td>
-      <td><span class="tag">${e.forWhom||'—'}</span></td>
-      <td>${e.paidBy||'—'}</td>
+      <td data-label="Status">${sBadge(e.status)}</td>
+      <td data-label="Split"><span class="badge badge-neutral">${e.split||'—'}</span></td>
+      <td data-label="For"><span class="tag">${e.forWhom||'—'}</span></td>
+      <td data-label="Paid by">${e.paidBy||'—'}</td>
       ${cVals}${pbVals}${uVals}
-      <td><span class="booking-code">${e.code||'—'}</span></td>
-      <td><span class="tag">${e.platform||'—'}</span></td>
-      <td style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
-      <td><div class="flex gap-2">
+      <td data-label="Code"><span class="booking-code">${e.code||'—'}</span></td>
+      <td data-label="Platform"><span class="tag">${e.platform||'—'}</span></td>
+      <td data-label="Notes" style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
+      <td style="--no-label:1"><div class="flex gap-2">
         <button class="${e.locked?'lock-btn locked':'lock-btn'}" onclick="toggleLock('${k}',${e.id})" title="${e.locked?'Unlock transaction':'Lock transaction'}">${e.locked?'🔒':'🔓'}</button>
         <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked?'disabled title="Unlock to edit"':''}>✏️</button>
         <button class="btn btn-danger btn-sm" onclick="delExp('${k}',${e.id})" ${e.locked?'disabled title="Unlock to delete"':''}>🗑</button>
@@ -914,13 +1165,12 @@ function renderTable(k){
   const tSGD=data.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
   const tCost=people.map(p=>`<td class="tabular fw-700">${fmt(data.reduce((s,e)=>s+personCost(e,p,people),0))}</td>`).join('');
   const tUp=people.map(p=>{const t=data.reduce((s,e)=>s+personUnpaid(e,p,people),0);return`<td class="tabular fw-700" style="color:${t>0?'var(--color-error)':'var(--color-text-muted)'}">${t>0?fmt(t):'—'}</td>`;}).join('');
-  const totalLabel=`Total unpaid to ${currentUsername}`;
   document.getElementById(prefix+'-table-wrap').innerHTML=`<table>
     <thead><tr><th>From</th><th>To</th><th>Type</th><th>Location</th><th>Cost</th><th>In SGD ↗</th><th>Status</th><th>Split</th><th>For</th><th>Paid by</th>${costH}${pbH}${upH}<th>Booking Code</th><th>Platform</th><th>Notes</th><th>Actions</th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot>
   <tr class="tfoot-row">
-    <td colspan="5" class="fw-700">${totalLabel}</td>
+    <td colspan="5" class="fw-700">TOTAL</td>
     <td class="tabular fw-700" style="color:var(--color-primary)">${fmt(tSGD)}</td>
     <td></td><td></td><td></td><td></td>
     ${tCost}
