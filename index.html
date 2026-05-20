@@ -177,13 +177,43 @@ tbody tr:hover{background:var(--color-surface-offset);}
 .tabular{font-variant-numeric:tabular-nums;}
 .mobile-menu-btn{display:none;}
 @media(max-width:768px){
-  .app-shell{grid-template-columns:1fr;}
-  .sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:100dvh;padding-top:var(--topbar-h,61px);}
+  .app-shell{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+  .sidebar{
+    display:none;
+    position:fixed;left:0;top:0;bottom:0;
+    z-index:40;
+    width:80vw;max-width:300px;
+    transform:translateX(-100%);
+    transition:transform var(--transition);
+    box-shadow:var(--shadow-lg);
+    height:100dvh;
+    padding-top:var(--topbar-h,61px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
   .sidebar.open{display:block;transform:translateX(0);}
-  .main-content{padding:var(--space-5) var(--space-4);}
+  .main-content{
+    padding:var(--space-4) var(--space-3);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom, 0px));
+  }
   .form-grid{grid-template-columns:1fr;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
   .mobile-menu-btn{display:flex;}
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+  .page-header{margin-bottom:var(--space-5);}
+  .page-title{font-size:clamp(1.25rem,5vw,1.75rem);}
+  .card{padding:var(--space-4);}
+  .btn{min-height:44px;}
+  .nav-item{min-height:44px;}
+  .theme-toggle{width:44px;height:44px;}
+  .bottom-nav{display:flex;}
+  .topbar-actions .btn-primary{display:none;}
+}
+@media(max-width:380px){
+  .kpi-grid{grid-template-columns:1fr;}
 }
 
 .nav-item-wrap{position:relative;display:flex;align-items:center;}
@@ -229,6 +259,48 @@ tbody tr:hover{background:var(--color-surface-offset);}
 .suggestion-item:hover,.suggestion-item.active{background:var(--color-primary-highlight);color:var(--color-primary);}
 .suggestion-flag{font-size:1.2rem;min-width:24px;}
 
+
+/* ── Bottom Nav (mobile only) ── */
+.bottom-nav{
+  display:none;
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:50;
+  background:var(--color-surface);
+  border-top:1px solid var(--color-divider);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  box-shadow:0 -4px 16px rgba(44,31,14,.10);
+}
+.bottom-nav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:8px 4px;
+  font-size:10px;
+  font-weight:500;
+  color:var(--color-text-muted);
+  background:none;
+  border:none;
+  cursor:pointer;
+  min-height:52px;
+  transition:color var(--transition);
+  -webkit-tap-highlight-color:transparent;
+}
+.bottom-nav-item.active{color:var(--color-primary);}
+.bottom-nav-item svg{transition:transform var(--transition);}
+.bottom-nav-item.active svg{transform:scale(1.15);}
+.sidebar-overlay{
+  display:none;
+  position:fixed;inset:0;
+  z-index:39;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.sidebar-overlay.open{display:block;}
 </style>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -783,9 +855,27 @@ function showPage(k){
   document.getElementById('page-'+k).classList.add('active');
   document.querySelector(`[data-page="${k}"]`).classList.add('active');
   document.getElementById('sidebar').classList.remove('open');
+  const ov = document.getElementById('sidebarOverlay');
+  if(ov) ov.classList.remove('open');
+  setBottomNav(k);
+  // Scroll main content to top on page switch
+  const mc = document.querySelector('.main-content');
+  if(mc) mc.scrollTop = 0;
   if(k==='overview') renderOverview();
   else if(k==='settlement') renderSettlement();
   else renderTrip(k);
+}
+
+function setBottomNav(k){
+  document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById('bn-'+k);
+  if(btn) btn.classList.add('active');
+}
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  const ov = document.getElementById('sidebarOverlay');
+  if(ov) ov.classList.remove('open');
 }
 
 // ===================== USERNAME =====================
@@ -1216,7 +1306,11 @@ function toggleLock(k, id) {
   t.innerHTML=d==='dark'?sun:moon;
   t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);t.innerHTML=d==='dark'?sun:moon;});
 })();
-document.getElementById('menuToggle').addEventListener('click',()=>{setTopbarHeight();document.getElementById('sidebar').classList.toggle('open');});
+document.getElementById('menuToggle').addEventListener('click',()=>{
+  setTopbarHeight();
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+});
 
 // ===================== DELETE TRIP =====================
 let tripToDelete = null;
@@ -1451,5 +1545,32 @@ window.addEventListener('orientationchange', setTopbarHeight);
 document.addEventListener('DOMContentLoaded', setTopbarHeight);
 setTimeout(setTopbarHeight, 100); // fallback after fonts/icons load
 </script>
+
+<!-- ── Sidebar overlay (mobile tap-to-close) ── -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ── Bottom navigation bar (iPhone) ── -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-item active" id="bn-overview" onclick="showPage('overview');setBottomNav('overview')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+    <span>Overview</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-vietnam" onclick="showPage('vietnam');setBottomNav('vietnam')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"/></svg>
+    <span>🇻🇳</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-australia" onclick="showPage('australia');setBottomNav('australia')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"/></svg>
+    <span>🇦🇺</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-korea" onclick="showPage('korea');setBottomNav('korea')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"/></svg>
+    <span>🇰🇷</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-settlement" onclick="showPage('settlement');setBottomNav('settlement')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <span>💸</span>
+  </button>
+</nav>
 </body>
 </html>
