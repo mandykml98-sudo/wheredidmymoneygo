@@ -49,22 +49,20 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-font-smoothing:antialiased;}
 body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6;}
-button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
-input,select,textarea{font:inherit;color:inherit;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;touch-action:manipulation;}
+input,select{touch-action:manipulation;}
 :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm);}
 .app-shell{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100dvh;}
-.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-6);background:var(--color-surface);border-bottom:1px solid var(--color-divider);position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);overflow:hidden;flex-wrap:nowrap;min-height:61px;}
-.sidebar{background:var(--color-surface);border-right:1px solid var(--color-divider);padding:var(--space-6) 0;overflow-y:auto;position:sticky;top:61px;height:calc(100dvh - 61px);}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-6);background:var(--color-surface);border-bottom:1px solid var(--color-divider);position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);}
+.sidebar{background:var(--color-surface);border-right:1px solid var(--color-divider);padding:var(--space-6) 0;overflow-y:auto;position:sticky;top:var(--topbar-h,61px);height:calc(100dvh - var(--topbar-h,61px));}
 .main-content{background:var(--color-bg);overflow-y:auto;padding:var(--space-8);}
-@media(max-width:768px){.main-content{padding:var(--space-4);padding-top:var(--space-5);}}
 .logo{display:flex;align-items:center;gap:var(--space-3);text-decoration:none;color:var(--color-text);}
 .logo-icon{width:36px;height:36px;}
 .logo-text{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;color:var(--color-primary);}
 .topbar-actions{display:flex;align-items:center;gap:var(--space-3);}
 .theme-toggle{width:38px;height:38px;border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);transition:background var(--transition);}
 .theme-toggle:hover{background:var(--color-surface-offset);}
-.btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-full);font-size:var(--text-sm);font-weight:500;transition:all var(--transition);border:none;cursor:pointer;min-height:48px;min-width:48px;justify-content:center;}
-@media(max-width:768px){.btn{min-height:52px;min-width:52px;padding:var(--space-4) var(--space-6);}}
+.btn{display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-full);font-size:var(--text-sm);font-weight:500;transition:all var(--transition);border:none;cursor:pointer;}
 .btn-primary{background:var(--color-primary);color:#fff;box-shadow:var(--shadow-sm);}
 .btn-primary:hover{background:var(--color-primary-hover);box-shadow:var(--shadow-md);}
 .btn-ghost{color:var(--color-text-muted);padding:var(--space-2) var(--space-3);}
@@ -74,7 +72,6 @@ input,select,textarea{font:inherit;color:inherit;}
 .btn-sm{padding:var(--space-1) var(--space-3);font-size:var(--text-xs);}
 .sidebar-label{font-size:var(--text-xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-faint);padding:var(--space-2) var(--space-6);margin-bottom:var(--space-1);}
 .nav-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-6);font-size:var(--text-sm);color:var(--color-text-muted);cursor:pointer;transition:all var(--transition);border-left:3px solid transparent;user-select:none;}
-@media(max-width:768px){.nav-item{padding:var(--space-4) var(--space-5);min-height:48px;}}
 .nav-item:hover{background:var(--color-surface-offset);color:var(--color-text);}
 .nav-item.active{background:var(--color-primary-highlight);color:var(--color-primary);border-left-color:var(--color-primary);font-weight:600;}
 .nav-icon{width:18px;height:18px;flex-shrink:0;}
@@ -83,32 +80,27 @@ input,select,textarea{font:inherit;color:inherit;}
 .nav-badge.alert{background:var(--color-warning-bg);color:var(--color-warning);}
 .page{display:none;}.page.active{display:block;}
 .page-header{margin-bottom:var(--space-8);}
-@media(max-width:768px){.page-header{margin-bottom:var(--space-4);}}
 .page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;color:var(--color-text);margin-bottom:var(--space-2);}
 .page-subtitle{font-size:var(--text-sm);color:var(--color-text-muted);}
 .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-6);box-shadow:var(--shadow-sm);}
 .card-title{font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--space-4);color:var(--color-text);}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4);margin-bottom:var(--space-8);overflow:visible;}
-@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);gap:var(--space-2);margin-bottom:var(--space-4);}}
-@media(max-width:480px){.kpi-grid{grid-template-columns:repeat(2,1fr);gap:var(--space-2);}}
-@media(max-width:360px){.kpi-grid{grid-template-columns:1fr;gap:var(--space-2);}}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4);margin-bottom:var(--space-8);}
 .kpi-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--shadow-sm);min-width:0;overflow:hidden;}
-@media(max-width:768px){.kpi-card{padding:var(--space-3);}}
 .kpi-label{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);margin-bottom:var(--space-2);}
 .kpi-value{font-family:var(--font-display);font-weight:700;color:var(--color-text);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .kpi-value.accent{color:var(--color-primary);}
 .kpi-value.warning{color:var(--color-warning);}
 .kpi-sub{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-1);}
-.fx-banner{display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;padding:var(--space-3) var(--space-5);background:var(--color-primary-highlight);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-6);font-size:var(--text-xs);}
-.fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;}
-.fx-chip{display:inline-flex;align-items:center;gap:6px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:3px 12px;font-size:var(--text-xs);font-weight:600;}
-.fx-date{margin-left:auto;color:var(--color-text-muted);font-size:var(--text-xs);}
+.fx-banner{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);background:var(--color-primary-highlight);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-6);font-size:var(--text-xs);overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;flex-shrink:0;}
+.fx-banner::-webkit-scrollbar{display:none;}
+.fx-chip{display:inline-flex;align-items:center;gap:4px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px 10px 2px 6px;font-size:var(--text-xs);font-weight:600;white-space:nowrap;flex-shrink:0;overflow:hidden;line-height:1.4;}
+.fx-chip-flag{font-size:.95em;line-height:1;display:inline-flex;align-items:center;justify-content:center;width:1.3em;height:1.3em;overflow:hidden;flex-shrink:0;}
+.fx-date{margin-left:auto;color:var(--color-text-muted);font-size:var(--text-xs);flex-shrink:0;}
+@media(max-width:768px){.fx-date{display:none;}}
 .fx-edit-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);background:var(--color-primary);color:#fff;font-size:var(--text-xs);font-weight:600;border:none;cursor:pointer;transition:background var(--transition);}
 .fx-edit-btn:hover{background:var(--color-primary-hover);}
 .table-wrap{overflow-x:auto;border-radius:var(--radius-xl);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);}
-@media(max-width:768px){.table-wrap{border:none;box-shadow:none;border-radius:0;margin:0 calc(var(--space-4) * -1);}
-table{font-size:clamp(.7rem,.65rem + .2vw,.8rem);}
-td,th{padding:var(--space-2);}}
 table{width:100%;border-collapse:collapse;font-size:var(--text-sm);background:var(--color-surface);}
 thead{background:var(--color-surface-offset);}
 th{padding:var(--space-3) var(--space-4);text-align:left;font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);white-space:nowrap;border-bottom:1px solid var(--color-divider);}
@@ -138,11 +130,9 @@ tbody tr:hover{background:var(--color-surface-offset);}
 .filter-bar{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5);flex-wrap:wrap;}
 .filter-select{padding:var(--space-2) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-full);background:var(--color-surface);font-size:var(--text-sm);color:var(--color-text);min-width:120px;}
 .filter-select:focus{border-color:var(--color-primary);outline:none;}
-table{min-width:100%;}
-table td,table th{white-space:nowrap;}
 .modal-backdrop{position:fixed;inset:0;background:rgba(26,18,8,.55);z-index:100;display:none;align-items:center;justify-content:center;padding:var(--space-4);backdrop-filter:blur(4px);}
 .modal-backdrop.open{display:flex;}
-.modal{background:var(--color-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-lg);padding:var(--space-8);width:100%;max-width:720px;max-height:calc(100dvh - 60px);overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp 220ms cubic-bezier(0.16,1,0.3,1);}
+.modal{background:var(--color-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-lg);padding:var(--space-8);width:100%;max-width:720px;max-height:95dvh;overflow-y:auto;animation:slideUp 220ms cubic-bezier(0.16,1,0.3,1);}
 .modal.sm{max-width:720px;}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .modal-title{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-6);color:var(--color-text);}
@@ -151,12 +141,10 @@ table td,table th{white-space:nowrap;}
 .form-group.full{grid-column:1/-1;}
 .form-label{font-size:var(--text-sm);font-weight:500;color:var(--color-text);}
 .form-input,.form-select,.form-textarea{padding:var(--space-3) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);transition:border-color var(--transition);}
-@media(max-width:768px){.form-input,.form-select,.form-textarea{padding:var(--space-4);font-size:1rem;min-height:48px;}}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--color-primary);outline:none;box-shadow:0 0 0 3px rgba(192,98,42,.15);}
 .form-textarea{resize:vertical;min-height:80px;}
 .modal-footer{display:flex;justify-content:flex-end;gap:var(--space-3);margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--color-divider);}
 .trips-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-6);margin-top:var(--space-6);}
-@media(max-width:768px){.trips-overview{grid-template-columns:1fr;gap:var(--space-4);}}
 .trip-overview-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-2xl);overflow:hidden;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition);}
 .trip-overview-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
 .trip-card-header{padding:var(--space-6);color:#fff;}
@@ -190,7 +178,7 @@ table td,table th{white-space:nowrap;}
 .mobile-menu-btn{display:none;}
 @media(max-width:768px){
   .app-shell{grid-template-columns:1fr;}
-  .sidebar{display:none;position:fixed;left:0;top:61px;bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:auto;}
+  .sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:100dvh;padding-top:var(--topbar-h,61px);}
   .sidebar.open{display:block;transform:translateX(0);}
   .main-content{padding:var(--space-5) var(--space-4);}
   .form-grid{grid-template-columns:1fr;}
@@ -241,414 +229,6 @@ table td,table th{white-space:nowrap;}
 .suggestion-item:hover,.suggestion-item.active{background:var(--color-primary-highlight);color:var(--color-primary);}
 .suggestion-flag{font-size:1.2rem;min-width:24px;}
 
-
-/* ═══════════════════════════════════════════
-   IPHONE / MOBILE UX IMPROVEMENTS
-   ═══════════════════════════════════════════ */
-
-/* Touch targets & interaction */
-button, .btn, .nav-item, select, input, .filter-select, .pb-select {
-  touch-action: manipulation;
-  -webkit-user-select: none;
-  user-select: none;
-}
-input, textarea {
-  -webkit-user-select: text;
-  user-select: text;
-}
-/* Prevent double-tap zoom on buttons */
-@media (hover: none) {
-  button, .btn, .nav-item, select, .filter-select, .pb-select {
-    touch-action: manipulation;
-  }
-}
-
-/* ── Topbar: wrap on small screens ── */
-@media (max-width: 768px) {
-  .topbar {
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    padding-top: max(var(--space-3), env(safe-area-inset-top, 0px));
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-  .topbar-actions {
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    order: 3;
-    width: 100%;
-  }
-  #username-input {
-    width: 85px !important;
-    font-size: 16px !important;
-    min-height: 44px;
-    padding: 8px 10px !important;
-  }
-  .btn-sm {
-    min-height: 44px;
-    padding: var(--space-2) var(--space-3);
-  }
-  .theme-toggle {
-    width: 52px;
-    height: 52px;
-    flex-shrink: 0;
-  }
-}
-
-/* ── Safe area insets for iPhone home bar ── */
-@media (max-width: 768px) {
-  .main-content {
-    padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
-  }
-  .sidebar {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-}
-
-/* ── KPI grid: force 2 columns on tiny screens ── */
-@media (max-width: 480px) {
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  .kpi-value {
-    font-size: clamp(1rem, 4vw, 1.4rem) !important;
-    white-space: normal;
-    word-break: break-all;
-  }
-  .page-title {
-    font-size: clamp(1.2rem, 5vw, 2rem);
-  }
-}
-
-/* ── Modal: bottom sheet on mobile ── */
-@media (max-width: 768px) {
-  .modal-backdrop {
-    align-items: flex-end !important;
-    padding: 0 !important;
-  }
-  .modal {
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
-    max-height: calc(100dvh - env(safe-area-inset-bottom, 0px)) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: var(--space-6) var(--space-5) var(--space-4) !important;
-    animation: slideUpSheet 260ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-    -webkit-overflow-scrolling: touch;
-  }
-  /* drag handle pill */
-  .modal::before {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 4px;
-    background: var(--color-divider);
-    border-radius: var(--radius-full);
-    margin: 0 auto var(--space-4);
-  }
-  @keyframes slideUpSheet {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0);   opacity: 1; }
-  }
-  .modal-footer {
-    position: sticky;
-    bottom: 0;
-    background: var(--color-surface);
-    padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, 20px));
-    margin-top: var(--space-4);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-divider);
-    flex-direction: column-reverse;
-    gap: var(--space-2);
-    margin-left: calc(var(--space-8) * -1);
-    margin-right: calc(var(--space-8) * -1);
-    padding-left: var(--space-8);
-    padding-right: var(--space-8);
-  }
-  .modal-footer .btn {
-    width: 100%;
-    justify-content: center;
-    min-height: 48px;
-    font-size: var(--text-base);
-  }
-  .form-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .form-input, .form-select, .form-textarea {
-    min-height: 48px;
-    font-size: 16px !important; /* prevents iOS zoom on focus */
-  }
-}
-
-/* ── Table: card layout on mobile ── */
-@media (max-width: 768px) {
-  .table-wrap {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    border-radius: 0 !important;
-  }
-  .table-wrap table {
-    display: block;
-    width: 100%;
-  }
-  .table-wrap thead {
-    display: none;
-  }
-  .table-wrap tbody {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  .table-wrap tbody tr {
-    display: block;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-4);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
-  }
-  .table-wrap tbody tr:last-child td {
-    border-bottom: 1px solid var(--color-divider);
-  }
-  .table-wrap tbody td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--color-divider);
-    white-space: normal;
-    font-size: var(--text-xs);
-    gap: var(--space-2);
-    min-height: 36px;
-  }
-  .table-wrap tbody td:last-child {
-    border-bottom: none;
-    padding-top: var(--space-3);
-  }
-  .table-wrap tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: .06em;
-    flex-shrink: 0;
-    min-width: 80px;
-  }
-  .table-wrap tbody td:empty {
-    display: none;
-  }
-  .table-wrap tfoot {
-    display: block;
-    margin-top: var(--space-2);
-  }
-  .table-wrap tfoot tr {
-    display: flex;
-    justify-content: space-between;
-    background: var(--color-surface-offset);
-    border-radius: var(--radius-xl);
-    padding: var(--space-3) var(--space-4);
-    font-weight: 700;
-    font-size: var(--text-sm);
-  }
-  .table-wrap tfoot td {
-    border: none !important;
-    padding: 0;
-    white-space: nowrap;
-  }
-  /* hide less important columns on mobile */
-  .table-wrap tbody td[data-label="Platform"],
-  .table-wrap tbody td[data-label="Code"],
-  .table-wrap tbody td[data-label="To"] {
-    display: none;
-  }
-  .location-text {
-    max-width: 160px !important;
-    white-space: normal !important;
-    word-break: break-word;
-  }
-  .filter-bar {
-    gap: var(--space-2);
-  }
-  .filter-select {
-    min-height: 44px;
-    font-size: 16px !important;
-    flex: 1;
-  }
-}
-
-/* ── Nav delete buttons: always visible on touch devices ── */
-@media (hover: none) {
-  .nav-del-btn {
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative !important;
-    right: 0 !important;
-  }
-  /* Increase lock/action button tap targets */
-  .lock-btn {
-    width: 48px !important;
-    height: 48px !important;
-    min-height: 48px;
-    min-width: 48px;
-  }
-  .btn-danger.btn-sm,
-  .btn-ghost.btn-sm {
-    min-height: 48px;
-    min-width: 48px;
-  }
-  .pb-select {
-    min-height: 48px;
-    padding: var(--space-3) var(--space-4);
-  }
-}
-
-/* ── Trip overview cards: single column on very small screens ── */
-@media (max-width: 480px) {
-  .trips-overview {
-    grid-template-columns: 1fr !important;
-  }
-  .settlement-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ── FX banner: scroll horizontally on mobile ── */
-@media (max-width: 768px) {
-  .fx-banner {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: var(--space-2) var(--space-4);
-  }
-  .fx-banner::-webkit-scrollbar { display: none; }
-  .fx-date { display: none; }
-}
-
-/* ── ENHANCED MOBILE UX ── */
-
-/* Better button spacing on mobile */
-@media (max-width: 768px) {
-  .topbar-actions {
-    width: 100%;
-    justify-content: space-between;
-    order: 3;
-  }
-  .topbar-actions .btn {
-    flex: 1;
-    min-width: auto;
-    justify-content: center;
-  }
-  .topbar-actions .btn-primary {
-    order: -1;
-  }
-}
-
-/* Stack filter controls vertically on small screens */
-@media (max-width: 480px) {
-  .filter-bar {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: var(--space-2) !important;
-  }
-  .filter-bar .filter-select {
-    flex: 1 !important;
-  }
-}
-
-/* Improve form spacing on mobile */
-@media (max-width: 768px) {
-  .form-group {
-    gap: var(--space-3);
-  }
-  .form-label {
-    font-weight: 600;
-  }
-  .form-input, .form-select, .form-textarea {
-    letter-spacing: 0.02em;
-  }
-}
-
-/* Improve KPI card readability on tiny screens */
-@media (max-width: 480px) {
-  .kpi-card {
-    padding: var(--space-4) !important;
-  }
-  .kpi-label {
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-  }
-}
-
-/* Better spacing for nav items on touch devices */
-@media (hover: none) and (max-width: 768px) {
-  .nav-item {
-    padding: var(--space-4) var(--space-5) !important;
-    min-height: 50px;
-  }
-  .sidebar-label {
-    padding: var(--space-3) var(--space-5);
-  }
-}
-
-/* Tighter page header on mobile */
-@media (max-width: 480px) {
-  .page-header {
-    margin-bottom: var(--space-3) !important;
-  }
-  .page-title {
-    margin-bottom: 0;
-  }
-  .page-subtitle {
-    font-size: 0.85rem;
-  }
-}
-
-/* Better tap targets for action buttons in tables */
-@media (max-width: 768px) {
-  .btn-danger.btn-sm,
-  .btn-ghost.btn-sm,
-  .lock-btn {
-    min-height: 40px !important;
-    min-width: 40px !important;
-    font-size: 16px;
-  }
-}
-
-/* Optimize topbar for very small screens */
-@media (max-width: 360px) {
-  .topbar {
-    padding: var(--space-2) var(--space-3);
-  }
-  .logo-text {
-    display: none;
-  }
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-  }
-  #username-input {
-    width: 70px !important;
-    font-size: 0.8rem !important;
-  }
-  .topbar-actions .btn svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-/* Improve card spacing for single column layout */
-@media (max-width: 480px) {
-  .card {
-    padding: var(--space-5) var(--space-4);
-  }
-  .trips-overview {
-    gap: var(--space-3) !important;
-  }
-}
 </style>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1111,18 +691,27 @@ function personCost(e, person, people) {
   return e.split==='YES'?sgd/sp.length:sgd;
 }
 function personUnpaid(e, person, people) {
-  // "Unpaid to person" = what others still owe this person (person must be the payer)
+  // person must be the payer to have money owed TO them
   if(e.paidBy !== person) return 0;
   const sp = getSplitPeople(e, people);
   const sgd = toSGD(e.cost, e.cur);
-  const sharePerPerson = e.split === 'YES' ? sgd / sp.length : sgd;
   let owed = 0;
-  sp.forEach(p => {
-    if(p === person) return; // payer doesn't owe themselves
-    // Check if this co-traveller has paid back TO the payer (person)
-    const pb = (e.paidBack || {})[p];
-    if(pb !== 'Paid Back') owed += sharePerPerson;
-  });
+  if(e.split === 'YES') {
+    // split evenly among sp, all non-payers owe their share
+    const share = sgd / sp.length;
+    sp.forEach(p => {
+      if(p === person) return;
+      const pb = (e.paidBack || {})[p];
+      if(pb !== 'Paid Back') owed += share;
+    });
+  } else {
+    // split=NO: forWhom person owes the full amount if they're not the payer
+    sp.forEach(p => {
+      if(p === person) return;
+      const pb = (e.paidBack || {})[p];
+      if(pb !== 'Paid Back') owed += sgd;
+    });
+  }
   return owed;
 }
 
@@ -1182,7 +771,7 @@ function fxBanner(){
   const chips=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
     const m=FX_META[c]||{flag:''};
     const d=r<0.01?r.toFixed(6):r.toFixed(4);
-    return`<span class="fx-chip">${m.flag} 1 ${c} = ${d} SGD</span>`;
+    return`<span class="fx-chip"><span class="fx-chip-flag">${m.flag}</span>1 ${c}&nbsp;=&nbsp;${d} SGD</span>`;
   }).join('');
   return`<div class="fx-banner"><span class="fx-banner-label">💱 FX Rates</span>${chips}<span class="fx-date">May 2026 · OFX/AlaChand</span><button class="fx-edit-btn" onclick="openFxModal()">✏️ Edit</button></div>`;
 }
@@ -1306,27 +895,37 @@ function renderTable(k){
     const lockClass = e.locked ? 'locked-cell' : '';
     const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
     const sgdCell=isFX
-      ?`<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
-      :`<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
-    const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
-    const pbVals=people.map(p=>{ if(p===e.paidBy) return `<td data-label="Paid back ${p}"><span class='badge badge-neutral'>Paid upfront</span></td>`; return `<td data-label="Paid back ${p}">${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`; }).join('');
-    const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
+      ?`<td class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
+      :`<td class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
+    const cVals=people.map(p=>`<td class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
+    const pbVals=people.map(p=>{
+      const sp=getSplitPeople(e,people);
+      if(p===e.paidBy) return `<td><span class='badge badge-neutral'>Paid upfront</span></td>`;
+      if(e.split!=='YES'){
+        // split=NO: only show dropdown if payer paid on behalf of this specific person
+        if(sp.includes(p)) return `<td>${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`;
+        return `<td><span style='color:var(--color-text-faint)'>—</span></td>`;
+      }
+      if(!sp.includes(p)) return `<td><span style='color:var(--color-text-faint)'>—</span></td>`;
+      return `<td>${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`;
+    }).join('');
+    const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
     const costCellClass = e.locked ? 'locked-cell' : '';
     return`<tr>
-      <td data-label="Date">${fmtDate(e.from)}</td><td data-label="To">${fmtDate(e.to)}</td>
-      <td data-label="Type"><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
-      <td data-label="Location"><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
-      <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
+      <td>${fmtDate(e.from)}</td><td>${fmtDate(e.to)}</td>
+      <td><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
+      <td><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
+      <td class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
       ${sgdCell}
-      <td data-label="Status">${sBadge(e.status)}</td>
-      <td data-label="Split"><span class="badge badge-neutral">${e.split||'—'}</span></td>
-      <td data-label="For"><span class="tag">${e.forWhom||'—'}</span></td>
-      <td data-label="Paid by">${e.paidBy||'—'}</td>
+      <td>${sBadge(e.status)}</td>
+      <td><span class="badge badge-neutral">${e.split||'—'}</span></td>
+      <td><span class="tag">${e.forWhom||'—'}</span></td>
+      <td>${e.paidBy||'—'}</td>
       ${cVals}${pbVals}${uVals}
-      <td data-label="Code"><span class="booking-code">${e.code||'—'}</span></td>
-      <td data-label="Platform"><span class="tag">${e.platform||'—'}</span></td>
-      <td data-label="Notes" style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
-      <td style="--no-label:1"><div class="flex gap-2">
+      <td><span class="booking-code">${e.code||'—'}</span></td>
+      <td><span class="tag">${e.platform||'—'}</span></td>
+      <td style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
+      <td><div class="flex gap-2">
         <button class="${e.locked?'lock-btn locked':'lock-btn'}" onclick="toggleLock('${k}',${e.id})" title="${e.locked?'Unlock transaction':'Lock transaction'}">${e.locked?'🔒':'🔓'}</button>
         <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked?'disabled title="Unlock to edit"':''}>✏️</button>
         <button class="btn btn-danger btn-sm" onclick="delExp('${k}',${e.id})" ${e.locked?'disabled title="Unlock to delete"':''}>🗑</button>
@@ -1617,7 +1216,7 @@ function toggleLock(k, id) {
   t.innerHTML=d==='dark'?sun:moon;
   t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);t.innerHTML=d==='dark'?sun:moon;});
 })();
-document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+document.getElementById('menuToggle').addEventListener('click',()=>{setTopbarHeight();document.getElementById('sidebar').classList.toggle('open');});
 
 // ===================== DELETE TRIP =====================
 let tripToDelete = null;
@@ -1841,6 +1440,16 @@ function saveNewTrip(ev){
 renderOverview();
 </script>
 <div id="install-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#b5622a;color:#fff;padding:0.75rem 1.5rem;border-radius:2rem;font-size:0.9rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:9999;align-items:center;gap:1rem;white-space:nowrap;">💸 Add to Home Screen<button onclick="doInstall()" style="background:#fff;color:#b5622a;border:none;border-radius:1rem;padding:0.3rem 0.9rem;font-weight:700;cursor:pointer;margin-left:0.5rem">Install</button><button onclick="document.getElementById('install-banner').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;margin-left:0.25rem">✕</button></div>
-<script>var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});function doInstall(){document.getElementById('install-banner').style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;});}}window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';});</script><script>if('serviceWorker' in navigator){var b=new Blob(['const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));'],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){console.log(e);});}</script>
+<script>var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});function doInstall(){document.getElementById('install-banner').style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;});}}window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';});</script><script>if('serviceWorker' in navigator){var b=new Blob(['const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));'],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){console.log(e);});}
+// ── Dynamic topbar height → CSS variable ──
+function setTopbarHeight() {
+  const h = document.querySelector('.topbar').offsetHeight;
+  document.documentElement.style.setProperty('--topbar-h', h + 'px');
+}
+window.addEventListener('resize', setTopbarHeight);
+window.addEventListener('orientationchange', setTopbarHeight);
+document.addEventListener('DOMContentLoaded', setTopbarHeight);
+setTimeout(setTopbarHeight, 100); // fallback after fonts/icons load
+</script>
 </body>
 </html>
