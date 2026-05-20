@@ -177,27 +177,56 @@ tbody tr:hover{background:var(--color-surface-offset);}
 .tabular{font-variant-numeric:tabular-nums;}
 .mobile-menu-btn{display:none;}
 @media(max-width:768px){
-  .app-shell{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+  /* Reset grid — use fixed positioning for reliable iOS scroll */
+  .app-shell{
+    display:block;
+    height:100dvh;
+    overflow:hidden;
+  }
+  /* Topbar: fixed at top */
+  .topbar{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:50;
+  }
+  /* Sidebar: fixed, slides in from left */
   .sidebar{
-    display:none;
-    position:fixed;left:0;top:0;bottom:0;
-    z-index:40;
-    width:80vw;max-width:300px;
+    display:block !important;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    z-index:45;
+    width:80vw;
+    max-width:300px;
     transform:translateX(-100%);
-    transition:transform var(--transition);
+    transition:transform 0.28s cubic-bezier(0.16,1,0.3,1);
     box-shadow:var(--shadow-lg);
     height:100dvh;
     padding-top:var(--topbar-h,61px);
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
+    visibility:hidden;
+    background:var(--color-surface);
+    border-right:1px solid var(--color-divider);
   }
-  .sidebar.open{display:block;transform:translateX(0);}
+  .sidebar.open{
+    transform:translateX(0);
+    visibility:visible;
+  }
+  /* Main content: fixed below topbar, above bottom nav — this is what scrolls */
   .main-content{
-    padding:var(--space-4) var(--space-3);
-    overflow-y:auto;
+    position:fixed;
+    top:var(--topbar-h,61px);
+    left:0;right:0;
+    bottom:calc(52px + env(safe-area-inset-bottom, 0px));
+    overflow-y:scroll;
+    overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
-    padding-bottom:calc(72px + env(safe-area-inset-bottom, 0px));
+    padding:var(--space-4) var(--space-3);
+    padding-bottom:var(--space-6);
+    background:var(--color-bg);
   }
   .form-grid{grid-template-columns:1fr;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
@@ -211,6 +240,21 @@ tbody tr:hover{background:var(--color-surface-offset);}
   .theme-toggle{width:44px;height:44px;}
   .bottom-nav{display:flex;}
   .topbar-actions .btn-primary{display:none;}
+}
+
+  /* Modal full-screen friendly on mobile */
+  .modal{
+    max-height:calc(100dvh - var(--topbar-h,61px) - var(--space-8));
+    border-radius:var(--radius-xl);
+    padding:var(--space-5);
+  }
+  .modal-backdrop{
+    padding:var(--space-3);
+    align-items:flex-end;
+  }
+
+@media(max-width:380px){
+  .kpi-grid{grid-template-columns:1fr;}
 }
 @media(max-width:380px){
   .kpi-grid{grid-template-columns:1fr;}
