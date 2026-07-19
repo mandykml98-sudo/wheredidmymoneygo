@@ -1006,130 +1006,78 @@ function loadTripsFromStorage(){
 }
 
 // ===================== FX RATES =====================
-// Sources: AlaChand May 6 2026 (AUD), OFX May 14 2026 (KRW), OFX May 12 2026 (VND)
 const DEFAULT_FX = {
-  SGD:1.0,
-  AUD:0.9217,    USD:1.35,      JPY:0.00924,   EUR:1.52,
-  GBP:1.80,      THB:0.0401,    MYR:0.303,     IDR:0.0000822,
-  PHP:0.0238,    TWD:0.0444,    HKD:0.173,     KRW:0.000858,
-  VND:0.0000484, CNY:0.186,     INR:0.0160,    NZD:0.830,
-  CAD:0.985,     CHF:1.495,     SEK:0.0704,    NOK:0.0676,
-  DKK:0.204,     BRL:0.182,     MXN:0.0500,    TRY:0.0293,
-  ZAR:0.0540,    EGP:0.0205,    AED:0.368,     SAR:0.360,
-  QAR:0.371,     BDT:0.00912,   PKR:0.00360,   LKR:0.00333,
-  MMK:0.000353,  KHR:0.000245,  LAK:0.0000362,
+  SGD: 1,
+  AUD: 1.109259,
+  USD: 0.774387,
+  JPY: 125.76769,
+  EUR: 0.677023,
+  GBP: 0.575689,
+  THB: 26.032659,
+  MYR: 3.162335,
+  IDR: 13906.689673,
+  PHP: 47.709902,
+  TWD: 25.018959,
+  HKD: 6.071822,
+  KRW: 1151.139554,
+  VND: 20291.853516,
+  CNY: 5.25573,
+  INR: 74.568265,
+  NZD: 1.326082,
+  CAD: 1.085738,
+  CHF: 0.625246,
+  SEK: 7.471589,
+  NOK: 7.480976,
+  DKK: 5.050851,
+  BRL: 3.95647,
+  MXN: 13.565215,
+  TRY: 36.53396,
+  ZAR: 12.787321,
+  EGP: 39.131853,
+  AED: 2.843937,
+  SAR: 2.903952,
+  QAR: 2.818769,
+  BDT: 95.432946,
+  PKR: 215.266799,
+  LKR: 260.226748,
+  MMK: 1631.656108,
+  KHR: 3139.394737,
+  LAK: 17207.384543
 };
-const FX_META = {
-  AUD:{ flag:'🇦🇺', name:'Australian Dollar',    note:'1 SGD = 1.085 AUD · May 2026' },
-  KRW:{ flag:'🇰🇷', name:'Korean Won',           note:'1 SGD = 1,164.95 KRW · May 2026' },
-  VND:{ flag:'🇻🇳', name:'Vietnamese Dong',      note:'1 SGD = 20,652 VND · May 2026' },
-  USD:{ flag:'🇺🇸', name:'US Dollar',             note:'Market reference rate · May 2026' },
-  JPY:{ flag:'🇯🇵', name:'Japanese Yen',          note:'1 SGD = 108.2 JPY · May 2026' },
-  EUR:{ flag:'🇪🇺', name:'Euro',                  note:'1 SGD = 0.658 EUR · May 2026' },
-  GBP:{ flag:'🇬🇧', name:'British Pound',         note:'1 SGD = 0.556 GBP · May 2026' },
-  THB:{ flag:'🇹🇭', name:'Thai Baht',             note:'1 SGD = 24.9 THB · May 2026' },
-  MYR:{ flag:'🇲🇾', name:'Malaysian Ringgit',     note:'1 SGD = 3.30 MYR · May 2026' },
-  IDR:{ flag:'🇮🇩', name:'Indonesian Rupiah',     note:'1 SGD = 12,165 IDR · May 2026' },
-  PHP:{ flag:'🇵🇭', name:'Philippine Peso',       note:'1 SGD = 42.0 PHP · May 2026' },
-  TWD:{ flag:'🇹🇼', name:'New Taiwan Dollar',     note:'1 SGD = 22.5 TWD · May 2026' },
-  HKD:{ flag:'🇭🇰', name:'Hong Kong Dollar',      note:'1 SGD = 5.78 HKD · May 2026' },
-  CNY:{ flag:'🇨🇳', name:'Chinese Yuan',          note:'1 SGD = 5.38 CNY · May 2026' },
-  INR:{ flag:'🇮🇳', name:'Indian Rupee',          note:'1 SGD = 62.5 INR · May 2026' },
-  NZD:{ flag:'🇳🇿', name:'New Zealand Dollar',    note:'1 SGD = 1.205 NZD · May 2026' },
-  CAD:{ flag:'🇨🇦', name:'Canadian Dollar',       note:'1 SGD = 1.015 CAD · May 2026' },
-  CHF:{ flag:'🇨🇭', name:'Swiss Franc',           note:'1 SGD = 0.669 CHF · May 2026' },
-  SEK:{ flag:'🇸🇪', name:'Swedish Krona',         note:'1 SGD = 14.2 SEK · May 2026' },
-  NOK:{ flag:'🇳🇴', name:'Norwegian Krone',       note:'1 SGD = 14.8 NOK · May 2026' },
-  DKK:{ flag:'🇩🇰', name:'Danish Krone',          note:'1 SGD = 9.0 DKK · May 2026' },
-  BRL:{ flag:'🇧🇷', name:'Brazilian Real',        note:'1 SGD = 7.4 BRL · May 2026' },
-  MXN:{ flag:'🇲🇽', name:'Mexican Peso',          note:'1 SGD = 27.0 MXN · May 2026' },
-  TRY:{ flag:'🇹🇷', name:'Turkish Lira',          note:'1 SGD = 46.0 TRY · May 2026' },
-  ZAR:{ flag:'🇿🇦', name:'South African Rand',    note:'1 SGD = 24.8 ZAR · May 2026' },
-  EGP:{ flag:'🇪🇬', name:'Egyptian Pound',        note:'1 SGD = 66.0 EGP · May 2026' },
-  AED:{ flag:'🇦🇪', name:'UAE Dirham',            note:'1 SGD = 4.96 AED · May 2026' },
-  SAR:{ flag:'🇸🇦', name:'Saudi Riyal',           note:'1 SGD = 5.06 SAR · May 2026' },
-  QAR:{ flag:'🇶🇦', name:'Qatari Riyal',          note:'1 SGD = 4.91 QAR · May 2026' },
-  BDT:{ flag:'🇧🇩', name:'Bangladeshi Taka',      note:'1 SGD = 148 BDT · May 2026' },
-  PKR:{ flag:'🇵🇰', name:'Pakistani Rupee',       note:'1 SGD = 375 PKR · May 2026' },
-  LKR:{ flag:'🇱🇰', name:'Sri Lankan Rupee',      note:'1 SGD = 405 LKR · May 2026' },
-  MMK:{ flag:'🇲🇲', name:'Myanmar Kyat',          note:'1 SGD = 2835 MMK · May 2026' },
-  KHR:{ flag:'🇰🇭', name:'Cambodian Riel',        note:'1 SGD = 5500 KHR · May 2026' },
-  LAK:{ flag:'🇱🇦', name:'Lao Kip',               note:'1 SGD = 27600 LAK · May 2026' },
-};
+
 let fx = { ...DEFAULT_FX };
+let fxLastUpdated = "18 Jul 2026 UTC";
 
-// Persisted fetched FX timestamp/key
-const FX_STORAGE_KEY = 'wdmmg_fx';
-
-async function fetchDailyFx(){
-  const apis = [
-    'https://api.exchangerate.host/latest?base=SGD',
-    'https://open.er-api.com/v6/latest/SGD'
-  ];
-  for(const api of apis){
-    try{
-      const res = await fetch(api, {cache:'no-cache'});
-      if(!res.ok) throw new Error('Network response not ok');
-      const data = await res.json();
-      if(!data || !data.rates) throw new Error('Invalid FX data');
-      const newFx = { ...fx };
-      Object.keys(data.rates).forEach(c => {
-        if(c === 'SGD') return newFx['SGD'] = 1.0;
-        const r = data.rates[c];
-        if(r && r > 0) newFx[c] = 1 / r;
-      });
-      Object.keys(DEFAULT_FX).forEach(c=>{ if(!newFx[c]) newFx[c]=DEFAULT_FX[c]; });
-      fx = newFx;
-      localStorage.setItem(FX_STORAGE_KEY, JSON.stringify({fx,ts:Date.now()}));
-      if(typeof renderFxRows === 'function') renderFxRows();
-      updateAllKpis();
-      return true;
-    }catch(err){
-      console.warn('Failed to fetch FX from', api, err);
-      // try next endpoint
-    }
-  }
-  return false;
-}
-
-function loadFxFromStorage(){
-  try{
-    const s = localStorage.getItem(FX_STORAGE_KEY);
-    if(!s) return false;
-    const obj = JSON.parse(s);
-    if(obj && obj.fx) { fx = obj.fx; return true; }
-  }catch(e){/* ignore */}
-  return false;
-}
-
-function updateAllKpis(){
-  // update per-trip KPIs and overview
-  Object.keys(trips).forEach(k=>updateTripKpis(k));
-  if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
-}
-
-function initFx(){
-  // try load persisted fx
-  let stored = null; try{ stored = JSON.parse(localStorage.getItem(FX_STORAGE_KEY)||'null'); }catch(e){}
-  if(stored && stored.fx){ fx = stored.fx; }
-  if(typeof renderFxRows === 'function') renderFxRows();
-  // If no stored ts or older than 24h, attempt fetch
-  const ts = stored && stored.ts ? stored.ts : 0;
-  const ageH = (Date.now() - ts) / (1000*60*60);
-  if(!ts || ageH > 24){ fetchDailyFx().then(ok=>{ if(!ok) console.warn('Using cached/default FX'); }); }
-}
-
-function refreshFxNow(){
-  const btn = event && event.currentTarget ? event.currentTarget : null;
-  if(btn) btn.disabled = true;
-  fetchDailyFx().then(ok=>{
-    if(!ok) alert('Failed to refresh rates. Keeping current values.');
-    else alert('Exchange rates updated.');
-    if(btn) btn.disabled = false;
+async function fetchDailyFx() {
+  const res = await fetch("https://open.er-api.com/v6/latest/SGD", {
+    method: "GET",
+    headers: { "Accept": "application/json" },
+    cache: "no-store"
   });
+
+  if (!res.ok) throw new Error("FX fetch failed");
+
+  const data = await res.json();
+  if (data.result !== "success" || !data.rates) {
+    throw new Error("Invalid FX payload");
+  }
+
+  fx = { SGD: 1, ...DEFAULT_FX, ...data.rates };
+  fxLastUpdated = data.time_last_update_utc || "Live";
+  return fx;
 }
 
-function toSGD(cost, cur) { return Number(cost) * (fx[cur] || 1); }
+function toSGD(amount, cur) {
+  const rate = fx[cur] || 1;
+  if (cur === "SGD") return Number(amount || 0);
+  return Number(amount || 0) / rate;
+}
+
+function fromSGD(amountSgd, cur) {
+  const rate = fx[cur] || 1;
+  if (cur === "SGD") return Number(amountSgd || 0);
+  return Number(amountSgd || 0) * rate;
+}
 
 // ===================== CATEGORIES (customizable) =====================
 const DEFAULT_CATEGORIES = ['Hotel','Flight','Car/Fuel','Food','Misc'];
@@ -1303,13 +1251,21 @@ function updateTripKpis(k) {
 function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'2-digit'});}
 
 // ===================== FX BANNER =====================
-function fxBanner(){
-  const chips=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
-    const m=FX_META[c]||{flag:''};
-    const d=r<0.01?r.toFixed(6):r.toFixed(4);
-    return`<span class="fx-chip">${m.flag} 1 ${c} = ${d} SGD</span>`;
-  }).join('');
-  return`<div class="fx-banner"><span class="fx-banner-label">💱 FX Rates</span>${chips}<span class="fx-date">May 2026 · OFX/AlaChand</span><button class="fx-edit-btn" onclick="openFxModal()">✏️ Edit</button></div>`;
+function fxBanner() {
+  const chips = Object.entries(fx)
+    .filter(([c]) => c !== "SGD")
+    .slice(0, 8)
+    .map(([c, r]) => `<span class="fx-chip">${c} ${Number(r).toFixed(r >= 100 ? 2 : 4)}</span>`)
+    .join("");
+
+  return `
+    <div class="fx-banner">
+      <span class="fx-banner-label">FX Rates</span>
+      ${chips}
+      <span class="fx-date">${fxLastUpdated}</span>
+      <button class="fx-edit-btn" onclick="openFxModal()">Edit</button>
+    </div>
+  `;
 }
 
 // ===================== NAVIGATION =====================
@@ -1536,7 +1492,7 @@ function renderSettlement(){
 
 // ===================== FX MODAL =====================
 function openFxModal(){
-  const rows=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
+  const rows=Object.entries(fx).filter(([c])=>c!=='SGD').slice(0,20).map(([c,r])=>{
     const m=FX_META[c]||{flag:'',name:c,note:''};
     const d=r<0.01?r.toFixed(7):r.toFixed(5);
     return`<div class="fx-rate-row">
