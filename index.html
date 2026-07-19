@@ -1062,33 +1062,34 @@ let fx = { ...DEFAULT_FX };
 const FX_STORAGE_KEY = 'wdmmg_fx';
 
 async function fetchDailyFx(){
-  const api = 'https://api.exchangerate.host/latest?base=SGD';
-  try{
-    const res = await fetch(api, {cache:'no-cache'});
-    if(!res.ok) throw new Error('Network response not ok');
-    const data = await res.json();
-    if(!data || !data.rates) throw new Error('Invalid FX data');
-    // data.rates gives currency per 1 SGD (e.g., AUD: 0.9217 means 1 SGD = 0.9217 AUD)
-    // We want fx[currency] = SGD per 1 unit of currency => fx[c] = 1 / data.rates[c]
-    const newFx = { ...fx };
-    Object.keys(data.rates).forEach(c => {
-      if(c === 'SGD') return newFx['SGD'] = 1.0;
-      const r = data.rates[c];
-      if(r && r > 0) newFx[c] = 1 / r;
-    });
-    // Keep DEFAULT_FX entries if API missing some currencies
-    Object.keys(DEFAULT_FX).forEach(c=>{ if(!newFx[c]) newFx[c]=DEFAULT_FX[c]; });
-    fx = newFx;
-    // persist with timestamp
-    localStorage.setItem(FX_STORAGE_KEY, JSON.stringify({fx,ts:Date.now()}));
-    if(typeof renderFxRows === 'function') renderFxRows();
-    // re-render tables/kpis using new FX
-    updateAllKpis();
-    return true;
-  }catch(err){
-    console.warn('Failed to fetch FX:', err);
-    return false;
+  const apis = [
+    'https://api.exchangerate.host/latest?base=SGD',
+    'https://open.er-api.com/v6/latest/SGD'
+  ];
+  for(const api of apis){
+    try{
+      const res = await fetch(api, {cache:'no-cache'});
+      if(!res.ok) throw new Error('Network response not ok');
+      const data = await res.json();
+      if(!data || !data.rates) throw new Error('Invalid FX data');
+      const newFx = { ...fx };
+      Object.keys(data.rates).forEach(c => {
+        if(c === 'SGD') return newFx['SGD'] = 1.0;
+        const r = data.rates[c];
+        if(r && r > 0) newFx[c] = 1 / r;
+      });
+      Object.keys(DEFAULT_FX).forEach(c=>{ if(!newFx[c]) newFx[c]=DEFAULT_FX[c]; });
+      fx = newFx;
+      localStorage.setItem(FX_STORAGE_KEY, JSON.stringify({fx,ts:Date.now()}));
+      if(typeof renderFxRows === 'function') renderFxRows();
+      updateAllKpis();
+      return true;
+    }catch(err){
+      console.warn('Failed to fetch FX from', api, err);
+      // try next endpoint
+    }
   }
+  return false;
 }
 
 function loadFxFromStorage(){
@@ -1979,13 +1980,8 @@ function doInstall(){
 window.addEventListener('appinstalled', function(){ document.getElementById('install-banner').style.display='none'; });
 </script>
 <script>
-if('serviceWorker' in navigator){
-  var swCode = `const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));`;
-  try{
-    var b = new Blob([swCode], {type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){ console.log(e); });
-  }catch(e){ console.log('SW register failed', e); }
-}
+// Service worker registration removed for Netlify / blob-URL compatibility.
+// Register a proper service worker file if you add one to the site root.
 </script>
 </body>
 </html>
