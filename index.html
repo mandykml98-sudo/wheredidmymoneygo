@@ -1079,6 +1079,11 @@ function fromSGD(amountSgd, cur) {
   return Number(amountSgd || 0) * rate;
 }
 
+function initFx(){
+  // Initialize FX on page load - can be expanded later if needed
+  // Currently rates are pre-loaded from DEFAULT_FX
+}
+
 // ===================== CATEGORIES (customizable) =====================
 const DEFAULT_CATEGORIES = ['Hotel','Flight','Car/Fuel','Food','Misc'];
 let categories = [];
