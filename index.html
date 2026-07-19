@@ -224,7 +224,14 @@ table{min-width:100%;}
 table td,table th{white-space:nowrap;}
 .modal-backdrop{position:fixed;inset:0;background:rgba(26,18,8,.55);z-index:100;display:none;align-items:center;justify-content:center;padding:var(--space-4);backdrop-filter:blur(4px);}
 .modal-backdrop.open{display:flex;}
-.modal{background:var(--color-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-lg);padding:var(--space-8);width:100%;max-width:720px;max-height:calc(100dvh - 60px);overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp 220ms cubic-bezier(0.16,1,0.3,1);}
+.modal{background:var(--color-surface);border-radius:var(--radius-2xl);box-shadow:var(--shadow-lg);padding:var(--space-8);width:100%;max-width:720px;max-height:calc(100dvh - 60px);overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp 220ms cubic-bezier(0.16,1,0.3,1);} 
+
+/* FX modal: pin header and footer, allow body to scroll */
+#fx-modal .modal{display:flex;flex-direction:column;overflow:hidden;max-height:calc(100dvh - var(--topbar-height));}
+#fx-modal .modal-header{position:sticky;top:0;z-index:6;background:var(--color-surface);padding-bottom:var(--space-3);}
+#fx-modal .modal-body{overflow:auto;flex:1;padding-top:0;padding-bottom:var(--space-3);}
+#fx-modal .modal-footer{position:sticky;bottom:0;z-index:6;background:var(--color-surface);}
+
 .modal.sm{max-width:720px;}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .modal-title{font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-6);color:var(--color-text);}
@@ -272,9 +279,9 @@ table td,table th{white-space:nowrap;}
 .mobile-menu-btn{display:none;}
 @media(max-width:768px){
   .app-shell{grid-template-columns:1fr;}
-  .sidebar{display:none;position:fixed;left:0;top:61px;bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:auto;}
+  .sidebar{display:none;position:fixed;left:0;top:var(--topbar-height);bottom:0;z-index:40;width:260px;transform:translateX(-100%);transition:transform var(--transition);box-shadow:var(--shadow-lg);height:auto;}
   .sidebar.open{display:block;transform:translateX(0);}
-  .main-content{padding:var(--space-5) var(--space-4);}
+  .main-content{padding:var(--space-5) var(--space-4);padding-top:calc(var(--topbar-height) + var(--space-4));}
   .form-grid{grid-template-columns:1fr;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
   .mobile-menu-btn{display:flex;}
@@ -803,7 +810,7 @@ input, textarea {
 <header class="topbar">
   <div class="flex items-center gap-3">
     <button class="btn btn-ghost mobile-menu-btn" id="menuToggle"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"></svg></button>
-    <a href="#" class="logo">
+    <a href="#" class="logo" onclick="showPage('overview'); return false;">
       <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
         <circle cx="18" cy="18" r="16" fill="currentColor" opacity="0.12"/>
         <path d="M18 6C12 12 8 16 8 20c0 5 4.5 8 10 8s10-3 10-8c0-4-4-8-10-14z" fill="var(--color-primary)" opacity="0.9"/>
@@ -1056,9 +1063,11 @@ input, textarea {
 <!-- FX MODAL -->
 <div class="modal-backdrop" id="fx-modal" onclick="if(event.target===this)closeFxModal()">
   <div class="modal sm">
-    <h2 class="modal-title">💱 Exchange Rates → SGD</h2>
-    <p class="text-sm text-muted mb-4">Source: OFX / AlaChand reference rates. Edit any rate and click Apply to recalculate all amounts instantly.</p>
-    <div id="fx-rows"></div>
+    <div class="modal-header">
+      <h2 class="modal-title">💱 Exchange Rates → SGD</h2>
+      <p class="text-sm text-muted mb-4">Source: OFX / AlaChand reference rates. Edit any rate and click Apply to recalculate all amounts instantly.</p>
+    </div>
+    <div class="modal-body" id="fx-rows"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
       <button class="btn btn-ghost" onclick="refreshFxNow()">Refresh Rates</button>
@@ -1134,7 +1143,43 @@ function updateFxSearch(value){
 
 function renderFxBanners(){
   document.querySelectorAll('[id$="-fx-banner"]').forEach(el => {
-    if(el) el.innerHTML = fxBanner();
+    if(!el) return;
+    const chipsHtml = (function(){
+      const codes = getFilteredFxCodes();
+      if(!codes.length) return '<span class="fx-no-results">No matching currencies found.</span>';
+      return codes.map(c=>{
+        const r = fx[c] || DEFAULT_FX[c] || 1;
+        const d = r >= 100 ? r.toFixed(2) : r.toFixed(4);
+        return `
+          <span class="fx-chip">
+            <span class="fx-chip-inner">
+              <span class="fx-chip-flag">${FX_META[c].flag}</span>
+              <span class="fx-chip-rate">1 SGD = ${d}</span>
+              <span class="fx-chip-code">${c}</span>
+            </span>
+          </span>
+        `;
+      }).join('');
+    })();
+
+    // Initial render: create structure and wire input handler once
+    if(!el.dataset.fxInit){
+      el.innerHTML = fxBanner();
+      el.dataset.fxInit = '1';
+      const input = el.querySelector('.fx-search-input');
+      if(input){
+        input.addEventListener('input', (e)=>{ fxSearchTerm = e.target.value || ''; renderFxBanners(); });
+      }
+      const chipsContainer = el.querySelector('.fx-banner-chips');
+      if(chipsContainer) chipsContainer.innerHTML = chipsHtml;
+      const dateEl = el.querySelector('.fx-date'); if(dateEl) dateEl.textContent = fxLastUpdated;
+      return;
+    }
+
+    // Subsequent updates: only update chips and date to preserve input focus/caret
+    const chipsContainer = el.querySelector('.fx-banner-chips');
+    if(chipsContainer) chipsContainer.innerHTML = chipsHtml;
+    const dateEl = el.querySelector('.fx-date'); if(dateEl) dateEl.textContent = fxLastUpdated;
   });
 }
 
@@ -1410,7 +1455,7 @@ function fxBanner() {
         <button class="fx-edit-btn" onclick="openFxModal()">Edit</button>
       </div>
       <div class="fx-search">
-        <input class="fx-search-input" type="search" value="${htmlEscape(fxSearchTerm)}" placeholder="Search currency code or name" oninput="updateFxSearch(this.value)">
+        <input class="fx-search-input" type="search" value="${htmlEscape(fxSearchTerm)}" placeholder="Search currency code or name">
       </div>
       <div class="fx-banner-chips">
         ${chips}
