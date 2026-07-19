@@ -980,9 +980,10 @@ input, textarea {
     <p class="text-sm text-muted mb-4">Source: OFX / AlaChand mid-market, May 2026. Edit any rate and click Apply to recalculate all amounts instantly.</p>
     <div id="fx-rows"></div>
     <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
-        <button class="btn btn-ghost" onclick="refreshFxNow()">Refresh Rates</button>
-        <button class="btn btn-primary" onclick="applyFx()">Apply & Recalculate</button>
+      <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
+      <button class="btn btn-ghost" onclick="refreshFxNow()">Refresh Rates</button>
+      <button class="btn btn-ghost" onclick="restoreFxFromStorage()">Restore Cached</button>
+      <button class="btn btn-primary" onclick="applyFx()">Apply & Recalculate</button>
     </div>
   </div>
 </div>
@@ -1557,6 +1558,20 @@ function applyFx(){
   if(a) showPage(a.dataset.page);
 }
 function resetFx(){ fx={...DEFAULT_FX}; openFxModal(); }
+
+function restoreFxFromStorage(){
+  try{
+    const s = localStorage.getItem(FX_STORAGE_KEY);
+    if(!s) return alert('No cached exchange rates found in localStorage.');
+    const obj = JSON.parse(s);
+    if(!obj || !obj.fx) return alert('Cached FX is invalid.');
+    fx = obj.fx;
+    if(typeof renderFxRows === 'function') renderFxRows();
+    updateAllKpis();
+    openFxModal();
+    alert('Exchange rates restored from cache. Click Apply to recalculate.');
+  }catch(e){ console.error('restoreFxFromStorage error', e); alert('Failed to restore FX from storage'); }
+}
 
 // ===================== EXPENSE MODAL =====================
 function openAddModal(tripKey){
