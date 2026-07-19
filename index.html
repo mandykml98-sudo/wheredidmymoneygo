@@ -1968,6 +1968,25 @@ function saveNewTrip(ev){
 renderOverview();
 </script>
 <div id="install-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#b5622a;color:#fff;padding:0.75rem 1.5rem;border-radius:2rem;font-size:0.9rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:9999;align-items:center;gap:1rem;white-space:nowrap;">💸 Add to Home Screen<button onclick="doInstall()" style="background:#fff;color:#b5622a;border:none;border-radius:1rem;padding:0.3rem 0.9rem;font-weight:700;cursor:pointer;margin-left:0.5rem">Install</button><button onclick="document.getElementById('install-banner').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;margin-left:0.25rem">✕</button></div>
-<script>var deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});function doInstall(){document.getElementById('install-banner').style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;});}}window.addEventListener('appinstalled',function(){document.getElementById('install-banner').style.display='none';});</script><script>if('serviceWorker' in navigator){var b=new Blob(['const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));'],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){console.log(e);});}</script>
+<script>
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault(); deferredPrompt = e; document.getElementById('install-banner').style.display = 'flex';
+});
+function doInstall(){
+  document.getElementById('install-banner').style.display='none';
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt = null; }); }
+}
+window.addEventListener('appinstalled', function(){ document.getElementById('install-banner').style.display='none'; });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  var swCode = `const CACHE='wdmmg-v1';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));`;
+  try{
+    var b = new Blob([swCode], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(e){ console.log(e); });
+  }catch(e){ console.log('SW register failed', e); }
+}
+</script>
 </body>
 </html>
