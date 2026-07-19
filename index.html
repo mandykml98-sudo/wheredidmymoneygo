@@ -1452,13 +1452,9 @@ function renderTable(k){
     const rate=fx[e.cur]||1;
     const lockClass = e.locked ? 'locked-cell' : '';
     const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
-    const sgdCell = isFX
-      ? `<td data-label="SGD" class="tabular ${lockClass}">
-           <span class="sgd-foreign">${fmt(sgd)}</span>
-           <span class="fx-note">@ 1 SGD = ${rate.toFixed(4)} ${e.cur}</span>
-           ${lockBadge}
-         </td>`
-      : `<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
+    const sgdCell=isFX
+      ?`<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
+      :`<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
     const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
     const pbVals=people.map(p=>{ if(p===e.paidBy) return `<td data-label="Paid back ${p}"><span class='badge badge-neutral'>Paid upfront</span></td>`; return `<td data-label="Paid back ${p}">${pbDropdown(k, e.id, p, (e.paidBack||{})[p])}</td>`; }).join('');
     const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
