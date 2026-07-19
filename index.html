@@ -607,23 +607,44 @@ input, textarea {
 /* ── FX banner: scroll horizontally on mobile ── */
 @media (max-width: 768px) {
   .fx-banner {
-    overflow-x: auto;
-    flex-wrap: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow-x: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding: var(--space-2) var(--space-3);
-    gap: var(--space-2);
+    gap: var(--space-3);
     min-width: 0;
   }
   .fx-banner::-webkit-scrollbar { display: none; }
-  .fx-date { display: none; }
-  .fx-banner-label {
-    flex-shrink: 0;
-    white-space: nowrap;
+  .fx-banner-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
-  .fx-banner-rate {
-    flex-shrink: 0;
-    white-space: nowrap;
+  .fx-search {
+    width: 100%;
+    max-width: 100%;
+  }
+  .fx-banner-label,
+  .fx-date,
+  .fx-edit-btn {
+    width: 100%;
+  }
+  .fx-date {
+    display: block;
+  }
+  .fx-banner-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    overflow-x: auto;
+    width: 100%;
+  }
+  .fx-banner-label {
+    white-space: normal;
   }
 }
 
@@ -884,7 +905,8 @@ input, textarea {
           </div>
           <div id="nt-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--color-surface);border:1.5px solid var(--color-primary);border-radius:var(--radius-md);box-shadow:var(--shadow-md);z-index:200;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
         </div>
-        <div class="form-group full"><label class="form-label">Date Range</label><input class="form-input" type="text" id="nt-dates" placeholder="e.g. Jul 1–10, 2026"></div>
+        <div class="form-group"><label class="form-label">Start Date</label><input class="form-input" type="date" id="nt-start" required></div>
+        <div class="form-group"><label class="form-label">End Date</label><input class="form-input" type="date" id="nt-end"></div>
         <div class="form-group full"><label class="form-label">Travellers (comma-separated)</label><input class="form-input" type="text" id="nt-people" placeholder="e.g. Mandy, Wei Long" required></div>
         <div class="form-group"><label class="form-label">Card Colour</label>
           <select class="form-select" id="nt-colour">
@@ -1069,10 +1091,11 @@ input, textarea {
     </div>
     <div class="modal-body" id="fx-rows"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
-      <button class="btn btn-ghost" onclick="refreshFxNow()">Refresh Rates</button>
-      <button class="btn btn-ghost" onclick="restoreFxFromStorage()">Restore Cached</button>
-      <button class="btn btn-primary" onclick="applyFx()">Apply & Recalculate</button>
+      <button type="button" class="btn btn-ghost" onclick="closeFxModal()">Cancel</button>
+      <button type="button" class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
+      <button type="button" class="btn btn-ghost" onclick="refreshFxNow()">Refresh Rates</button>
+      <button type="button" class="btn btn-ghost" onclick="restoreFxFromStorage()">Restore Cached</button>
+      <button type="button" class="btn btn-primary" onclick="applyFx()">Apply & Recalculate</button>
     </div>
   </div>
 </div>
@@ -1429,6 +1452,7 @@ function updateTripKpis(k) {
     <div class="kpi-card"><div class="kpi-label">Owed to ${currentUsername}</div><div class="kpi-value" style="color:var(--color-warning)">${fmt(tUnpaid)}</div></div>`;
 }
 function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'2-digit'});}
+function formatTripDate(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'2-digit'});} 
 
 // ===================== FX BANNER =====================
 function fxBanner() {
@@ -1624,6 +1648,14 @@ function renderTable(k){
   const tSGD=data.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
   const currentUser=currentUsername||'You';
   const unpaidToUser=data.reduce((s,e)=>s+personUnpaid(e,currentUser,people),0);
+  const perPersonTotals = people.map(p=>({
+    name:p,
+    total:trip.expenses.reduce((sum,e)=>sum+personCost(e,p,people),0)
+  }));
+  const perPersonHtml = perPersonTotals.map(item=>`<div>
+      <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">${item.name}</div>
+      <div class="tabular fw-700" style="color:var(--color-text);font-size:var(--text-lg);">${fmt(item.total)}</div>
+    </div>`).join('');
   document.getElementById(prefix+'-table-wrap').innerHTML=`<table>
     <thead><tr><th>From</th><th>To</th><th>Type</th><th>Description</th><th>Cost</th><th>In SGD ↗</th><th>Status</th><th>Split</th><th>For</th><th>Paid by</th>${costH}${pbH}${upH}<th>Booking Code</th><th>Platform</th><th>Notes</th><th>Actions</th></tr></thead>
     <tbody>${rows}</tbody>
@@ -1638,6 +1670,7 @@ function renderTable(k){
       <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">Unpaid to ${currentUser}</div>
       <div class="tabular fw-700" style="color:${unpaidToUser>0?'var(--color-error)':'var(--color-success)'};font-size:var(--text-lg);">${unpaidToUser>0?fmt(unpaidToUser):'—'}</div>
     </div>
+    ${perPersonHtml}
   </div>
   `;
   // icons inline
@@ -2266,8 +2299,10 @@ function saveNewTrip(ev){
   ev.preventDefault();
   const name = document.getElementById('nt-name').value.trim();
   const flag = document.getElementById('nt-flag-preview').textContent.trim() || '🌍';
-  const dates = document.getElementById('nt-dates').value.trim();
+  const startDate = document.getElementById('nt-start').value;
+  const endDate = document.getElementById('nt-end').value;
   const people = document.getElementById('nt-people').value.split(',').map(p=>p.trim()).filter(Boolean);
+  const dates = startDate && endDate ? `${formatTripDate(startDate)} – ${formatTripDate(endDate)}` : startDate ? formatTripDate(startDate) : endDate ? formatTripDate(endDate) : '';
   if(!people.length){ alert('Please enter at least one traveller name.'); return; }
   const colour = document.getElementById('nt-colour').value;
   const key = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '-' + Date.now();
@@ -2288,7 +2323,8 @@ function saveNewTrip(ev){
   closeAddTripModal();
   document.getElementById('nt-name').value='';
   document.getElementById('nt-flag-preview').textContent='🌍';
-  document.getElementById('nt-dates').value='';
+  document.getElementById('nt-start').value='';
+  document.getElementById('nt-end').value='';
   document.getElementById('nt-people').value='';
   document.getElementById('nt-suggestions').style.display='none';
 
