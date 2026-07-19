@@ -977,7 +977,7 @@ input, textarea {
 <div class="modal-backdrop" id="fx-modal" onclick="if(event.target===this)closeFxModal()">
   <div class="modal sm">
     <h2 class="modal-title">💱 Exchange Rates → SGD</h2>
-    <p class="text-sm text-muted mb-4">Source: OFX / AlaChand mid-market, May 2026. Edit any rate and click Apply to recalculate all amounts instantly.</p>
+    <p class="text-sm text-muted mb-4">Source: OFX / AlaChand reference rates. Edit any rate and click Apply to recalculate all amounts instantly.</p>
     <div id="fx-rows"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="resetFx()">Reset to defaults</button>
@@ -1027,26 +1027,12 @@ const DEFAULT_FX = {
   CAD: 1.085738,
   CHF: 0.625246,
   SEK: 7.471589,
-  NOK: 7.480976,
-  DKK: 5.050851,
-  BRL: 3.95647,
-  MXN: 13.565215,
-  TRY: 36.53396,
-  ZAR: 12.787321,
-  EGP: 39.131853,
-  AED: 2.843937,
-  SAR: 2.903952,
-  QAR: 2.818769,
-  BDT: 95.432946,
-  PKR: 215.266799,
-  LKR: 260.226748,
-  MMK: 1631.656108,
-  KHR: 3139.394737,
-  LAK: 17207.384543
+  NOK: 7.480976
 };
+const FX_STORAGE_KEY = 'wdmmg_fx';
 
 let fx = { ...DEFAULT_FX };
-let fxLastUpdated = "18 Jul 2026 UTC";
+let fxLastUpdated = "Latest";
 
 async function fetchDailyFx() {
   const res = await fetch("https://open.er-api.com/v6/latest/SGD", {
@@ -1062,9 +1048,27 @@ async function fetchDailyFx() {
     throw new Error("Invalid FX payload");
   }
 
-  fx = { SGD: 1, ...DEFAULT_FX, ...data.rates };
-  fxLastUpdated = data.time_last_update_utc || "Live";
+  const fetched = { SGD: 1 };
+  Object.keys(FX_META).forEach(cur => {
+    if (cur === 'SGD') return;
+    fetched[cur] = data.rates[cur] || DEFAULT_FX[cur] || 1;
+  });
+
+  fx = fetched;
+  fxLastUpdated = data.time_last_update_utc || new Date().toISOString();
+  saveFxToStorage();
   return fx;
+}
+
+function refreshFxNow(){
+  fetchDailyFx().then(()=>{
+    renderFxRows();
+    const a = document.querySelector('.nav-item.active');
+    if(a) showPage(a.dataset.page);
+  }).catch(e=>{
+    console.error('refreshFxNow error', e);
+    alert('Unable to refresh FX rates.');
+  });
 }
 
 function toSGD(amount, cur) {
@@ -1079,9 +1083,66 @@ function fromSGD(amountSgd, cur) {
   return Number(amountSgd || 0) * rate;
 }
 
+const FX_META = {
+  AUD:{ flag:'🇦🇺', name:'Australian Dollar',    note:'Live API rate' },
+  USD:{ flag:'🇺🇸', name:'US Dollar',             note:'Live API rate' },
+  JPY:{ flag:'🇯🇵', name:'Japanese Yen',          note:'Live API rate' },
+  EUR:{ flag:'🇪🇺', name:'Euro',                  note:'Live API rate' },
+  GBP:{ flag:'🇬🇧', name:'British Pound',         note:'Live API rate' },
+  THB:{ flag:'🇹🇭', name:'Thai Baht',             note:'Live API rate' },
+  MYR:{ flag:'🇲🇾', name:'Malaysian Ringgit',     note:'Live API rate' },
+  IDR:{ flag:'🇮🇩', name:'Indonesian Rupiah',     note:'Live API rate' },
+  PHP:{ flag:'🇵🇭', name:'Philippine Peso',       note:'Live API rate' },
+  TWD:{ flag:'🇹🇼', name:'New Taiwan Dollar',     note:'Live API rate' },
+  HKD:{ flag:'🇭🇰', name:'Hong Kong Dollar',      note:'Live API rate' },
+  KRW:{ flag:'🇰🇷', name:'Korean Won',           note:'Live API rate' },
+  VND:{ flag:'🇻🇳', name:'Vietnamese Dong',      note:'Live API rate' },
+  CNY:{ flag:'🇨🇳', name:'Chinese Yuan',          note:'Live API rate' },
+  INR:{ flag:'🇮🇳', name:'Indian Rupee',          note:'Live API rate' },
+  NZD:{ flag:'🇳🇿', name:'New Zealand Dollar',    note:'Live API rate' },
+  CAD:{ flag:'🇨🇦', name:'Canadian Dollar',       note:'Live API rate' },
+  CHF:{ flag:'🇨🇭', name:'Swiss Franc',           note:'Live API rate' },
+  SEK:{ flag:'🇸🇪', name:'Swedish Krona',         note:'Live API rate' },
+  NOK:{ flag:'🇳🇴', name:'Norwegian Krone',       note:'Live API rate' },
+};
+
 function initFx(){
-  // Initialize FX on page load - can be expanded later if needed
-  // Currently rates are pre-loaded from DEFAULT_FX
+  loadFxFromStorage();
+
+  const activeNav = document.querySelector('.nav-item.active');
+  const activePage = activeNav ? activeNav.dataset.page : null;
+
+  fetchDailyFx().then(()=>{
+    renderFxRows();
+    if(activePage) showPage(activePage);
+    else renderOverview();
+  }).catch(e=>{
+    console.warn('FX fetch failed, using cache/default', e);
+    if(activePage) showPage(activePage);
+    else renderOverview();
+  });
+}
+
+function loadFxFromStorage(){
+  try {
+    const stored = localStorage.getItem(FX_STORAGE_KEY);
+    if(!stored) return;
+    const obj = JSON.parse(stored);
+    if(obj && obj.fx){
+      fx = obj.fx;
+      fxLastUpdated = obj.fxLastUpdated || fxLastUpdated;
+    }
+  } catch(e){
+    console.warn('Failed to load FX cache', e);
+  }
+}
+
+function saveFxToStorage(){
+  try {
+    localStorage.setItem(FX_STORAGE_KEY, JSON.stringify({fx, fxLastUpdated}));
+  } catch(e){
+    console.warn('Failed to save FX cache', e);
+  }
 }
 
 // ===================== CATEGORIES (customizable) =====================
@@ -1257,11 +1318,11 @@ function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt
 
 // ===================== FX BANNER =====================
 function fxBanner() {
-  const chips = Object.entries(fx)
-    .filter(([c]) => c !== "SGD")
-    .slice(0, 8)
-    .map(([c, r]) => `<span class="fx-chip">${c} ${Number(r).toFixed(r >= 100 ? 2 : 4)}</span>`)
-    .join("");
+  const chips = Object.keys(FX_META).map(c => {
+    const r = fx[c] || DEFAULT_FX[c] || 1;
+    const d = r >= 100 ? r.toFixed(2) : r.toFixed(4);
+    return `<span class="fx-chip">${FX_META[c].flag} 1 SGD = ${d} ${c}</span>`;
+  }).join("");
 
   return `
     <div class="fx-banner">
@@ -1496,29 +1557,43 @@ function renderSettlement(){
 }
 
 // ===================== FX MODAL =====================
-function openFxModal(){
-  const rows=Object.entries(fx).filter(([c])=>c!=='SGD').map(([c,r])=>{
-    const d=r<0.01?r.toFixed(7):r.toFixed(5);
-    return`<div class="fx-rate-row">
-      <div style="font-weight:700">${c}</div>
+function renderFxRows(){
+  const rows = Object.keys(FX_META).map(c=>{
+    const r = fx[c] || DEFAULT_FX[c] || 1;
+    const d = r < 0.01 ? r.toFixed(7) : r.toFixed(5);
+    const m = FX_META[c];
+    return `<div class="fx-rate-row">
+      <div><div style="font-weight:700">${m.flag} ${c} — ${m.name}</div><div class="text-xs text-muted">${m.note}</div></div>
       <div class="flex items-center gap-2">
-        <span class="text-xs text-muted">1 ${c} =</span>
+        <span class="text-xs text-muted">1 SGD =</span>
         <input class="fx-input" type="number" step="0.0000001" min="0" id="fxi-${c}" value="${d}">
-        <span class="text-xs">SGD</span>
+        <span class="text-xs">${c}</span>
       </div>
     </div>`;
   }).join('');
-  document.getElementById('fx-rows').innerHTML=rows;
+  document.getElementById('fx-rows').innerHTML = rows;
+}
+
+function openFxModal(){
+  renderFxRows();
   document.getElementById('fx-modal').classList.add('open');
 }
 function closeFxModal(){ document.getElementById('fx-modal').classList.remove('open'); }
 function applyFx(){
   Object.keys(fx).filter(c=>c!=='SGD').forEach(c=>{ const el=document.getElementById('fxi-'+c); if(el) fx[c]=parseFloat(el.value)||fx[c]; });
+  fxLastUpdated = 'Manual';
+  saveFxToStorage();
   closeFxModal();
   const a=document.querySelector('.nav-item.active');
   if(a) showPage(a.dataset.page);
 }
-function resetFx(){ fx={...DEFAULT_FX}; openFxModal(); }
+function resetFx(){ fx={...DEFAULT_FX}; fxLastUpdated = 'Default'; saveFxToStorage(); openFxModal(); }
+
+function updateAllKpis(){
+  const a = document.querySelector('.nav-item.active');
+  if(a) showPage(a.dataset.page);
+  else renderOverview();
+}
 
 function restoreFxFromStorage(){
   try{
@@ -1527,7 +1602,8 @@ function restoreFxFromStorage(){
     const obj = JSON.parse(s);
     if(!obj || !obj.fx) return alert('Cached FX is invalid.');
     fx = obj.fx;
-    if(typeof renderFxRows === 'function') renderFxRows();
+    fxLastUpdated = obj.fxLastUpdated || fxLastUpdated;
+    renderFxRows();
     updateAllKpis();
     openFxModal();
     alert('Exchange rates restored from cache. Click Apply to recalculate.');
