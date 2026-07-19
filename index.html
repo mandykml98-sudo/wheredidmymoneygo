@@ -1232,6 +1232,8 @@ loadTripsFromStorage();
 // Load custom categories and render into selects
 loadCategoriesFromStorage();
 renderCategoryOptions();
+// Hydrate any dynamically saved trips into the sidebar and main content
+hydrateStoredTrips();
 
 // ===================== COMPUTED =====================
 function getSplitPeople(e, people) {
@@ -1953,6 +1955,54 @@ function closeAddTripModal() {
   document.getElementById('nt-suggestions').style.display = 'none';
 }
 
+function createTripPageElement(key) {
+  if(document.getElementById('page-' + key)) return;
+  const trip = trips[key];
+  if(!trip) return;
+  const pg = document.createElement('div');
+  pg.className = 'page';
+  pg.id = 'page-' + key;
+  pg.innerHTML = `
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">${trip.flag} ${trip.name}</h1><p class="page-subtitle" id="${key}-subtitle"></p></div>
+      <button class="btn btn-primary" onclick="openAddModal('${key}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add Expense</button>
+    </div>
+    <div id="${key}-fx-banner"></div>
+    <div class="kpi-grid" id="${key}-kpis"></div>
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterTable('${key}','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
+      <select class="filter-select" onchange="filterTable('${key}','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
+    </div>
+    <div class="table-wrap" id="${key}-table-wrap"></div>`;
+  document.querySelector('.main-content').appendChild(pg);
+}
+
+function createTripSidebarEntry(key) {
+  const nav = document.querySelector('.sidebar');
+  if(!nav || nav.querySelector(`[data-page="${key}"]`)) return;
+  const trip = trips[key];
+  if(!trip) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'nav-item-wrap';
+  wrap.innerHTML = `<div class="nav-item" onclick="showPage('${key}')" data-page="${key}"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>${trip.flag} ${trip.name}<span class="nav-badge" id="badge-${key}">0</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('${key}')" title="Delete trip">✕</button>`;
+  const addTripWrapper = nav.querySelector('button[onclick="openAddTripModal()"]')?.closest('div');
+  if(addTripWrapper) addTripWrapper.before(wrap);
+  else {
+    const allDividers = nav.querySelectorAll('.nav-divider');
+    const toolsDivider = allDividers[allDividers.length - 1];
+    if(toolsDivider) toolsDivider.before(wrap);
+    else nav.appendChild(wrap);
+  }
+}
+
+function hydrateStoredTrips() {
+  Object.keys(trips).forEach(key => {
+    if(!activeFilters[key]) activeFilters[key] = {};
+    createTripPageElement(key);
+    createTripSidebarEntry(key);
+  });
+}
+
 function saveNewTrip(ev){
   ev.preventDefault();
   const name = document.getElementById('nt-name').value.trim();
@@ -1973,34 +2023,9 @@ function saveNewTrip(ev){
   activeFilters[key] = {};
   saveTripsToStorage();
 
-  // Create page
-  const pg = document.createElement('div');
-  pg.className = 'page';
-  pg.id = 'page-' + key;
-  pg.innerHTML = `
-    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
-      <div><h1 class="page-title">${flag} ${name}</h1><p class="page-subtitle" id="${key}-subtitle"></p></div>
-      <button class="btn btn-primary" onclick="openAddModal('${key}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
-    </div>
-    <div id="${key}-fx-banner"></div>
-    <div class="kpi-grid" id="${key}-kpis"></div>
-    <div class="filter-bar">
-      <select class="filter-select" onchange="filterTable('${key}','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
-      <select class="filter-select" onchange="filterTable('${key}','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
-    </div>
-    <div class="table-wrap" id="${key}-table-wrap"></div>`;
-  document.querySelector('.main-content').appendChild(pg);
+  createTripPageElement(key);
+  createTripSidebarEntry(key);
 
-  // Create sidebar entry
-  const nav = document.querySelector('.sidebar');
-  const allDividers = nav.querySelectorAll('.nav-divider');
-  const toolsDivider = allDividers[allDividers.length - 1];
-  const wrap = document.createElement('div');
-  wrap.className = 'nav-item-wrap';
-  wrap.innerHTML = `<div class="nav-item" onclick="showPage('${key}')" data-page="${key}"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></svg>${flag} ${name}<span class="nav-badge" id="badge-${key}">0</span></div><button class="nav-del-btn" onclick="confirmDeleteTrip('${key}')" title="Delete trip">✕</button>`;
-  toolsDivider.before(wrap);
-
-  // icons inline
   closeAddTripModal();
   document.getElementById('nt-name').value='';
   document.getElementById('nt-flag-preview').textContent='🌍';
@@ -2010,6 +2035,7 @@ function saveNewTrip(ev){
 
   // Refresh expense modal trip dropdown so new trip appears
   populateTripDropdown(key);
+  renderOverview();
   // Navigate to new trip page
   try { showPage(key); } catch(err) { console.error('showPage error:', err); }
 }
