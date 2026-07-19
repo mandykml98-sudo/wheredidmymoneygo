@@ -1081,7 +1081,7 @@ async function fetchDailyFx(){
     fx = newFx;
     // persist with timestamp
     localStorage.setItem(FX_STORAGE_KEY, JSON.stringify({fx,ts:Date.now()}));
-    renderFxRows && renderFxRows();
+    if(typeof renderFxRows === 'function') renderFxRows();
     // re-render tables/kpis using new FX
     updateAllKpis();
     return true;
@@ -1111,7 +1111,7 @@ function initFx(){
   // try load persisted fx
   let stored = null; try{ stored = JSON.parse(localStorage.getItem(FX_STORAGE_KEY)||'null'); }catch(e){}
   if(stored && stored.fx){ fx = stored.fx; }
-  renderFxRows && renderFxRows();
+  if(typeof renderFxRows === 'function') renderFxRows();
   // If no stored ts or older than 24h, attempt fetch
   const ts = stored && stored.ts ? stored.ts : 0;
   const ageH = (Date.now() - ts) / (1000*60*60);
@@ -1217,8 +1217,6 @@ loadTripsFromStorage();
 // Load custom categories and render into selects
 loadCategoriesFromStorage();
 renderCategoryOptions();
-// Initialize FX (load cached and auto-refresh daily)
-initFx();
 
 // ===================== COMPUTED =====================
 function getSplitPeople(e, people) {
@@ -1965,6 +1963,7 @@ function saveNewTrip(ev){
 }
 
 // icons inline
+initFx();
 renderOverview();
 </script>
 <div id="install-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#b5622a;color:#fff;padding:0.75rem 1.5rem;border-radius:2rem;font-size:0.9rem;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:9999;align-items:center;gap:1rem;white-space:nowrap;">💸 Add to Home Screen<button onclick="doInstall()" style="background:#fff;color:#b5622a;border:none;border-radius:1rem;padding:0.3rem 0.9rem;font-weight:700;cursor:pointer;margin-left:0.5rem">Install</button><button onclick="document.getElementById('install-banner').style.display='none'" style="background:transparent;border:none;color:#fff;font-size:1.1rem;cursor:pointer;margin-left:0.25rem">✕</button></div>
