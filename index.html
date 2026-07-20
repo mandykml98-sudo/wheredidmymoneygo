@@ -238,6 +238,31 @@ table td,table th{white-space:nowrap;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);}
 .form-group{display:flex;flex-direction:column;gap:var(--space-2);}
 .form-group.full{grid-column:1/-1;}
+.date-range-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:var(--space-3);
+}
+
+.date-range-field{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-2);
+}
+
+.date-range-mini-label{
+  font-size:var(--text-xs);
+  font-weight:600;
+  color:var(--color-text-muted);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+@media (max-width:768px){
+  .date-range-row{
+    grid-template-columns:1fr;
+  }
+}
 .form-label{font-size:var(--text-sm);font-weight:500;color:var(--color-text);}
 .form-input,.form-select,.form-textarea{padding:var(--space-3) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);transition:border-color var(--transition);}
 @media(max-width:768px){.form-input,.form-select,.form-textarea{padding:var(--space-4);font-size:1rem;min-height:48px;}}
@@ -566,6 +591,10 @@ input, textarea {
     font-size: 16px !important;
     flex: 1;
   }
+  .expense-search-input {
+  min-width: 240px;
+  flex: 1 1 260px;
+}
 }
 
 /* ── Nav delete buttons: always visible on touch devices ── */
@@ -604,7 +633,7 @@ input, textarea {
   }
 }
 
-/* ── FX banner: scroll horizontally on mobile ── */
+/* FX banner scroll horizontally on mobile */
 @media (max-width: 768px) {
   .fx-banner {
     display: flex;
@@ -617,25 +646,33 @@ input, textarea {
     gap: var(--space-3);
     min-width: 0;
   }
-  .fx-banner::-webkit-scrollbar { display: none; }
+
+  .fx-banner::-webkit-scrollbar {
+    display: none;
+  }
+
   .fx-banner-top {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
+
   .fx-search {
     width: 100%;
     max-width: 100%;
   }
+
   .fx-banner-label,
   .fx-date,
   .fx-edit-btn {
     width: 100%;
   }
+
   .fx-date {
     display: block;
   }
+
   .fx-banner-chips {
     display: flex;
     gap: 10px;
@@ -643,6 +680,7 @@ input, textarea {
     overflow-x: auto;
     width: 100%;
   }
+
   .fx-banner-label {
     white-space: normal;
   }
@@ -674,8 +712,14 @@ input, textarea {
     grid-template-columns: 1fr 1fr !important;
     gap: var(--space-2) !important;
   }
+
   .filter-bar .filter-select {
     flex: 1 !important;
+  }
+
+  .filter-bar .expense-search-input {
+    grid-column: 1 / -1;
+    min-width: 0;
   }
 }
 
@@ -841,12 +885,11 @@ input, textarea {
       <span class="logo-text">wheredidmymoneygo</span>
     </a>
   </div>
-  <div class="topbar-actions">
-    <input type="text" id="username-input" placeholder="Your name" value="Mandy" maxlength="20" style="padding:6px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);width:140px;" onchange="updateUsername()" onkeyup="if(event.key==='Enter') updateUsername()">
-    <button class="btn btn-ghost btn-sm" onclick="openFxModal()">💱 FX Rates</button>
-    <button class="btn btn-primary" onclick="openAddModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Expense</button>
-    <button class="theme-toggle" data-theme-toggle><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></svg></button>
-  </div>
+<div class="topbar-actions">
+  <input type="text" id="username-input" placeholder="Your name" value="Mandy" maxlength="20" style="padding:6px 12px;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);width:140px;" onchange="updateUsername()" onkeyup="if(event.key==='Enter') updateUsername()">
+  <button class="btn btn-ghost btn-sm" onclick="openFxModal()">💱 FX Rates</button>
+  <button class="theme-toggle" data-theme-toggle><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></svg></button>
+</div>
 </header>
 
 <!-- SIDEBAR -->
@@ -892,24 +935,39 @@ input, textarea {
 </div>
 
 <!-- ADD TRIP MODAL -->
-<div class="modal-backdrop" id="add-trip-modal" onclick="if(event.target===this)closeAddTripModal()">
+<div class="modal-backdrop" id="edit-trip-modal" onclick="if(event.target===this)closeEditTripModal()">
   <div class="modal sm">
-    <h2 class="modal-title">✈️ Add New Trip</h2>
-    <form onsubmit="saveNewTrip(event)">
+    <h2 class="modal-title">Edit Trip Details</h2>
+    <form onsubmit="saveTripDetails(event)">
+      <input type="hidden" id="et-key">
+
       <div class="form-grid">
-        <div class="form-group full" style="position:relative">
-          <label class="form-label">Country</label>
-          <div style="display:flex;gap:var(--space-2);align-items:center">
-            <span id="nt-flag-preview" style="font-size:1.8rem;line-height:1;min-width:36px;text-align:center">🌍</span>
-            <input class="form-input" type="text" id="nt-name" placeholder="e.g. Japan" required autocomplete="off" oninput="onCountryInput(this.value)" onkeydown="onCountryKey(event)" style="flex:1">
-          </div>
-          <div id="nt-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--color-surface);border:1.5px solid var(--color-primary);border-radius:var(--radius-md);box-shadow:var(--shadow-md);z-index:200;max-height:200px;overflow-y:auto;margin-top:2px;"></div>
+        <div class="form-group full">
+          <label class="form-label">Country / Trip Name</label>
+          <input class="form-input" type="text" id="et-name" required>
         </div>
-        <div class="form-group"><label class="form-label">Start Date</label><input class="form-input" type="date" id="nt-start" required></div>
-        <div class="form-group"><label class="form-label">End Date</label><input class="form-input" type="date" id="nt-end"></div>
-        <div class="form-group full"><label class="form-label">Travellers (comma-separated)</label><input class="form-input" type="text" id="nt-people" placeholder="e.g. Mandy, Wei Long" required></div>
-        <div class="form-group"><label class="form-label">Card Colour</label>
-          <select class="form-select" id="nt-colour">
+
+        <div class="form-group full">
+  <label class="form-label">Date Range</label>
+  <div class="date-range-row">
+    <div class="date-range-field">
+      <span class="date-range-mini-label">Start</span>
+      <input class="form-input" type="date" id="et-start">
+    </div>
+    <div class="date-range-field">
+      <span class="date-range-mini-label">End</span>
+      <input class="form-input" type="date" id="et-end">
+    </div>
+  </div>
+</div>
+        <div class="form-group full">
+          <label class="form-label">Travellers comma-separated</label>
+          <input class="form-input" type="text" id="et-people" placeholder="e.g. Mandy, Wei Long" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Card Colour</label>
+          <select class="form-select" id="et-colour">
             <optgroup label="Bold">
               <option value="vietnam">🔴 Warm Red</option>
               <option value="australia">🔵 Ocean Blue</option>
@@ -981,8 +1039,8 @@ input, textarea {
           </select></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-ghost" onclick="closeAddTripModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Trip</button>
+        <button type="button" class="btn btn-ghost" onclick="closeEditTripModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Trip Details</button>
       </div>
     </form>
   </div>
@@ -996,10 +1054,20 @@ input, textarea {
       <div id="lock-note" style="display:none;padding:var(--space-3) var(--space-4);background:var(--color-warning-bg);border:1px solid var(--color-warning);border-radius:var(--radius-md);margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--color-warning);font-weight:600;">
         🔒 This transaction is locked. Amount and currency cannot be edited. Unlock it first from the table to make changes.
       </div>
-      <div class="form-grid">
-        <div class="form-group"><label class="form-label">From Date</label><input class="form-input" type="date" id="f-from" required></div>
-        <div class="form-group"><label class="form-label">To Date</label><input class="form-input" type="date" id="f-to"></div>
-        <div class="form-group"><label class="form-label">Type</label>
+<div class="form-group full">
+  <label class="form-label">Date Range</label>
+  <div class="date-range-row">
+    <div class="date-range-field">
+      <span class="date-range-mini-label">From</span>
+      <input class="form-input" type="date" id="f-from" required>
+    </div>
+    <div class="date-range-field">
+      <span class="date-range-mini-label">To</span>
+      <input class="form-input" type="date" id="f-to">
+    </div>
+  </div>
+</div>
+   <div class="form-group"><label class="form-label">Type</label>
           <div style="display:flex;gap:var(--space-2);align-items:center">
             <select class="form-select" id="f-type" required style="flex:1"></select>
             <button type="button" class="btn btn-ghost btn-sm" title="Add category" onclick="promptAddCategory()" style="white-space:nowrap;padding:6px 10px;height:40px;">＋ Add</button>
@@ -1070,8 +1138,27 @@ input, textarea {
         <div class="form-group"><label class="form-label">For Whom</label>
           <select class="form-select" id="f-forwhom"></select></div>
         <div class="form-group"><label class="form-label">Platform</label>
-          <select class="form-select" id="f-platform"><option>AGODA</option><option>SCOOT</option><option>TRIP.COM</option><option>Misc</option></select></div>
-        <div class="form-group"><label class="form-label">Booking Code</label><input class="form-input" type="text" id="f-code"></div>
+<div class="form-group">
+  <label class="form-label">Platform</label>
+  <input
+    class="form-input"
+    type="text"
+    id="f-platform"
+    list="platform-options"
+    placeholder="e.g. Agoda, Booking.com, Airbnb, Scoot"
+  >
+  <datalist id="platform-options">
+    <option value="AGODA">
+    <option value="SCOOT">
+    <option value="TRIP.COM">
+    <option value="BOOKING.COM">
+    <option value="AIRBNB">
+    <option value="EXPEDIA">
+    <option value="KLOOK">
+    <option value="Misc">
+  </datalist>
+</div>        
+<div class="form-group"><label class="form-label">Booking Code</label><input class="form-input" type="text" id="f-code"></div>
         <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="f-notes"></textarea></div>
       </div>
       <div class="modal-footer">
@@ -1087,8 +1174,7 @@ input, textarea {
   <div class="modal sm">
     <div class="modal-header">
       <h2 class="modal-title">💱 Exchange Rates → SGD</h2>
-      <p class="text-sm text-muted mb-4">Source: OFX / AlaChand reference rates. Edit any rate and click Apply to recalculate all amounts instantly.</p>
-    </div>
+<p class="text-sm text-muted mb-4">Source: live SGD-based exchange rates. You can still edit any rate manually, then click Apply to recalculate all amounts instantly.</p>    </div>
     <div class="modal-body" id="fx-rows"></div>
     <div class="modal-footer">
       <button type="button" class="btn btn-ghost" onclick="closeFxModal()">Cancel</button>
@@ -1439,9 +1525,8 @@ function updatePaidBack(tripKey, expId, person, newVal) {
 function updateTripKpis(k) {
   const trip = trips[k];
   if(!trip) return;
-  const prefixMap={vietnam:'vn',australia:'au',korea:'kr'};
-  const prefix = prefixMap[k] || k;
-  const tSGD = trip.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
+const prefix = k;  
+const tSGD = trip.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
   const uCount = trip.expenses.filter(e=>e.status==='Unpaid').length;
   const tUnpaid = trip.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,trip.people),0);
   const kpiEl = document.getElementById(prefix+'-kpis');
@@ -1564,36 +1649,103 @@ function renderOverview(){
 
 // ===================== TRIP =====================
 function renderTrip(k){
-  const trip=trips[k];
-  const prefixMap={vietnam:'vn',australia:'au',korea:'kr'};
-  const prefix=prefixMap[k]||k;
-  const tSGD=trip.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
-  const uCount=trip.expenses.filter(e=>e.status==='Unpaid').length;
-  const tUnpaid=trip.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,trip.people),0);
-  const subtitleEl=document.getElementById(prefix+'-subtitle');
-  if(subtitleEl) subtitleEl.textContent=`${trip.dates} · ${trip.expenses.length} bookings`;
+  const trip = trips[k];
+  if (!trip) return;
+
+  const tSGD = trip.expenses.reduce((s,e)=>s + toSGD(e.cost, e.cur), 0);
+  const uCount = trip.expenses.filter(e => e.status === 'Unpaid').length;
+  const tUnpaid = trip.expenses.reduce((s,e)=>s + personUnpaid(e, currentUsername, trip.people), 0);
+
+  const subtitleEl = document.getElementById(`${k}-subtitle`);
+  if (subtitleEl) {
+    subtitleEl.textContent = `${trip.dates} · ${trip.expenses.length} bookings`;
+  }
+
   renderFxBanners();
-  const kpiEl=document.getElementById(prefix+'-kpis');
-  if(kpiEl) kpiEl.innerHTML=
-    kpiDiv('Total (SGD)',fmt(tSGD),'accent','At current FX rates')+
-    kpiDiv('Bookings',trip.expenses.length,'','')+
-    kpiDiv('Unpaid Items',uCount,'warning','')+
-    kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','');
+
+  const kpiEl = document.getElementById(`${k}-kpis`);
+  if (kpiEl) {
+    kpiEl.innerHTML =
+      kpiDiv('Total (SGD)', fmt(tSGD), 'accent', 'At current FX rates') +
+      kpiDiv('Bookings', trip.expenses.length, '', '') +
+      kpiDiv('Unpaid Items', uCount, 'warning', '') +
+      kpiDiv('Owed to ' + currentUsername, fmt(tUnpaid), 'warning', '');
+  }
+
   renderTable(k);
-  const badge=document.getElementById('badge-'+k);
-  if(badge) badge.textContent=trip.expenses.length;
+
+  const badge = document.getElementById(`badge-${k}`);
+  if (badge) badge.textContent = trip.expenses.length;
+}
+
+function refreshTripUI(key) {
+  const trip = trips[key];
+  if (!trip) return;
+
+  const navItem = document.querySelector(`.nav-item[data-page="${key}"]`);
+  if (navItem) {
+    navItem.innerHTML = `
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19.5 2.5S18 2 16.5 3.5L13 7 4.8 5.2c-.5-.1-1 .1-1.3.5l-.5.5c-.3.4-.3.9 0 1.3L7 10l-2 2H3l-1 1 3 2 2 3 1-1v-2l2-2 2.9 3.9c.4.3.9.4 1.3 0l.5-.5c.4-.3.6-.8.5-1.3"></path>
+      </svg>
+      ${trip.flag} ${trip.name}
+      <span class="nav-badge" id="badge-${key}">${trip.expenses.length}</span>
+    `;
+  }
+
+  const page = document.getElementById(`page-${key}`);
+  if (page) {
+    const title = page.querySelector('.page-title');
+    if (title) title.textContent = `${trip.flag} ${trip.name}`;
+  }
+
+  renderTrip(key);
+  renderOverview();
+
+  const settlementPage = document.getElementById('page-settlement');
+  if (settlementPage && settlementPage.classList.contains('active')) {
+    renderSettlement();
+  }
 }
 
 function renderTable(k){
-  const trip=trips[k]; const people=trip.people;
-  const prefixMap2={vietnam:'vn',australia:'au',korea:'kr'};
-  const prefix=prefixMap2[k]||k;
-  const flt=activeFilters[k]||{};
-  let data=[...trip.expenses];
-  if(flt.type) data=data.filter(e=>e.type===flt.type);
-  if(flt.status) data=data.filter(e=>e.status===flt.status);
-  if(!data.length){
-    document.getElementById(prefix+'-table-wrap').innerHTML=`<div style="padding:4rem;text-align:center;color:var(--color-text-muted)"><p style="font-size:2rem">🔍</p><p style="margin-top:1rem">No expenses match the current filters.</p></div>`;
+  const trip = trips[k];
+  const people = trip.people;
+  const prefix = k;
+  const flt = activeFilters[k] || {};
+  let data = [...trip.expenses];
+
+  if (flt.type) data = data.filter(e => e.type === flt.type);
+  if (flt.status) data = data.filter(e => e.status === flt.status);
+
+  if (flt.search && flt.search.trim()) {
+    const q = flt.search.trim().toLowerCase();
+    data = data.filter(e => {
+      const haystack = [
+        e.type,
+        e.location,
+        e.platform,
+        e.code,
+        e.notes,
+        e.paidBy,
+        e.forWhom,
+        e.status,
+        e.cur
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(q);
+    });
+  }
+
+  if (!data.length) {
+    document.getElementById(prefix + '-table-wrap').innerHTML =
+      `<div style="padding:4rem;text-align:center;color:var(--color-text-muted)">
+        <p style="font-size:2rem">🔍</p>
+        <p style="margin-top:1rem;">No expenses match the current filters or search.</p>
+      </div>`;
     return;
   }
   const costH=people.map(p=>`<th>Cost (${p})</th>`).join('');
@@ -2006,10 +2158,71 @@ function executeDeleteTrip(){
 }
 
 // ===================== ADD TRIP =====================
-function openAddTripModal(){
-  document.getElementById('add-trip-modal').classList.add('open');
+function openEditTripModal(key) {
+  const trip = trips[key];
+  if (!trip) return;
+
+  document.getElementById('et-key').value = key;
+  document.getElementById('et-name').value = trip.name || '';
+  document.getElementById('et-start').value = trip.startDate || '';
+  document.getElementById('et-end').value = trip.endDate || '';
+  document.getElementById('et-people').value = (trip.people || []).join(', ');
+  document.getElementById('et-colour').value = trip.style || 'vietnam';
+  document.getElementById('et-currency').value = trip.defaultCur || 'SGD';
+
+  document.getElementById('edit-trip-modal').classList.add('open');
 }
 
+function closeEditTripModal() {
+  document.getElementById('edit-trip-modal').classList.remove('open');
+}
+
+function saveTripDetails(ev) {
+  ev.preventDefault();
+
+  const key = document.getElementById('et-key').value;
+  const trip = trips[key];
+  if (!trip) return;
+
+  const name = document.getElementById('et-name').value.trim();
+  const startDate = document.getElementById('et-start').value;
+  const endDate = document.getElementById('et-end').value;
+  const people = document.getElementById('et-people').value
+    .split(',')
+    .map(p => p.trim())
+    .filter(Boolean);
+  const colour = document.getElementById('et-colour').value;
+  const defaultCur = document.getElementById('et-currency').value;
+
+  if (!name) {
+    alert('Please enter a trip name.');
+    return;
+  }
+
+  if (!people.length) {
+    alert('Please enter at least one traveller name.');
+    return;
+  }
+
+  trip.name = name;
+  trip.startDate = startDate;
+  trip.endDate = endDate;
+  trip.people = people;
+  trip.style = colour;
+  trip.defaultCur = defaultCur;
+  trip.dates =
+    startDate && endDate
+      ? `${formatTripDate(startDate)} - ${formatTripDate(endDate)}`
+      : startDate
+      ? formatTripDate(startDate)
+      : endDate
+      ? formatTripDate(endDate)
+      : '';
+
+  saveTripsToStorage();
+  refreshTripUI(key);
+  closeEditTripModal();
+}
 // ===================== COUNTRY AUTOCOMPLETE =====================
 const COUNTRIES = [
   {name:'Afghanistan',flag:'🇦🇫',cur:'USD'},{name:'Albania',flag:'🇦🇱',cur:'USD'},
@@ -2262,9 +2475,26 @@ function createTripPageElement(key) {
     <div id="${key}-fx-banner"></div>
     <div class="kpi-grid" id="${key}-kpis"></div>
     <div class="filter-bar">
-      <select class="filter-select" onchange="filterTable('${key}','type',this.value)"><option value="">All Types</option><option>Hotel</option><option>Flight</option><option>Car/Fuel</option><option>Food</option><option>Misc</option></select>
-      <select class="filter-select" onchange="filterTable('${key}','status',this.value)"><option value="">All Status</option><option>Paid</option><option>Unpaid</option></select>
-    </div>
+  <input
+    class="form-input expense-search-input"
+    type="search"
+    placeholder="Search description, type, platform, code..."
+    oninput="filterTable('${key}','search',this.value)"
+  >
+  <select class="filter-select" onchange="filterTable('${key}','type',this.value)">
+    <option value="">All Types</option>
+    <option>Hotel</option>
+    <option>Flight</option>
+    <option>Car/Fuel</option>
+    <option>Food</option>
+    <option>Misc</option>
+  </select>
+  <select class="filter-select" onchange="filterTable('${key}','status',this.value)">
+    <option value="">All Status</option>
+    <option>Paid</option>
+    <option>Unpaid</option>
+  </select>
+</div>
     <div class="table-wrap" id="${key}-table-wrap"></div>`;
   document.querySelector('.main-content').appendChild(pg);
 }
@@ -2310,11 +2540,19 @@ function saveNewTrip(ev){
   // Auto-register currency in FX if not already present
   const ntCur = document.getElementById('nt-currency') ? document.getElementById('nt-currency').value : 'SGD';
   if(ntCur && ntCur !== 'SGD' && !fx[ntCur]) {
-    fx[ntCur] = DEFAULT_FX[ntCur] || 1.0;
-    if(!FX_META[ntCur]) FX_META[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
-  }
-  trips[key] = { name, flag, style: colour, dates, people, expenses: [], defaultCur: ntCur };
-  activeFilters[key] = {};
+fx[ntCur] = DEFAULTFX[ntCur] || 1.0;
+if(!FXMETA[ntCur]) FXMETA[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };  }
+trips[key] = {
+  name,
+  flag,
+  style: colour,
+  startDate,
+  endDate,
+  dates,
+  people,
+  expenses: [],
+  defaultCur: ntCur
+};  activeFilters[key] = {};
   saveTripsToStorage();
 
   createTripPageElement(key);
