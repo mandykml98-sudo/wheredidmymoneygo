@@ -2193,7 +2193,14 @@ function openAddModal(tripKey){
   document.getElementById('f-currency').disabled = false;
   document.getElementById('f-sgd').disabled = false;
   document.getElementById('lock-note').style.display = 'none';
-  if (expenseDatePicker) expenseDatePicker.clear();
+const trip = trips[tripKey];
+if (expenseDatePicker) {
+  if (trip && trip.from) {
+    expenseDatePicker.setDate(trip.from, true);
+  } else {
+    expenseDatePicker.clear();
+  }
+}
   document.getElementById('modal').classList.add('open');
 }
 function autoCalcSGD(){
