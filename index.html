@@ -1669,11 +1669,14 @@ function renderOverview(){
     kpiDiv('Bookings',tExp,'','Across all trips')+
     kpiDiv('Total Spent (SGD)',fmt(tSGD),'accent','At current FX rates')+
     kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','Pending repayment');
-  document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).map(([k,t])=>{
+document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).map(([k,t])=>{
     const sgd=t.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
     const owed=t.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,t.people),0);
     return`<div class="trip-overview-card" onclick="showPage('${k}')">
-      <div class="trip-card-header ${t.style}"><div class="trip-card-flag">${t.flag}</div><div class="trip-card-name">${t.name}</div><div class="trip-card-dates">${t.dates}</div></div>
+      <div class="trip-card-header ${t.style}" style="position:relative">
+        <button type="button" onclick="event.stopPropagation();openEditTripModal('${k}')" title="Edit trip" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:var(--radius-full);background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;border:none;cursor:pointer;">✏️</button>
+        <div class="trip-card-flag">${t.flag}</div><div class="trip-card-name">${t.name}</div><div class="trip-card-dates">${t.dates}</div>
+      </div>
       <div class="trip-card-body">
         <div class="trip-stat-row"><span class="trip-stat-label">Travellers</span><span class="trip-stat-value">${t.people.join(', ')}</span></div>
         <div class="trip-stat-row"><span class="trip-stat-label">Bookings</span><span class="trip-stat-value">${t.expenses.length}</span></div>
@@ -1681,7 +1684,7 @@ function renderOverview(){
         <div class="trip-stat-row"><span class="trip-stat-label">Owed to ${currentUsername}</span><span class="trip-stat-value" style="color:var(--color-warning)">${fmt(owed)}</span></div>
       </div></div>`;
   }).join('');
-  // icons inline
+ // icons inline
 }
 
 // ===================== TRIP =====================
