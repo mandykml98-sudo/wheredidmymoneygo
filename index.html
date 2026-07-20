@@ -1378,7 +1378,6 @@ const FX_STORAGE_KEY = 'wdmmg_fx';
 let fx = { ...DEFAULT_FX };
 let fxLastUpdated = "Latest";
 let fxSearchTerm = '';
-let expenseFx = null; // holds historical rates for the currently selected expense date, or null if using live rates
 
 function getFilteredFxCodes(){
   const term = fxSearchTerm.trim().toUpperCase();
@@ -1465,23 +1464,35 @@ async function fetchDailyFx() {
   return fx;
 }
 
+let expenseFx = null;
+
 async function fetchHistoricalFx(dateStr){
   try {
-    const res = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/${dateStr}/currencies/sgd.json`);
+    const res = await fetch(`https://api.frankfurter.app/${dateStr}?from=SGD`);
     if(!res.ok) throw new Error('Historical FX fetch failed');
     const data = await res.json();
-    const rates = data.sgd;
-    const fetched = { SGD: 1 };
-    Object.keys(FXMETA).forEach(cur => {
-      if(cur === 'SGD') return;
-      const code = cur.toLowerCase();
-      fetched[cur] = rates[code] ? 1 / rates[code] : (fx[cur] || 1);
-    });
-    return fetched;
-  } catch(e) {
-    console.warn('Historical FX fetch failed, using current rates', e);
+    return { SGD: 1, ...data.rates };
+  } catch(e){
+    console.error('fetchHistoricalFx error', e);
     return null;
   }
+}
+
+function initExpenseDatePicker(){
+  expenseDatePicker = flatpickr("#f-date", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d M Y",
+    onChange: async function(selectedDates, dateStr, instance){
+      if(!selectedDates.length){ expenseFx = null; autoCalcSGD(); return; }
+      const startDateStr = instance.formatDate(selectedDates[0], "Y-m-d");
+      document.getElementById('fx-hint').textContent = 'Fetching rate for selected date...';
+      const histFx = await fetchHistoricalFx(startDateStr);
+      expenseFx = histFx;
+      autoCalcSGD();
+    }
+  });
 }
 
 function refreshFxNow(){
@@ -2168,7 +2179,7 @@ function openAddModal(tripKey){
 }
 function openEdit(k,id){
   const e=trips[k].expenses.find(x=>x.id===id); if(!e) return;
-  editingId=id; editingTrip=k;
+  editingId=id; editingTrip=k;expenseFx = null;
   document.getElementById('modal-title').textContent='Edit Expense';
   document.getElementById('modal-submit-btn').textContent='Update Expense';
   populateTripDropdown(k);
@@ -2240,15 +2251,16 @@ if (expenseDatePicker) {
 }  document.getElementById('modal').classList.add('open');
 }
 function autoCalcSGD(){
-  const c=parseFloat(document.getElementById('f-cost').value)||0;
-  const cur=document.getElementById('f-currency').value;
-  const rateSource = expenseFx || fx;
-  const r=rateSource[cur]||1;
-  document.getElementById('f-sgd').value=(c/r).toFixed(2);
+  const c = parseFloat(document.getElementById('f-cost').value)||0;
+  const cur = document.getElementById('f-currency').value;
+  const activeFx = expenseFx || fx;
+  const r = activeFx[cur] || fx[cur] || 1;
+  document.getElementById('f-sgd').value = (c/r).toFixed(2);
   document.getElementById('fx-hint').textContent = cur!=='SGD'
-    ? `(@ 1 SGD = ${r.toFixed(5)} ${cur}${expenseFx ? ' — historical rate' : ''})`
+    ? `(@ 1 SGD = ${r.toFixed(5)} ${cur}${expenseFx ? ' — rate as of selected date' : ''})`
     : '';
 }
+
 function saveExpense(ev){
   ev.preventDefault();
   const k=document.getElementById('f-trip').value;
