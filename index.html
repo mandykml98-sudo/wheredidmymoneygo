@@ -2567,7 +2567,6 @@ function saveNewTrip(ev){
   const flag = '🌍';
   const key = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '-' + Date.now();
 
-  // Auto-register currency in FX if not already present
   const ntCur = document.getElementById('nt-currency') ? document.getElementById('nt-currency').value : 'SGD';
   if(ntCur && ntCur !== 'SGD' && !fx[ntCur]) {
     fx[ntCur] = DEFAULTFX[ntCur] || 1.0;
@@ -2599,10 +2598,8 @@ function saveNewTrip(ev){
   document.getElementById('nt-people').value='';
   document.getElementById('nt-suggestions').style.display='none';
 
-  // Refresh expense modal trip dropdown so new trip appears
   populateTripDropdown(key);
   renderOverview();
-  // Navigate to new trip page
   try { showPage(key); } catch(err) { console.error('showPage error:', err); }
 }
 
