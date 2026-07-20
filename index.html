@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>wheredidmymoneygo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
 <style>
@@ -945,19 +947,26 @@ input, textarea {
           <input class="form-input" type="text" id="nt-name" required>
         </div>
 
-        <div class="form-group full">
-          <label class="form-label">Date Range</label>
-          <div class="date-range-row">
-            <div class="date-range-field">
-              <span class="date-range-mini-label">Start</span>
-              <input class="form-input" type="date" id="nt-start">
-            </div>
-            <div class="date-range-field">
-              <span class="date-range-mini-label">End</span>
-              <input class="form-input" type="date" id="nt-end">
-            </div>
-          </div>
-        </div>
+<div class="form-group full">
+  <label class="form-label">Date Range</label>
+  <input class="form-input" type="text" id="nt-daterange" placeholder="Select start and end date">
+  <input type="hidden" id="nt-start">
+  <input type="hidden" id="nt-end">
+</div>
+<script>
+function initTripDateRangePicker() {
+  flatpickr("#nt-daterange", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    onChange: function(selectedDates, dateStr, instance) {
+      if (selectedDates.length === 2) {
+        document.getElementById('nt-start').value = instance.formatDate(selectedDates[0], "Y-m-d");
+        document.getElementById('nt-end').value = instance.formatDate(selectedDates[1], "Y-m-d");
+      }
+    }
+  });
+}
+</script>
 
         <div class="form-group full">
           <label class="form-label">Travellers comma-separated</label>
@@ -1020,6 +1029,7 @@ input, textarea {
 <script>
 function openAddTripModal() {
   const modal = document.getElementById('add-trip-modal');
+  initTripDateRangePicker();
   if (modal) modal.classList.add('open');
 }
 
