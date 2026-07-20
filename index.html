@@ -1366,7 +1366,7 @@ function fromSGD(amountSgd, cur) {
   return Number(amountSgd || 0) * rate;
 }
 
-const FXMETA = {
+const FX_META = {
   AUD: {flag:'🇦🇺', name:'Australian Dollar', note:'Live API rate'},
   CAD: {flag:'🇨🇦', name:'Canadian Dollar', note:'Live API rate'},
   CHF: {flag:'🇨🇭', name:'Swiss Franc', note:'Live API rate'},
@@ -2617,7 +2617,7 @@ function saveNewTrip(ev){
   const ntCur = document.getElementById('nt-currency') ? document.getElementById('nt-currency').value : 'SGD';
   if(ntCur && ntCur !== 'SGD' && !fx[ntCur]) {
     fx[ntCur] = DEFAULTFX[ntCur] || 1.0;
-    if(!FXMETA[ntCur]) FXMETA[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
+    if(!FX_META[ntCur]) FX_META[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
   }
   trips[key] = {
     name,
