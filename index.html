@@ -935,39 +935,38 @@ input, textarea {
 </div>
 
 <!-- ADD TRIP MODAL -->
-<div class="modal-backdrop" id="edit-trip-modal" onclick="if(event.target===this)closeEditTripModal()">
+<div class="modal-backdrop" id="add-trip-modal" onclick="if(event.target===this)closeAddTripModal()">
   <div class="modal sm">
-    <h2 class="modal-title">Edit Trip Details</h2>
-    <form onsubmit="saveTripDetails(event)">
-      <input type="hidden" id="et-key">
-
+    <h2 class="modal-title">Add Trip</h2>
+    <form onsubmit="saveNewTrip(event)">
       <div class="form-grid">
         <div class="form-group full">
           <label class="form-label">Country / Trip Name</label>
-          <input class="form-input" type="text" id="et-name" required>
+          <input class="form-input" type="text" id="nt-name" required>
         </div>
 
         <div class="form-group full">
-  <label class="form-label">Date Range</label>
-  <div class="date-range-row">
-    <div class="date-range-field">
-      <span class="date-range-mini-label">Start</span>
-      <input class="form-input" type="date" id="et-start">
-    </div>
-    <div class="date-range-field">
-      <span class="date-range-mini-label">End</span>
-      <input class="form-input" type="date" id="et-end">
-    </div>
-  </div>
-</div>
+          <label class="form-label">Date Range</label>
+          <div class="date-range-row">
+            <div class="date-range-field">
+              <span class="date-range-mini-label">Start</span>
+              <input class="form-input" type="date" id="nt-start">
+            </div>
+            <div class="date-range-field">
+              <span class="date-range-mini-label">End</span>
+              <input class="form-input" type="date" id="nt-end">
+            </div>
+          </div>
+        </div>
+
         <div class="form-group full">
           <label class="form-label">Travellers comma-separated</label>
-          <input class="form-input" type="text" id="et-people" placeholder="e.g. Mandy, Wei Long" required>
+          <input class="form-input" type="text" id="nt-people" placeholder="e.g. Mandy, Wei Long" required>
         </div>
 
         <div class="form-group">
           <label class="form-label">Card Colour</label>
-          <select class="form-select" id="et-colour">
+          <select class="form-select" id="nt-colour">
             <optgroup label="Bold">
               <option value="vietnam">🔴 Warm Red</option>
               <option value="australia">🔵 Ocean Blue</option>
@@ -989,62 +988,46 @@ input, textarea {
               <option value="pastel-butter">🧈 Pastel Butter</option>
               <option value="pastel-coral">🪸 Pastel Coral</option>
             </optgroup>
-          </select></div>
-        <div class="form-group"><label class="form-label">Default Currency</label>
-          <select class="form-select" id="et-currency">
-            <optgroup label="Asia Pacific">
-              <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
-              <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
-              <option value="NZD">🇳🇿 NZD – New Zealand Dollar</option>
-              <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
-              <option value="KRW">🇰🇷 KRW – Korean Won</option>
-              <option value="CNY">🇨🇳 CNY – Chinese Yuan</option>
-              <option value="HKD">🇭🇰 HKD – Hong Kong Dollar</option>
-              <option value="TWD">🇹🇼 TWD – New Taiwan Dollar</option>
-              <option value="THB">🇹🇭 THB – Thai Baht</option>
-              <option value="MYR">🇲🇾 MYR – Malaysian Ringgit</option>
-              <option value="IDR">🇮🇩 IDR – Indonesian Rupiah</option>
-              <option value="PHP">🇵🇭 PHP – Philippine Peso</option>
-              <option value="VND">🇻🇳 VND – Vietnamese Dong</option>
-              <option value="INR">🇮🇳 INR – Indian Rupee</option>
-              <option value="BDT">🇧🇩 BDT – Bangladeshi Taka</option>
-              <option value="LKR">🇱🇰 LKR – Sri Lankan Rupee</option>
-              <option value="PKR">🇵🇰 PKR – Pakistani Rupee</option>
-              <option value="MMK">🇲🇲 MMK – Myanmar Kyat</option>
-              <option value="KHR">🇰🇭 KHR – Cambodian Riel</option>
-              <option value="LAK">🇱🇦 LAK – Lao Kip</option>
-            </optgroup>
-            <optgroup label="Americas">
-              <option value="USD">🇺🇸 USD – US Dollar</option>
-              <option value="CAD">🇨🇦 CAD – Canadian Dollar</option>
-              <option value="BRL">🇧🇷 BRL – Brazilian Real</option>
-              <option value="MXN">🇲🇽 MXN – Mexican Peso</option>
-            </optgroup>
-            <optgroup label="Europe">
-              <option value="EUR">🇪🇺 EUR – Euro</option>
-              <option value="GBP">🇬🇧 GBP – British Pound</option>
-              <option value="CHF">🇨🇭 CHF – Swiss Franc</option>
-              <option value="SEK">🇸🇪 SEK – Swedish Krona</option>
-              <option value="NOK">🇳🇴 NOK – Norwegian Krone</option>
-              <option value="DKK">🇩🇰 DKK – Danish Krone</option>
-              <option value="TRY">🇹🇷 TRY – Turkish Lira</option>
-            </optgroup>
-            <optgroup label="Middle East & Africa">
-              <option value="AED">🇦🇪 AED – UAE Dirham</option>
-              <option value="SAR">🇸🇦 SAR – Saudi Riyal</option>
-              <option value="QAR">🇶🇦 QAR – Qatari Riyal</option>
-              <option value="EGP">🇪🇬 EGP – Egyptian Pound</option>
-              <option value="ZAR">🇿🇦 ZAR – South African Rand</option>
-            </optgroup>
-          </select></div>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Default Currency</label>
+          <select class="form-select" id="nt-currency">
+            <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
+            <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
+            <option value="USD">🇺🇸 USD – US Dollar</option>
+            <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
+            <option value="KRW">🇰🇷 KRW – Korean Won</option>
+            <option value="THB">🇹🇭 THB – Thai Baht</option>
+            <option value="MYR">🇲🇾 MYR – Malaysian Ringgit</option>
+            <option value="IDR">🇮🇩 IDR – Indonesian Rupiah</option>
+            <option value="PHP">🇵🇭 PHP – Philippine Peso</option>
+            <option value="VND">🇻🇳 VND – Vietnamese Dong</option>
+            <option value="EUR">🇪🇺 EUR – Euro</option>
+            <option value="GBP">🇬🇧 GBP – British Pound</option>
+          </select>
+        </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-ghost" onclick="closeEditTripModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Trip Details</button>
+        <button type="button" class="btn btn-ghost" onclick="closeAddTripModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Trip</button>
       </div>
     </form>
   </div>
 </div>
+
+function openAddTripModal() {
+  const modal = document.getElementById('add-trip-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeAddTripModal() {
+  const modal = document.getElementById('add-trip-modal');
+  if (modal) modal.classList.remove('open');
+}
+
 
 <!-- EXPENSE MODAL -->
 <div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
@@ -1137,7 +1120,6 @@ input, textarea {
           <select class="form-select" id="f-split"><option value="YES">Yes</option><option value="NO">No</option></select></div>
         <div class="form-group"><label class="form-label">For Whom</label>
           <select class="form-select" id="f-forwhom"></select></div>
-        <div class="form-group"><label class="form-label">Platform</label>
 <div class="form-group">
   <label class="form-label">Platform</label>
   <input class="form-input" type="text" id="f-platform" list="platform-options" placeholder="e.g. Agoda, Booking.com, Airbnb, Scoot">
