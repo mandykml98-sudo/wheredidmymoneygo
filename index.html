@@ -1218,7 +1218,6 @@ function saveTripDetails(ev){
         🔒 This transaction is locked. Amount and currency cannot be edited. Unlock it first from the table to make changes.
       </div>
 <div class="form-group full">
-<div class="form-group full">
   <label class="form-label">Date</label>
   <input class="form-input" type="text" id="f-date" placeholder="Select date" required>
 </div>
@@ -2175,6 +2174,28 @@ if (e.to && e.to !== e.from) {
   document.getElementById('modal').classList.add('open');
 }
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function openAddModal(tripKey){
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add Expense';
+  populateTripDropdown(tripKey);
+  document.getElementById('f-type').value = '';
+  document.getElementById('f-location').value = '';
+  document.getElementById('f-cost').value = '';
+  document.getElementById('f-sgd').value = '';
+  document.getElementById('f-status').value = 'Paid';
+  document.getElementById('f-split').value = 'YES';
+  document.getElementById('f-platform').value = '';
+  document.getElementById('f-code').value = '';
+  document.getElementById('f-notes').value = '';
+  updateExpenseModalPeople();
+  document.getElementById('f-cost').disabled = false;
+  document.getElementById('f-currency').disabled = false;
+  document.getElementById('f-sgd').disabled = false;
+  document.getElementById('lock-note').style.display = 'none';
+  if (expenseDatePicker) expenseDatePicker.clear();
+  document.getElementById('modal').classList.add('open');
+}
 function autoCalcSGD(){
   const c=parseFloat(document.getElementById('f-cost').value)||0;
   const cur=document.getElementById('f-currency').value;
