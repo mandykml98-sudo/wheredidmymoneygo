@@ -916,7 +916,13 @@ input, textarea {
 <!-- MAIN -->
 <main class="main-content">
   <div class="page active" id="page-overview">
-    <div class="page-header"><h1 class="page-title">Your Trips ✈️</h1><p class="page-subtitle">All your travels in one place</p></div>
+<div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+  <div><h1 class="page-title">Your Trips ✈️</h1><p class="page-subtitle">All your travels in one place</p></div>
+  <button class="btn btn-primary" onclick="openAddTripModal()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Add Trip
+  </button>
+</div>
     <div id="overview-fx-banner"></div>
     <div class="kpi-grid" id="overview-kpis"></div>
     <div class="trips-overview" id="trips-overview-cards"></div>
@@ -1372,6 +1378,7 @@ const FX_STORAGE_KEY = 'wdmmg_fx';
 let fx = { ...DEFAULT_FX };
 let fxLastUpdated = "Latest";
 let fxSearchTerm = '';
+let expenseFx = null; // holds historical rates for the currently selected expense date, or null if using live rates
 
 function getFilteredFxCodes(){
   const term = fxSearchTerm.trim().toUpperCase();
@@ -1456,6 +1463,25 @@ async function fetchDailyFx() {
   fxLastUpdated = data.time_last_update_utc || new Date().toISOString();
   saveFxToStorage();
   return fx;
+}
+
+async function fetchHistoricalFx(dateStr){
+  try {
+    const res = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/${dateStr}/currencies/sgd.json`);
+    if(!res.ok) throw new Error('Historical FX fetch failed');
+    const data = await res.json();
+    const rates = data.sgd;
+    const fetched = { SGD: 1 };
+    Object.keys(FXMETA).forEach(cur => {
+      if(cur === 'SGD') return;
+      const code = cur.toLowerCase();
+      fetched[cur] = rates[code] ? 1 / rates[code] : (fx[cur] || 1);
+    });
+    return fetched;
+  } catch(e) {
+    console.warn('Historical FX fetch failed, using current rates', e);
+    return null;
+  }
 }
 
 function refreshFxNow(){
@@ -2118,6 +2144,7 @@ function openAddModal(tripKey){
     return alert('Please add a trip before adding expenses.');
   }
   editingId=null;
+  expenseFx = null;
   const defaultTrip = tripKey || tripKeys[0];
   editingTrip = defaultTrip;
   document.getElementById('modal-title').textContent='Add Expense';
@@ -2173,7 +2200,11 @@ if (e.to && e.to !== e.from) {
   if(lockNote) lockNote.style.display = isLocked ? 'block' : 'none';
   document.getElementById('modal').classList.add('open');
 }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function closeModal()
+{ document.getElementById('modal').classList.remove('open');
+  expenseFx = null;
+ }
+
 
 function openAddModal(tripKey){
   editingId = null;
@@ -2211,9 +2242,12 @@ if (expenseDatePicker) {
 function autoCalcSGD(){
   const c=parseFloat(document.getElementById('f-cost').value)||0;
   const cur=document.getElementById('f-currency').value;
-  const r=fx[cur]||1;
+  const rateSource = expenseFx || fx;
+  const r=rateSource[cur]||1;
   document.getElementById('f-sgd').value=(c/r).toFixed(2);
-  document.getElementById('fx-hint').textContent=cur!=='SGD'?`(@ 1 SGD = ${r.toFixed(5)} ${cur})`:'';
+  document.getElementById('fx-hint').textContent = cur!=='SGD'
+    ? `(@ 1 SGD = ${r.toFixed(5)} ${cur}${expenseFx ? ' — historical rate' : ''})`
+    : '';
 }
 function saveExpense(ev){
   ev.preventDefault();
@@ -2859,12 +2893,19 @@ enableExpenseSwipeToClose();
 enableFxSwipeToClose();
 
 let expenseDatePicker;
-function initExpenseDatePicker() {
-  expenseDatePicker = flatpickr("#f-date", {
-    mode: "range",
-    dateFormat: "Y-m-d",
+function initExpenseDatePicker(){
+  expenseDatePicker = flatpickr('#f-date', {
+    mode: 'range',
+    dateFormat: 'Y-m-d',
     altInput: true,
-    altFormat: "d M Y"
+    altFormat: 'd M Y',
+    onChange: async function(selectedDates, dateStr, instance){
+      if(!selectedDates.length){ expenseFx = null; autoCalcSGD(); return; }
+      const startDateStr = instance.formatDate(selectedDates[0], "Y-m-d");
+      const histFx = await fetchHistoricalFx(startDateStr);
+      expenseFx = histFx;
+      autoCalcSGD();
+    }
   });
 }
 initExpenseDatePicker();
