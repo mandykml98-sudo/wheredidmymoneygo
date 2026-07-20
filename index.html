@@ -1077,6 +1077,137 @@ function closeAddTripModal() {
 }
 </script>
 
+<!-- EDIT TRIP MODAL -->
+<div class="modal-backdrop" id="edit-trip-modal" onclick="if(event.target===this)closeEditTripModal()">
+  <div class="modal sm">
+    <h2 class="modal-title">Edit Trip</h2>
+    <form onsubmit="saveTripDetails(event)">
+      <input type="hidden" id="et-key">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Country / Trip Name</label>
+          <input class="form-input" type="text" id="et-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input class="form-input" type="text" id="et-start" placeholder="Select start date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input class="form-input" type="text" id="et-end" placeholder="Select end date">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Travellers (comma-separated)</label>
+          <input class="form-input" type="text" id="et-people" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Card Colour</label>
+          <select class="form-select" id="et-colour">
+            <optgroup label="Bold">
+              <option value="vietnam">Warm Red</option>
+              <option value="australia">Ocean Blue</option>
+              <option value="korea">Deep Pink</option>
+              <option value="custom-green">Forest Green</option>
+              <option value="custom-gold">Sunset Gold</option>
+            </optgroup>
+            <optgroup label="Pastel">
+              <option value="pastel-rose">Pastel Rose</option>
+              <option value="pastel-peach">Pastel Peach</option>
+              <option value="pastel-mint">Pastel Mint</option>
+              <option value="pastel-sky">Pastel Sky</option>
+              <option value="pastel-lavender">Pastel Lavender</option>
+              <option value="pastel-lemon">Pastel Lemon</option>
+              <option value="pastel-lilac">Pastel Lilac</option>
+              <option value="pastel-sage">Pastel Sage</option>
+              <option value="pastel-blush">Pastel Blush</option>
+              <option value="pastel-powder">Pastel Powder Blue</option>
+              <option value="pastel-butter">Pastel Butter</option>
+              <option value="pastel-coral">Pastel Coral</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Default Currency</label>
+          <select class="form-select" id="et-currency">
+            <optgroup label="Asia Pacific">
+              <option value="SGD">SGD — Singapore Dollar</option>
+              <option value="AUD">AUD — Australian Dollar</option>
+              <option value="NZD">NZD — New Zealand Dollar</option>
+              <option value="JPY">JPY — Japanese Yen</option>
+              <option value="KRW">KRW — Korean Won</option>
+              <option value="CNY">CNY — Chinese Yuan</option>
+              <option value="HKD">HKD — Hong Kong Dollar</option>
+              <option value="TWD">TWD — New Taiwan Dollar</option>
+              <option value="THB">THB — Thai Baht</option>
+              <option value="MYR">MYR — Malaysian Ringgit</option>
+              <option value="IDR">IDR — Indonesian Rupiah</option>
+              <option value="PHP">PHP — Philippine Peso</option>
+              <option value="VND">VND — Vietnamese Dong</option>
+              <option value="INR">INR — Indian Rupee</option>
+              <option value="BDT">BDT — Bangladeshi Taka</option>
+              <option value="LKR">LKR — Sri Lankan Rupee</option>
+              <option value="PKR">PKR — Pakistani Rupee</option>
+              <option value="MMK">MMK — Myanmar Kyat</option>
+              <option value="KHR">KHR — Cambodian Riel</option>
+              <option value="LAK">LAK — Lao Kip</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="USD">USD — US Dollar</option>
+              <option value="CAD">CAD — Canadian Dollar</option>
+              <option value="BRL">BRL — Brazilian Real</option>
+              <option value="MXN">MXN — Mexican Peso</option>
+            </optgroup>
+            <optgroup label="Europe">
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+              <option value="CHF">CHF — Swiss Franc</option>
+              <option value="SEK">SEK — Swedish Krona</option>
+              <option value="NOK">NOK — Norwegian Krone</option>
+              <option value="DKK">DKK — Danish Krone</option>
+              <option value="TRY">TRY — Turkish Lira</option>
+            </optgroup>
+            <optgroup label="Middle East & Africa">
+              <option value="AED">AED — UAE Dirham</option>
+              <option value="SAR">SAR — Saudi Riyal</option>
+              <option value="QAR">QAR — Qatari Riyal</option>
+              <option value="EGP">EGP — Egyptian Pound</option>
+              <option value="ZAR">ZAR — South African Rand</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeEditTripModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function closeEditTripModal(){
+  const modal=document.getElementById('edit-trip-modal');
+  if(modal) modal.classList.remove('open');
+}
+
+function saveTripDetails(ev){
+  ev.preventDefault();
+  const key = document.getElementById('et-key').value;
+  const trip = trips[key];
+  if(!trip) return;
+
+  trip.name = document.getElementById('et-name').value.trim();
+  const start = document.getElementById('et-start').value;
+  const end = document.getElementById('et-end').value;
+  trip.dates = start && end ? `${start} – ${end}` : trip.dates;
+  trip.people = document.getElementById('et-people').value.split(',').map(s=>s.trim()).filter(Boolean);
+  trip.style = document.getElementById('et-colour').value;
+  trip.currency = document.getElementById('et-currency').value;
+
+  saveTripsToStorage();
+  closeEditTripModal();
+  renderOverview();
+}
+</script>
 
 <!-- EXPENSE MODAL -->
 <div class="modal-backdrop" id="modal" onclick="if(event.target===this)closeModal()">
