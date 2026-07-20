@@ -2378,12 +2378,23 @@ function openEditTripModal(key) {
   colourEl.value = trip.style || 'vietnam';
   currencyEl.value = trip.defaultCur || 'SGD';
 
-  modalEl.classList.add('open');
+modalEl.classList.add('open');
+  initEditTripDatePickers();
+  if(startEl.value) etStartPicker.setDate(startEl.value);
+  if(endEl.value) etEndPicker.setDate(endEl.value);
 }
 
 function closeEditTripModal() {
   const modalEl = document.getElementById('edit-trip-modal');
   if (modalEl) modalEl.classList.remove('open');
+}
+
+let etStartPicker, etEndPicker;
+function initEditTripDatePickers(){
+  if(etStartPicker) etStartPicker.destroy();
+  if(etEndPicker) etEndPicker.destroy();
+  etStartPicker = flatpickr('#et-start', { dateFormat: 'Y-m-d' });
+  etEndPicker = flatpickr('#et-end', { dateFormat: 'Y-m-d' });
 }
 
 function saveTripDetails(ev) {
