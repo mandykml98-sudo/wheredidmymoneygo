@@ -1727,11 +1727,12 @@ function fxBanner() {
 
   return `
     <div class="fx-banner">
-      <div class="fx-banner-top">
-        <span class="fx-banner-label">FX Rates</span>
-        <span class="fx-date">${fxLastUpdated}</span>
-        <button class="fx-edit-btn" onclick="openFxModal()">Edit</button>
-      </div>
+<div class="fx-banner-top">
+  <span class="fx-banner-label">💱 Live Rates</span>
+  <div class="fx-search"><input class="fx-search-input" ...></div>
+  <span class="fx-date"></span>
+  <button class="fx-edit-btn" onclick="openFxModal()">✏️ Edit</button>
+</div>
       <div class="fx-search">
         <input class="fx-search-input" type="search" value="${htmlEscape(fxSearchTerm)}" placeholder="Search currency code or name">
       </div>
