@@ -1490,22 +1490,34 @@ function pbDropdown(tripKey, expId, person, currentVal) {
   ];
   const optHTML = opts.map(o => `<option value="${o.v}" ${val===o.v?'selected':''}>${o.label}</option>`).join('');
   const colorClass = val==='Paid Back' ? 'pb-select paid' : val==='Not Yet' ? 'pb-select notyet' : 'pb-select neutral';
-  return `<select class="${colorClass}" onchange="updatePaidBack('${tripKey}',${expId},'${person}',this.value)">${optHTML}</select>`;
+  return `<select class="${colorClass}"
+            data-trip-key="${String(tripKey).replace(/"/g,'&quot;')}"
+            data-exp-id="${expId}"
+            data-person="${String(person).replace(/"/g,'&quot;')}">${optHTML}</select>`;
 }
+
+document.addEventListener('change', function(e) {
+  if (e.target.matches('.pb-select')) {
+    const { tripKey, person } = e.target.dataset;
+    const expId = Number(e.target.dataset.expId);
+    updatePaidBack(tripKey, expId, person, e.target.value);
+  }
+});
 
 function updatePaidBack(tripKey, expId, person, newVal) {
   const trip = trips[tripKey];
-  if(!trip) return;
+  if (!trip) return;
   const e = trip.expenses.find(x => x.id === expId);
-  if(!e) return;
-  if(!e.paidBack) e.paidBack = {};
+  if (!e) return;
+  if (!e.paidBack) e.paidBack = {};
   e.paidBack[person] = newVal;
-  saveTripsToStorage();
+
+  try { saveTripsToStorage(); } catch (err) { console.warn('Save failed:', err); }
+
   renderTable(tripKey);
   updateTripKpis(tripKey);
-  // Also refresh settlement and overview if they are visible
-  if(document.getElementById('page-settlement').classList.contains('active')) renderSettlement();
-  if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
+  if (document.getElementById('page-settlement').classList.contains('active')) renderSettlement();
+  if (document.getElementById('page-overview').classList.contains('active')) renderOverview();
 }
 
 function updateTripKpis(k) {
