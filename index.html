@@ -2122,8 +2122,14 @@ function openAddModal(tripKey){
   const form=document.querySelector('#modal form'); form.reset();
   populateTripDropdown(defaultTrip);
   updateExpenseModalPeople();
-  if (expenseDatePicker) expenseDatePicker.clear();
-  // Reset any disabled fields from previous locked edit
+  if (expenseDatePicker) {
+    expenseDatePicker.clear();
+    const tripForDefault = trips[defaultTrip];
+    if (tripForDefault && tripForDefault.startDate) {
+      expenseDatePicker.jumpToDate(tripForDefault.startDate);
+    }
+  }
+   // Reset any disabled fields from previous locked edit
   ['f-cost','f-currency','f-sgd'].forEach(id=>{ document.getElementById(id).disabled=false; });
   const lockNote2 = document.getElementById('lock-note');
   if(lockNote2) lockNote2.style.display='none';
