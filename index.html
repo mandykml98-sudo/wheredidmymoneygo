@@ -2078,8 +2078,15 @@ function openFxModal(){
 }
 function closeFxModal(){ document.getElementById('fx-modal').classList.remove('open'); }
 function applyFx(){
-  Object.keys(fx).filter(c=>c!=='SGD').forEach(c=>{ const el=document.getElementById('fxi-'+c); if(el) fx[c]=parseFloat(el.value)||fx[c]; });
-  fxLastUpdated = 'Manual';
+  let manuallyChanged = false;
+  Object.keys(fx).filter(c=>c!=='SGD').forEach(c=>{
+    const el=document.getElementById('fxi-'+c);
+    if(el && parseFloat(el.value) !== fx[c]){
+      fx[c]=parseFloat(el.value)||fx[c];
+      manuallyChanged = true;
+    }
+  });
+  fxLastUpdated = manuallyChanged ? 'Manual' : fxLastUpdated;
   saveFxToStorage();
   closeFxModal();
   const a=document.querySelector('.nav-item.active');
