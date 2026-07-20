@@ -2580,13 +2580,14 @@ trips[key] = {
   createTripPageElement(key);
   createTripSidebarEntry(key);
 
-  closeAddTripModal();
-  document.getElementById('nt-name').value='';
-  document.getElementById('nt-flag-preview').textContent='🌍';
-  document.getElementById('nt-start').value='';
-  document.getElementById('nt-end').value='';
-  document.getElementById('nt-people').value='';
-  document.getElementById('nt-suggestions').style.display='none';
+closeAddTripModal();
+document.getElementById('nt-name').value='';
+const ntFlagPreview = document.getElementById('nt-flag-preview');
+if (ntFlagPreview) ntFlagPreview.textContent='🌍';
+document.getElementById('nt-start').value='';
+document.getElementById('nt-end').value='';
+document.getElementById('nt-people').value='';
+document.getElementById('nt-suggestions').style.display='none';
 
   // Refresh expense modal trip dropdown so new trip appears
   populateTripDropdown(key);
