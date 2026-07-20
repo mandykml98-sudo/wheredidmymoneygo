@@ -127,6 +127,7 @@ input,select,textarea{font:inherit;color:inherit;}
   font-size: var(--text-xs);
   font-weight: 600;
   line-height: 1.1;
+  scroll-snap-align: start;
 }
 .fx-chip-inner{
   display: flex;
@@ -154,23 +155,32 @@ input,select,textarea{font:inherit;color:inherit;}
 .fx-search{width:100%;max-width:420px;}
 .fx-search-input{width:100%;padding:10px 12px;border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-bg);color:var(--color-text);font-size:var(--text-sm);min-width:0;}
 .fx-banner-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;width:100%;}
-.fx-banner-chips{display:flex;gap:10px;flex-wrap:wrap;overflow-x:auto;width:100%;}
+.fx-banner-chips{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  width:100%;
+  scroll-snap-type:x mandatory;
+}
 .fx-no-results{color:var(--color-text-muted);font-size:var(--text-sm);padding:8px 0;}
 .fx-edit-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);background:var(--color-primary);color:#fff;font-size:var(--text-xs);font-weight:600;border:none;cursor:pointer;transition:background var(--transition);}
 .fx-edit-btn:hover{background:var(--color-primary-hover);}
 @media (max-width: 768px){
-  .fx-chip{
-    width: 104px;
-    height: 104px;
-    min-width: 104px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    text-align: center;
-    padding: 8px;
-    box-sizing: border-box;
-    flex-shrink: 0;
-  }
+.fx-chip {
+  width: 104px;
+  height: 104px;
+  min-width: 104px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 8px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
 
   .fx-chip-inner{
     display: flex;
@@ -675,13 +685,15 @@ input, textarea {
     display: block;
   }
 
-  .fx-banner-chips {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    width: 100%;
-  }
+.fx-banner-chips{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  width:100%;
+  scroll-snap-type:x mandatory;
+}
 
   .fx-banner-label {
     white-space: normal;
@@ -2550,8 +2562,8 @@ function hydrateStoredTrips() {
 function saveNewTrip(ev){
   ev.preventDefault();
   const name = document.getElementById('nt-name').value.trim();
-  const flag = document.getElementById('nt-flag-preview').textContent.trim() || '🌍';
-  const startDate = document.getElementById('nt-start').value;
+const flagPreviewEl = document.getElementById('nt-flag-preview');
+if (flagPreviewEl) flagPreviewEl.textContent = flag;  const startDate = document.getElementById('nt-start').value;
   const endDate = document.getElementById('nt-end').value;
   const people = document.getElementById('nt-people').value.split(',').map(p=>p.trim()).filter(Boolean);
   const dates = startDate && endDate ? `${formatTripDate(startDate)} – ${formatTripDate(endDate)}` : startDate ? formatTripDate(startDate) : endDate ? formatTripDate(endDate) : '';
