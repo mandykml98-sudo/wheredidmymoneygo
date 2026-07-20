@@ -1008,21 +1008,53 @@ function initTripDateRangePicker() {
 
                 <div class="form-group">
           <label class="form-label">Default Currency</label>
-          <select class="form-select" id="nt-currency">
-            <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
-            <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
-            <option value="USD">🇺🇸 USD – US Dollar</option>
-            <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
-            <option value="KRW">🇰🇷 KRW – Korean Won</option>
-            <option value="THB">🇹🇭 THB – Thai Baht</option>
-            <option value="MYR">🇲🇾 MYR – Malaysian Ringgit</option>
-            <option value="IDR">🇮🇩 IDR – Indonesian Rupiah</option>
-            <option value="PHP">🇵🇭 PHP – Philippine Peso</option>
-            <option value="VND">🇻🇳 VND – Vietnamese Dong</option>
-            <option value="EUR">🇪🇺 EUR – Euro</option>
-            <option value="GBP">🇬🇧 GBP – British Pound</option>
-          </select>
-        </div>
+<select class="form-select" id="nt-currency">
+  <optgroup label="Asia Pacific">
+    <option value="SGD">🇸🇬 SGD — Singapore Dollar</option>
+    <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+    <option value="NZD">🇳🇿 NZD — New Zealand Dollar</option>
+    <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+    <option value="KRW">🇰🇷 KRW — Korean Won</option>
+    <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+    <option value="HKD">🇭🇰 HKD — Hong Kong Dollar</option>
+    <option value="TWD">🇹🇼 TWD — New Taiwan Dollar</option>
+    <option value="THB">🇹🇭 THB — Thai Baht</option>
+    <option value="MYR">🇲🇾 MYR — Malaysian Ringgit</option>
+    <option value="IDR">🇮🇩 IDR — Indonesian Rupiah</option>
+    <option value="PHP">🇵🇭 PHP — Philippine Peso</option>
+    <option value="VND">🇻🇳 VND — Vietnamese Dong</option>
+    <option value="INR">🇮🇳 INR — Indian Rupee</option>
+    <option value="BDT">🇧🇩 BDT — Bangladeshi Taka</option>
+    <option value="LKR">🇱🇰 LKR — Sri Lankan Rupee</option>
+    <option value="PKR">🇵🇰 PKR — Pakistani Rupee</option>
+    <option value="MMK">🇲🇲 MMK — Myanmar Kyat</option>
+    <option value="KHR">🇰🇭 KHR — Cambodian Riel</option>
+    <option value="LAK">🇱🇦 LAK — Lao Kip</option>
+  </optgroup>
+  <optgroup label="Americas">
+    <option value="USD">🇺🇸 USD — US Dollar</option>
+    <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+    <option value="BRL">🇧🇷 BRL — Brazilian Real</option>
+    <option value="MXN">🇲🇽 MXN — Mexican Peso</option>
+  </optgroup>
+  <optgroup label="Europe">
+    <option value="EUR">🇪🇺 EUR — Euro</option>
+    <option value="GBP">🇬🇧 GBP — British Pound</option>
+    <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+    <option value="SEK">🇸🇪 SEK — Swedish Krona</option>
+    <option value="NOK">🇳🇴 NOK — Norwegian Krone</option>
+    <option value="DKK">🇩🇰 DKK — Danish Krone</option>
+    <option value="TRY">🇹🇷 TRY — Turkish Lira</option>
+  </optgroup>
+  <optgroup label="Middle East & Africa">
+    <option value="AED">🇦🇪 AED — UAE Dirham</option>
+    <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+    <option value="QAR">🇶🇦 QAR — Qatari Riyal</option>
+    <option value="EGP">🇪🇬 EGP — Egyptian Pound</option>
+    <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+  </optgroup>
+</select>
+    </div>
       </div>
 
       <div class="modal-footer">
@@ -1055,19 +1087,11 @@ function closeAddTripModal() {
         🔒 This transaction is locked. Amount and currency cannot be edited. Unlock it first from the table to make changes.
       </div>
 <div class="form-group full">
-  <label class="form-label">Date Range</label>
-  <div class="date-range-row">
-    <div class="date-range-field">
-      <span class="date-range-mini-label">From</span>
-      <input class="form-input" type="date" id="f-from" required>
-    </div>
-    <div class="date-range-field">
-      <span class="date-range-mini-label">To</span>
-      <input class="form-input" type="date" id="f-to">
-    </div>
-  </div>
+<div class="form-group full">
+  <label class="form-label">Date</label>
+  <input class="form-input" type="text" id="f-date" placeholder="Select date" required>
 </div>
-   <div class="form-group"><label class="form-label">Type</label>
+<div class="form-group"><label class="form-label">Type</label>
           <div style="display:flex;gap:var(--space-2);align-items:center">
             <select class="form-select" id="f-type" required style="flex:1"></select>
             <button type="button" class="btn btn-ghost btn-sm" title="Add category" onclick="promptAddCategory()" style="white-space:nowrap;padding:6px 10px;height:40px;">＋ Add</button>
@@ -1342,27 +1366,27 @@ function fromSGD(amountSgd, cur) {
   return Number(amountSgd || 0) * rate;
 }
 
-const FX_META = {
-  AUD:{ flag:'🇦🇺', name:'Australian Dollar',    note:'Live API rate' },
-  USD:{ flag:'🇺🇸', name:'US Dollar',             note:'Live API rate' },
-  JPY:{ flag:'🇯🇵', name:'Japanese Yen',          note:'Live API rate' },
-  EUR:{ flag:'🇪🇺', name:'Euro',                  note:'Live API rate' },
-  GBP:{ flag:'🇬🇧', name:'British Pound',         note:'Live API rate' },
-  THB:{ flag:'🇹🇭', name:'Thai Baht',             note:'Live API rate' },
-  MYR:{ flag:'🇲🇾', name:'Malaysian Ringgit',     note:'Live API rate' },
-  IDR:{ flag:'🇮🇩', name:'Indonesian Rupiah',     note:'Live API rate' },
-  PHP:{ flag:'🇵🇭', name:'Philippine Peso',       note:'Live API rate' },
-  TWD:{ flag:'🇹🇼', name:'New Taiwan Dollar',     note:'Live API rate' },
-  HKD:{ flag:'🇭🇰', name:'Hong Kong Dollar',      note:'Live API rate' },
-  KRW:{ flag:'🇰🇷', name:'Korean Won',           note:'Live API rate' },
-  VND:{ flag:'🇻🇳', name:'Vietnamese Dong',      note:'Live API rate' },
-  CNY:{ flag:'🇨🇳', name:'Chinese Yuan',          note:'Live API rate' },
-  INR:{ flag:'🇮🇳', name:'Indian Rupee',          note:'Live API rate' },
-  NZD:{ flag:'🇳🇿', name:'New Zealand Dollar',    note:'Live API rate' },
-  CAD:{ flag:'🇨🇦', name:'Canadian Dollar',       note:'Live API rate' },
-  CHF:{ flag:'🇨🇭', name:'Swiss Franc',           note:'Live API rate' },
-  SEK:{ flag:'🇸🇪', name:'Swedish Krona',         note:'Live API rate' },
-  NOK:{ flag:'🇳🇴', name:'Norwegian Krone',       note:'Live API rate' },
+const FXMETA = {
+  AUD: {flag:'🇦🇺', name:'Australian Dollar', note:'Live API rate'},
+  CAD: {flag:'🇨🇦', name:'Canadian Dollar', note:'Live API rate'},
+  CHF: {flag:'🇨🇭', name:'Swiss Franc', note:'Live API rate'},
+  CNY: {flag:'🇨🇳', name:'Chinese Yuan', note:'Live API rate'},
+  EUR: {flag:'🇪🇺', name:'Euro', note:'Live API rate'},
+  GBP: {flag:'🇬🇧', name:'British Pound', note:'Live API rate'},
+  HKD: {flag:'🇭🇰', name:'Hong Kong Dollar', note:'Live API rate'},
+  IDR: {flag:'🇮🇩', name:'Indonesian Rupiah', note:'Live API rate'},
+  INR: {flag:'🇮🇳', name:'Indian Rupee', note:'Live API rate'},
+  JPY: {flag:'🇯🇵', name:'Japanese Yen', note:'Live API rate'},
+  KRW: {flag:'🇰🇷', name:'Korean Won', note:'Live API rate'},
+  MYR: {flag:'🇲🇾', name:'Malaysian Ringgit', note:'Live API rate'},
+  NOK: {flag:'🇳🇴', name:'Norwegian Krone', note:'Live API rate'},
+  NZD: {flag:'🇳🇿', name:'New Zealand Dollar', note:'Live API rate'},
+  PHP: {flag:'🇵🇭', name:'Philippine Peso', note:'Live API rate'},
+  SEK: {flag:'🇸🇪', name:'Swedish Krona', note:'Live API rate'},
+  THB: {flag:'🇹🇭', name:'Thai Baht', note:'Live API rate'},
+  TWD: {flag:'🇹🇼', name:'New Taiwan Dollar', note:'Live API rate'},
+  USD: {flag:'🇺🇸', name:'US Dollar', note:'Live API rate'},
+  VND: {flag:'🇻🇳', name:'Vietnamese Dong', note:'Live API rate'}
 };
 
 function initFx(){
@@ -1964,6 +1988,7 @@ function openAddModal(tripKey){
   const form=document.querySelector('#modal form'); form.reset();
   populateTripDropdown(defaultTrip);
   updateExpenseModalPeople();
+  if (expenseDatePicker) expenseDatePicker.clear();
   // Reset any disabled fields from previous locked edit
   ['f-cost','f-currency','f-sgd'].forEach(id=>{ document.getElementById(id).disabled=false; });
   const lockNote2 = document.getElementById('lock-note');
@@ -1976,8 +2001,13 @@ function openEdit(k,id){
   document.getElementById('modal-title').textContent='Edit Expense';
   document.getElementById('modal-submit-btn').textContent='Update Expense';
   populateTripDropdown(k);
-  document.getElementById('f-from').value=e.from||'';
-  document.getElementById('f-to').value=e.to||'';
+
+if (e.to && e.to !== e.from) {
+  expenseDatePicker.setDate([e.from, e.to]);
+} else {
+  expenseDatePicker.setDate([e.from]);
+}  
+
   document.getElementById('f-type').value=e.type;
   document.getElementById('f-location').value=e.location||'';
   document.getElementById('f-cost').value=e.cost;
@@ -2010,6 +2040,19 @@ function autoCalcSGD(){
 function saveExpense(ev){
   ev.preventDefault();
   const k=document.getElementById('f-trip').value;
+
+  const selectedDates = expenseDatePicker.selectedDates;
+  let fromDate = '', toDate = '';
+  if (selectedDates.length === 1) {
+    fromDate = toDate = expenseDatePicker.formatDate(selectedDates[0], "Y-m-d");
+  } else if (selectedDates.length === 2) {
+    fromDate = expenseDatePicker.formatDate(selectedDates[0], "Y-m-d");
+    toDate = expenseDatePicker.formatDate(selectedDates[1], "Y-m-d");
+  } else {
+    alert("Please select a date.");
+    return;
+  }
+
   const trip=trips[k]; const people=trip.people;
   const cost=parseFloat(document.getElementById('f-cost').value)||0;
   const cur=document.getElementById('f-currency').value;
@@ -2023,35 +2066,39 @@ function saveExpense(ev){
   })();
   const pb={};
   people.forEach(p=>{ pb[p]=sp.includes(p)&&p!==paidBy?'Not Yet':''; });
-  // If editing a locked expense, preserve original cost/cur
-  let finalCost = cost, finalCur = cur;
-  if(editingId !== null) {
-    const existingExp = trips[k].expenses.find(x => x.id === editingId);
-    if(existingExp && existingExp.locked) {
-      finalCost = existingExp.lockedCost || existingExp.cost;
-      finalCur  = existingExp.lockedCur  || existingExp.cur;
-    }
+// If editing a locked expense, preserve original cost/cur
+let finalCost = cost, finalCur = cur;
+if(editingId !== null) {
+  const existingExp = trips[k].expenses.find(x => x.id === editingId);
+  if(existingExp && existingExp.locked) {
+    finalCost = existingExp.lockedCost || existingExp.cost;
+    finalCur  = existingExp.lockedCur  || existingExp.cur;
   }
-  const ne={id:editingId||nextId++,from:document.getElementById('f-from').value,to:document.getElementById('f-to').value,
+}
+
+const ne = {id:editingId!==null?editingId:nextId++,from:fromDate,to:toDate,
     type:document.getElementById('f-type').value,location:document.getElementById('f-location').value,
     cost:finalCost,cur:finalCur,status:document.getElementById('f-status').value,split,forWhom,paidBy,
     code:document.getElementById('f-code').value,platform:document.getElementById('f-platform').value,
     notes:document.getElementById('f-notes').value,paidBack:pb};
-  if(editingId!==null){
-    const idx=trip.expenses.findIndex(x=>x.id===editingId);
-    if(idx>-1){ ne.paidBack=trips[k].expenses[idx].paidBack; trip.expenses[idx]=ne; }
-  } else { trip.expenses.push(ne); }
-  saveTripsToStorage();
-  closeModal(); renderTrip(k);
-  if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
+
+if(editingId !== null){
+  const idx = trip.expenses.findIndex(x => x.id === editingId);
+  if(idx > -1){ ne.paidBack = trips[k].expenses[idx].paidBack; trip.expenses[idx] = ne; }
+} else {
+  trip.expenses.push(ne);
 }
+saveTripsToStorage();
+closeModal(); renderTrip(k);
+if(document.getElementById('page-overview').classList.contains('active')) renderOverview();
+}
+
 function delExp(k,id){
   if(!confirm('Delete this expense?')) return;
-  trips[k].expenses=trips[k].expenses.filter(e=>e.id!==id);
+  trips[k].expenses = trips[k].expenses.filter(e => e.id !== id);
   saveTripsToStorage();
   renderTrip(k);
 }
-
 
 
 // ===================== DYNAMIC EXPENSE MODAL =====================
@@ -2596,7 +2643,8 @@ function saveNewTrip(ev){
   document.getElementById('nt-start').value='';
   document.getElementById('nt-end').value='';
   document.getElementById('nt-people').value='';
-  document.getElementById('nt-suggestions').style.display='none';
+  const ntSuggestions = document.getElementById('nt-suggestions');
+  if (ntSuggestions) ntSuggestions.style.display='none';
 
   populateTripDropdown(key);
   renderOverview();
@@ -2620,6 +2668,17 @@ window.addEventListener('resize', () => { setTopbarCssVar(); enableAddTripSwipeT
 enableAddTripSwipeToClose();
 enableExpenseSwipeToClose();
 enableFxSwipeToClose();
+
+let expenseDatePicker;
+function initExpenseDatePicker() {
+  expenseDatePicker = flatpickr("#f-date", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d M Y"
+  });
+}
+initExpenseDatePicker();
 
 initFx();
 renderOverview();
