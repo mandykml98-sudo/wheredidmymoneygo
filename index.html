@@ -1260,8 +1260,8 @@ let fxSearchTerm = '';
 
 function getFilteredFxCodes(){
   const term = fxSearchTerm.trim().toUpperCase();
-  return Object.keys(FX_META).filter(code => {
-    const meta = FX_META[code];
+  return Object.keys(FXMETA).filter(code => {
+    const meta = FXMETA[code];
     return !term || code.includes(term) || meta.name.toUpperCase().includes(term);
   });
 }
@@ -1287,7 +1287,7 @@ function renderFxBanners(){
         return `
           <span class="fx-chip">
             <span class="fx-chip-inner">
-              <span class="fx-chip-flag">${FX_META[c].flag}</span>
+              <span class="fx-chip-flag">${FXMETA[c].flag}</span>
               <span class="fx-chip-rate">1 SGD = ${d}</span>
               <span class="fx-chip-code">${c}</span>
             </span>
@@ -1332,7 +1332,7 @@ async function fetchDailyFx() {
   }
 
   const fetched = { SGD: 1 };
-  Object.keys(FX_META).forEach(cur => {
+  Object.keys(FXMETA).forEach(cur => {
     if (cur === 'SGD') return;
     fetched[cur] = data.rates[cur] || DEFAULT_FX[cur] || 1;
   });
@@ -1366,7 +1366,7 @@ function fromSGD(amountSgd, cur) {
   return Number(amountSgd || 0) * rate;
 }
 
-const FX_META = {
+const FXMETA = {
   AUD: {flag:'🇦🇺', name:'Australian Dollar', note:'Live API rate'},
   CAD: {flag:'🇨🇦', name:'Canadian Dollar', note:'Live API rate'},
   CHF: {flag:'🇨🇭', name:'Swiss Franc', note:'Live API rate'},
@@ -1585,7 +1585,7 @@ function fxBanner() {
     return `
       <span class="fx-chip">
         <span class="fx-chip-inner">
-          <span class="fx-chip-flag">${FX_META[c].flag}</span>
+          <span class="fx-chip-flag">${FXMETA[c].flag}</span>
           <span class="fx-chip-rate">1 SGD = ${d}</span>
           <span class="fx-chip-code">${c}</span>
         </span>
@@ -1921,10 +1921,10 @@ function renderSettlement(){
 
 // ===================== FX MODAL =====================
 function renderFxRows(){
-  const rows = Object.keys(FX_META).map(c=>{
+  const rows = Object.keys(FXMETA).map(c=>{
     const r = fx[c] || DEFAULT_FX[c] || 1;
     const d = r < 0.01 ? r.toFixed(7) : r.toFixed(5);
-    const m = FX_META[c];
+    const m = FXMETA[c];
     return `<div class="fx-rate-row">
       <div><div style="font-weight:700">${m.flag} ${c} — ${m.name}</div><div class="text-xs text-muted">${m.note}</div></div>
       <div class="flex items-center gap-2">
@@ -2617,7 +2617,7 @@ function saveNewTrip(ev){
   const ntCur = document.getElementById('nt-currency') ? document.getElementById('nt-currency').value : 'SGD';
   if(ntCur && ntCur !== 'SGD' && !fx[ntCur]) {
     fx[ntCur] = DEFAULTFX[ntCur] || 1.0;
-    if(!FX_META[ntCur]) FX_META[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
+    if(!FXMETA[ntCur]) FXMETA[ntCur] = { flag: '', name: ntCur, note: 'Added with trip' };
   }
   trips[key] = {
     name,
