@@ -158,7 +158,7 @@ input,select,textarea{font:inherit;color:inherit;}
 .fx-banner-chips{
   display:flex;
   gap:10px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   overflow-x:auto;
   width:100%;
 }
@@ -1361,28 +1361,13 @@ function loadTripsFromStorage(){
 
 // ===================== FX RATES =====================
 const DEFAULT_FX = {
-  SGD: 1,
-  AUD: 1.109259,
-  USD: 0.774387,
-  JPY: 125.76769,
-  EUR: 0.677023,
-  GBP: 0.575689,
-  THB: 26.032659,
-  MYR: 3.162335,
-  IDR: 13906.689673,
-  PHP: 47.709902,
-  TWD: 25.018959,
-  HKD: 6.071822,
-  KRW: 1151.139554,
-  VND: 20291.853516,
-  CNY: 5.25573,
-  INR: 74.568265,
-  NZD: 1.326082,
-  CAD: 1.085738,
-  CHF: 0.625246,
-  SEK: 7.471589,
-  NOK: 7.480976
-};
+  SGD:1, AUD:1.109259, USD:0.774387, JPY:125.76769, EUR:0.677023, GBP:0.575689,
+  THB:26.032659, MYR:3.162335, IDR:13906.689673, PHP:47.709902, TWD:25.018959,
+  HKD:6.071822, KRW:1151.139554, VND:20291.853516, CNY:5.25573, INR:74.568265,
+  NZD:1.326082, CAD:1.085738, CHF:0.625246, SEK:7.471589, NOK:7.480976,
+  BDT:114.5, LKR:230, PKR:215, MMK:1625, KHR:3150, LAK:15850,
+  BRL:4.15, MXN:15.5, DKK:5.05, TRY:26.5, AED:2.845, SAR:2.905, QAR:2.815, EGP:37.9, ZAR:14.3
+  };
 const FX_STORAGE_KEY = 'wdmmg_fx';
 
 let fx = { ...DEFAULT_FX };
@@ -1498,26 +1483,42 @@ function fromSGD(amountSgd, cur) {
 }
 
 const FXMETA = {
+  AED: {flag:'🇦🇪', name:'UAE Dirham', note:'Live API rate'},
   AUD: {flag:'🇦🇺', name:'Australian Dollar', note:'Live API rate'},
+  BDT: {flag:'🇧🇩', name:'Bangladeshi Taka', note:'Live API rate'},
+  BRL: {flag:'🇧🇷', name:'Brazilian Real', note:'Live API rate'},
   CAD: {flag:'🇨🇦', name:'Canadian Dollar', note:'Live API rate'},
   CHF: {flag:'🇨🇭', name:'Swiss Franc', note:'Live API rate'},
   CNY: {flag:'🇨🇳', name:'Chinese Yuan', note:'Live API rate'},
+  DKK: {flag:'🇩🇰', name:'Danish Krone', note:'Live API rate'},
+  EGP: {flag:'🇪🇬', name:'Egyptian Pound', note:'Live API rate'},
   EUR: {flag:'🇪🇺', name:'Euro', note:'Live API rate'},
   GBP: {flag:'🇬🇧', name:'British Pound', note:'Live API rate'},
   HKD: {flag:'🇭🇰', name:'Hong Kong Dollar', note:'Live API rate'},
   IDR: {flag:'🇮🇩', name:'Indonesian Rupiah', note:'Live API rate'},
   INR: {flag:'🇮🇳', name:'Indian Rupee', note:'Live API rate'},
   JPY: {flag:'🇯🇵', name:'Japanese Yen', note:'Live API rate'},
+  KHR: {flag:'🇰🇭', name:'Cambodian Riel', note:'Live API rate'},
   KRW: {flag:'🇰🇷', name:'Korean Won', note:'Live API rate'},
+  LAK: {flag:'🇱🇦', name:'Lao Kip', note:'Live API rate'},
+  LKR: {flag:'🇱🇰', name:'Sri Lankan Rupee', note:'Live API rate'},
+  MMK: {flag:'🇲🇲', name:'Myanmar Kyat', note:'Live API rate'},
+  MXN: {flag:'🇲🇽', name:'Mexican Peso', note:'Live API rate'},
   MYR: {flag:'🇲🇾', name:'Malaysian Ringgit', note:'Live API rate'},
   NOK: {flag:'🇳🇴', name:'Norwegian Krone', note:'Live API rate'},
   NZD: {flag:'🇳🇿', name:'New Zealand Dollar', note:'Live API rate'},
   PHP: {flag:'🇵🇭', name:'Philippine Peso', note:'Live API rate'},
+  PKR: {flag:'🇵🇰', name:'Pakistani Rupee', note:'Live API rate'},
+  QAR: {flag:'🇶🇦', name:'Qatari Riyal', note:'Live API rate'},
+  SAR: {flag:'🇸🇦', name:'Saudi Riyal', note:'Live API rate'},
   SEK: {flag:'🇸🇪', name:'Swedish Krona', note:'Live API rate'},
+  SGD: {flag:'🇸🇬', name:'Singapore Dollar', note:'Base currency'},
   THB: {flag:'🇹🇭', name:'Thai Baht', note:'Live API rate'},
+  TRY: {flag:'🇹🇷', name:'Turkish Lira', note:'Live API rate'},
   TWD: {flag:'🇹🇼', name:'New Taiwan Dollar', note:'Live API rate'},
   USD: {flag:'🇺🇸', name:'US Dollar', note:'Live API rate'},
-  VND: {flag:'🇻🇳', name:'Vietnamese Dong', note:'Live API rate'}
+  VND: {flag:'🇻🇳', name:'Vietnamese Dong', note:'Live API rate'},
+  ZAR: {flag:'🇿🇦', name:'South African Rand', note:'Live API rate'}
 };
 
 function initFx(){
