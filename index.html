@@ -2195,13 +2195,18 @@ function openAddModal(tripKey){
   document.getElementById('lock-note').style.display = 'none';
 const trip = trips[tripKey];
 if (expenseDatePicker) {
-  if (trip && trip.from) {
-    expenseDatePicker.setDate(trip.from, true);
+  let startDate = null;
+  if (trip && trip.dates) {
+    const rawStart = trip.dates.split(/[-–]/)[0].trim();
+    const parsed = new Date(rawStart);
+    if (!isNaN(parsed.getTime())) startDate = parsed;
+  }
+  if (startDate) {
+    expenseDatePicker.setDate(startDate, true);
   } else {
     expenseDatePicker.clear();
   }
-}
-  document.getElementById('modal').classList.add('open');
+}  document.getElementById('modal').classList.add('open');
 }
 function autoCalcSGD(){
   const c=parseFloat(document.getElementById('f-cost').value)||0;
