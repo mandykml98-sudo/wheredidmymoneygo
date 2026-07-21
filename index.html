@@ -1468,12 +1468,13 @@ let expenseFx = null;
 
 async function fetchHistoricalFx(dateStr){
   try {
-    const res = await fetch(`https://api.frankfurter.app/${dateStr}?from=SGD`);
-    if(!res.ok) throw new Error('Historical FX fetch failed');
+    const res = await fetch(`https://api.frankfurter.dev/v1/${dateStr}?base=SGD`);
+    if(!res.ok) throw new Error('Historical FX fetch failed: ' + res.status);
     const data = await res.json();
     return { SGD: 1, ...data.rates };
   } catch(e){
     console.error('fetchHistoricalFx error', e);
+    document.getElementById('fx-hint').textContent = "Couldn't fetch historical rate — using today's rate.";
     return null;
   }
 }
