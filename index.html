@@ -136,6 +136,20 @@ input,select,textarea{font:inherit;color:inherit;}
 }
 .fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;}
 
+.fx-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px 12px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.1;
+  scroll-snap-align: start;
+}
+
 .fx-chip-inner{
   display: flex;
   align-items: center;
@@ -923,24 +937,35 @@ input, textarea {
   <div class="nav-divider"></div>
   <p class="sidebar-label">Tools</p>
   <div class="nav-item" onclick="showPage('settlement')" data-page="settlement"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
-  <div class="nav-divider"></div>
-  <div class="sidebar-label">Spending Breakdown</div>
-  <div id="sidebar-pie-chart" style="padding:0 var(--space-6);"></div>
+<div class="nav-item" onclick="showPage('breakdown')" data-page="breakdown">
+  <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M11 2v9l8 4a10 10 0 1 1-8-13z"/><path d="M20 12h-9"/>
+  </svg>
+  Breakdown
+</div>
 </nav>
 
 <!-- MAIN -->
 <main class="main-content">
   <div class="page active" id="page-overview">
-<div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
-  <div><h1 class="page-title">Your Trips ✈️</h1><p class="page-subtitle">All your travels in one place</p></div>
-  <button class="btn btn-primary" onclick="openAddTripModal()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Add Trip
-  </button>
-</div>
+    <div class="page-header flex items-center justify-between" style="flex-wrap:wrap;gap:var(--space-4)">
+      <div><h1 class="page-title">Your Trips ✈️</h1><p class="page-subtitle">All your travels in one place</p></div>
+      <button class="btn btn-primary" onclick="openAddTripModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Trip
+      </button>
+    </div>
     <div id="overview-fx-banner"></div>
     <div class="kpi-grid" id="overview-kpis"></div>
     <div class="trips-overview" id="trips-overview-cards"></div>
+  </div>
+
+  <div class="page" id="page-breakdown">
+    <div class="page-header">
+      <h1 class="page-title">Spending Breakdown</h1>
+      <p class="page-subtitle">Your expenses by category</p>
+    </div>
+    <div id="pie-chart-tab"></div>
   </div>
 
   <div class="page" id="page-settlement">
@@ -948,8 +973,6 @@ input, textarea {
     <div id="settlement-content"></div>
   </div>
 </main>
-</div>
-
 
 <!-- DELETE TRIP MODAL -->
 <div class="modal-backdrop" id="del-trip-modal" onclick="if(event.target===this)closeDelTripModal()">
@@ -1798,10 +1821,11 @@ function showPage(k){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+k).classList.add('active');
-  document.querySelector(`[data-page="${k}"]`).classList.add('active');
+  document.querySelector('[data-page="'+k+'"]').classList.add('active');
   document.getElementById('sidebar').classList.remove('open');
   if(k==='overview') renderOverview();
   else if(k==='settlement') renderSettlement();
+  else if(k==='breakdown') renderSidebarPieChart();
   else renderTrip(k);
 }
 
@@ -1815,6 +1839,8 @@ function updateUsername(){
   renderSidebarPieChart();
   const activePage = document.querySelector('.page.active');
   if(activePage.id === 'page-overview') renderOverview();
+  else if(activePage.id === 'page-settlement') renderSettlement();
+  else if(activePage.id === 'page-breakdown') renderSidebarPieChart();
   else {
     const pageMatch = activePage.id.match(/page-(.+)/);
     if(pageMatch) renderTrip(pageMatch[1]);
@@ -1824,7 +1850,6 @@ if(localStorage.getItem('currentUsername')) {
   currentUsername = localStorage.getItem('currentUsername');
   setTimeout(() => document.getElementById('username-input').value = currentUsername, 100);
 }
-
 // ===================== OVERVIEW =====================
 
 function kpiFont(val){
@@ -1873,7 +1898,7 @@ document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).
 }
 
 function renderSidebarPieChart(){
-  const container = document.getElementById('sidebar-pie-chart');
+const container = document.getElementById('pie-chart-tab');
   if(!container) return;
 
   const byType = {};
