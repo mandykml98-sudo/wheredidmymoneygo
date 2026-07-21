@@ -133,7 +133,9 @@ input,select,textarea{font:inherit;color:inherit;}
   max-width:100%;
   box-sizing:border-box;
   padding-bottom: 4px;
+  margin-top: 12px;
 }
+
 .fx-banner-label{font-weight:700;color:var(--color-primary);white-space:nowrap;}
 
 .fx-chip{
@@ -1919,7 +1921,7 @@ const container = document.getElementById('pie-chart-tab');
     return;
   }
 
-  const colors = ['#c0622a','#2e6fa3','#4a7c3f','#b87d1a','#b82a6a','#6b5542','#7a6452','#e05c4a'];
+const colors = ['#f4b8a0','#a8c8e8','#b8dcb0','#f5d9a0','#e8b0cc','#c9b8a8','#c5c0b8','#f2a89a'];
   let cumulative = 0;
   const size = 120, radius = 55, cx = size/2, cy = size/2;
 
@@ -1935,15 +1937,16 @@ const container = document.getElementById('pie-chart-tab');
     return `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${color}"></path>`;
   }).join('');
 
-  const legend = entries.map(([type,val],i)=>{
-    const color = colors[i % colors.length];
-    const pct = ((val/total)*100).toFixed(0);
-    return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px;">
-      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
-      <span style="color:var(--color-text-muted);flex:1;">${eIcon(type)}${type}</span>
-      <span style="font-weight:600;">${pct}%</span>
-    </div>`;
-  }).join('');
+const legend = entries.map(([type,val],i)=>{
+  const color = colors[i % colors.length];
+  const pct = (val/total*100).toFixed(0);
+  return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px">
+    <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+    <span style="color:var(--color-text-muted);flex:1">${eIcon(type)}${type}</span>
+    <span style="font-weight:600;color:var(--color-text)">S$${fmt(val)}</span>
+    <span style="font-weight:600;min-width:34px;text-align:right">${pct}%</span>
+  </div>`;
+}).join('');
 
   container.innerHTML = `
     <div style="text-align:center;">
@@ -2068,21 +2071,17 @@ function renderTable(k){
       ?`<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
       :`<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
     const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
-    const pbVals = people.map(p => {
-      const splitPeople = getSplitPeople(e, people);
-
-      if (p === e.paidBy) {
-        return `<td data-label="Paid back ${p}"><span class="badge badge-neutral">Paid upfront</span></td>`;
-      }
-
-      if (!splitPeople.includes(p)) {
-        return `<td data-label="Paid back ${p}" class="tabular text-muted">—</td>`;
-      }
-
+const pbVals = people.map(p=>{
+  const splitPeople = getSplitPeople(e, people);
+  if (p === e.paidBy) return `<td data-label="Paid back">${p}<span class="badge badge-neutral">Paid upfront</span></td>`;
+  if (e.split === 'NO') return `<td data-label="Paid back">${p}" class="tabular text-muted"></td>`;
+  if (!splitPeople.includes(p)) return `<td data-label="Paid back">${p}" class="tabular text-muted"></td>`;
+      
       return `<td data-label="Paid back ${p}">${pbDropdown(k, e.id, p, e.paidBack?.[p])}</td>`;
     }).join('');
     const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
     const costCellClass = e.locked ? 'locked-cell' : '';
+
     return`<tr>
       <td data-label="Date">${fmtDate(e.from)}</td><td data-label="To">${fmtDate(e.to)}</td>
       <td data-label="Type"><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
