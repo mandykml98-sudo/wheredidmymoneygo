@@ -1803,12 +1803,29 @@ function promptAddCategory(){
 
 // ===================== TRIP DATA =====================
 let trips = {};
-let nextId=100, editingId=null, editingTrip=null;
-let activeFilters={};
-const AVATARS={'Mandy':{color:'#c0622a',i:'M'},'Wei Long':{color:'#2e6fa3',i:'WL'},'Chloris':{color:'#b82a6a',i:'C'},'Germaine':{color:'#4a7c3f',i:'G'}};
+let nextId = 100;
+let editingId = null;
+let editingTrip = null;
+let activeFilters = {};
+const AVATARS = {
+  'Mandy': { color: '#c0622a', i: 'M' },
+  'Wei Long': { color: '#2e6fa3', i: 'WL' },
+  'Chloris': { color: '#b82a6a', i: 'C' },
+  'Germaine': { color: '#4a7c3f', i: 'G' }
+};
+
+function syncNextId() {
+  nextId = Math.max(
+    100,
+    ...Object.values(trips).flatMap(t =>
+      (t.expenses || []).map(e => Number(e.id) || 0)
+    )
+  ) + 1;
+}
 
 // Load saved trips from localStorage (overrides hardcoded defaults)
 loadTripsFromStorage();
+syncNextId();
 // Load custom categories and render into selects
 loadCategoriesFromStorage();
 renderCategoryOptions();
