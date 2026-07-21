@@ -1434,27 +1434,6 @@ function renderFxBanners(){
   });
 }
 
-    // Initial render: create structure and wire input handler once
-    if(!el.dataset.fxInit){
-      el.innerHTML = fxBanner();
-      el.dataset.fxInit = '1';
-      const input = el.querySelector('.fx-search-input');
-      if(input){
-        input.addEventListener('input', (e)=>{ fxSearchTerm = e.target.value || ''; renderFxBanners(); });
-      }
-      const chipsContainer = el.querySelector('.fx-banner-chips');
-      if(chipsContainer) chipsContainer.innerHTML = chipsHtml;
-      const dateEl = el.querySelector('.fx-date'); if(dateEl) dateEl.textContent = fxLastUpdated;
-      return;
-    }
-
-    // Subsequent updates: only update chips and date to preserve input focus/caret
-    const chipsContainer = el.querySelector('.fx-banner-chips');
-    if(chipsContainer) chipsContainer.innerHTML = chipsHtml;
-    const dateEl = el.querySelector('.fx-date'); if(dateEl) dateEl.textContent = fxLastUpdated;
-  });
-}
-
 async function fetchDailyFx() {
   const res = await fetch("https://open.er-api.com/v6/latest/SGD", {
     method: "GET",
