@@ -49,6 +49,23 @@
   --color-blue:#6aabdd;--color-blue-bg:#102030;
   --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);--shadow-lg:0 12px 32px rgba(0,0,0,.5);
 }
+
+.chart-tooltip{
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 8px 10px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  display: none;
+}
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-font-smoothing:antialiased;}
 body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6;}
@@ -1098,6 +1115,7 @@ input, textarea {
   <span>Add Expense</span>
 </button>
 
+<div id="chart-tooltip" class="chart-tooltip"></div>
 
 <!-- DELETE TRIP MODAL -->
 <div class="modal-backdrop" id="del-trip-modal" onclick="if(event.target===this)closeDelTripModal()">
@@ -2296,9 +2314,16 @@ function renderSpendingTrend() {
 
           ${points.map(p => `
             <g>
-              <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--color-primary)">
-                <title>${formatMonth(p.month)}: SGD ${fmt(p.val)}</title>
-              </circle>
+              <circle
+                cx="${p.x}"
+                cy="${p.y}"
+                r="6"
+                fill="var(--color-primary)"
+                data-month="${formatMonth(p.month)}"
+                data-value="${fmt(p.val)}"
+                class="trend-point"
+                style="cursor:pointer"
+              ></circle>
               <text
                 x="${p.x}"
                 y="${h - padB + 20}"
@@ -2307,11 +2332,56 @@ function renderSpendingTrend() {
                 fill="var(--color-text-muted)"
               >${formatMonth(p.month)}</text>
             </g>
-          `).join('')}
-        </svg>
+          `).join('')}       
+         </svg>
       </div>
     </div>
   `;
+  const tooltip = document.getElementById('chart-tooltip');
+  if (!tooltip) return;
+
+  const pointsEls = container.querySelectorAll('.trend-point');
+
+  pointsEls.forEach(pt => {
+    const showTip = (ev) => {
+      tooltip.textContent = `${pt.dataset.month}: SGD ${pt.dataset.value}`;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (ev.clientX + 12) + 'px';
+      tooltip.style.top = (ev.clientY - 36) + 'px';
+    };
+
+    const moveTip = (ev) => {
+      tooltip.style.left = (ev.clientX + 12) + 'px';
+      tooltip.style.top = (ev.clientY - 36) + 'px';
+    };
+
+    const hideTip = () => {
+      tooltip.style.display = 'none';
+    };
+
+    pt.addEventListener('mouseenter', showTip);
+    pt.addEventListener('mousemove', moveTip);
+    pt.addEventListener('mouseleave', hideTip);
+
+    pt.addEventListener('touchstart', (ev) => {
+      const touch = ev.touches[0];
+      if (!touch) return;
+      tooltip.textContent = `${pt.dataset.month}: SGD ${pt.dataset.value}`;
+      tooltip.style.display = 'block';
+      tooltip.style.left = (touch.clientX + 12) + 'px';
+      tooltip.style.top = (touch.clientY - 36) + 'px';
+    }, { passive: true });
+
+    pt.addEventListener('touchmove', (ev) => {
+      const touch = ev.touches[0];
+      if (!touch) return;
+      tooltip.style.left = (touch.clientX + 12) + 'px';
+      tooltip.style.top = (touch.clientY - 36) + 'px';
+    }, { passive: true });
+
+    pt.addEventListener('touchend', hideTip);
+    pt.addEventListener('touchcancel', hideTip);
+  });
 }
 
 // ===================== TRIP =====================
