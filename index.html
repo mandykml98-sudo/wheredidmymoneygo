@@ -1900,7 +1900,7 @@ document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).
 }
 
 function renderSidebarPieChart(){
-const container = document.getElementById('pie-chart-tab');
+  const container = document.getElementById('pie-chart-tab');
   if(!container) return;
 
   const byType = {};
@@ -1909,7 +1909,7 @@ const container = document.getElementById('pie-chart-tab');
       const sp = getSplitPeople(e, trip.people);
       if(!sp.includes(currentUsername)) return;
       const share = personCost(e, currentUsername, trip.people);
-      byType[e.type] = (byType[e.type]||0) + share;
+      byType[e.type] = (byType[e.type] || 0) + share;
     });
   });
 
@@ -1917,42 +1917,79 @@ const container = document.getElementById('pie-chart-tab');
   const total = entries.reduce((s,[,v])=>s+v,0);
 
   if(!total){
-    container.innerHTML = '<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0;">No expenses yet.</p>';
+    container.innerHTML = `<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0">No expenses yet.</p>`;
     return;
   }
 
-const colors = ['#f4b8a0','#a8c8e8','#b8dcb0','#f5d9a0','#e8b0cc','#c9b8a8','#c5c0b8','#f2a89a'];
+  const colors = ['#f4b8a0','#a8c8e8','#b8dcb0','#f5d9a0','#e8b0cc','#c9b8a8','#c5c0b8','#f2a89a'];
   let cumulative = 0;
-  const size = 120, radius = 55, cx = size/2, cy = size/2;
+  const size = 160, radius = 72, cx = size / 2, cy = size / 2;
 
   const slices = entries.map(([type,val],i)=>{
-    const frac = val/total;
-    const startAngle = cumulative * 2*Math.PI - Math.PI/2;
+    const frac = val / total;
+    const pct = (frac * 100).toFixed(1);
+    const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
     cumulative += frac;
-    const endAngle = cumulative * 2*Math.PI - Math.PI/2;
-    const x1 = cx + radius*Math.cos(startAngle), y1 = cy + radius*Math.sin(startAngle);
-    const x2 = cx + radius*Math.cos(endAngle), y2 = cy + radius*Math.sin(endAngle);
+    const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+    const x1 = cx + radius * Math.cos(startAngle);
+    const y1 = cy + radius * Math.sin(startAngle);
+    const x2 = cx + radius * Math.cos(endAngle);
+    const y2 = cy + radius * Math.sin(endAngle);
     const largeArc = frac > 0.5 ? 1 : 0;
     const color = colors[i % colors.length];
-    return `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${color}"></path>`;
+
+    return `<path
+      d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+      fill="${color}"
+      stroke="var(--color-bg)"
+      stroke-width="2"
+      style="cursor:pointer"
+      data-type="${type}"
+      data-pct="${pct}"
+      data-amount="${fmt(val)}"
+      onclick="showPieTooltip(this)"
+    >
+      <title>${type}: ${pct}% · ${fmt(val)}</title>
+    </path>`;
   }).join('');
 
-const legend = entries.map(([type,val],i)=>{
-  const color = colors[i % colors.length];
-  const pct = (val/total*100).toFixed(0);
-  return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px">
-    <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
-    <span style="color:var(--color-text-muted);flex:1">${eIcon(type)}${type}</span>
-    <span style="font-weight:600;color:var(--color-text)">S$${fmt(val)}</span>
-    <span style="font-weight:600;min-width:34px;text-align:right">${pct}%</span>
-  </div>`;
-}).join('');
+  const [firstType, firstVal] = entries[0];
+  const firstPct = ((firstVal / total) * 100).toFixed(1);
+
+  const legend = entries.map(([type,val],i)=>{
+    const color = colors[i % colors.length];
+    const pct = (val / total * 100).toFixed(0);
+    return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+      <span style="color:var(--color-text-muted);flex:1">${eIcon(type)}${type}</span>
+      <span style="font-weight:600;color:var(--color-text)">${fmt(val)}</span>
+      <span style="font-weight:600;min-width:34px;text-align:right">${pct}%</span>
+    </div>`;
+  }).join('');
 
   container.innerHTML = `
-    <div style="text-align:center;">
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${slices}</svg>
+    <div style="text-align:center">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="margin:0 auto">
+        ${slices}
+      </svg>
+      <div id="pie-chart-tooltip" style="margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-xs);text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
+        <div style="font-weight:700;color:var(--color-text)">${firstType}</div>
+        <div style="color:var(--color-text-muted);margin-top:4px">${firstPct}% · ${fmt(firstVal)}</div>
+      </div>
     </div>
-    <div style="margin-top:var(--space-2);">${legend}</div>
+    <div style="margin-top:var(--space-2)">${legend}</div>
+  `;
+}
+
+function showPieTooltip(el){
+  const box = document.getElementById('pie-chart-tooltip');
+  if(!box) return;
+  const type = el.dataset.type || '';
+  const pct = el.dataset.pct || '';
+  const amount = el.dataset.amount || '';
+  box.innerHTML = `
+    <div style="font-weight:700;color:var(--color-text)">${type}</div>
+    <div style="color:var(--color-text-muted);margin-top:4px">${pct}% · ${amount}</div>
   `;
 }
 
