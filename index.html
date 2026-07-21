@@ -2217,39 +2217,6 @@ function closeModal()
  }
 
 
-function openAddModal(tripKey){
-  editingId = null;
-  document.getElementById('modal-title').textContent = 'Add Expense';
-  populateTripDropdown(tripKey);
-  document.getElementById('f-type').value = '';
-  document.getElementById('f-location').value = '';
-  document.getElementById('f-cost').value = '';
-  document.getElementById('f-sgd').value = '';
-  document.getElementById('f-status').value = 'Paid';
-  document.getElementById('f-split').value = 'YES';
-  document.getElementById('f-platform').value = '';
-  document.getElementById('f-code').value = '';
-  document.getElementById('f-notes').value = '';
-  updateExpenseModalPeople();
-  document.getElementById('f-cost').disabled = false;
-  document.getElementById('f-currency').disabled = false;
-  document.getElementById('f-sgd').disabled = false;
-  document.getElementById('lock-note').style.display = 'none';
-const trip = trips[tripKey];
-if (expenseDatePicker) {
-  let startDate = null;
-  if (trip && trip.dates) {
-    const rawStart = trip.dates.split(/[-–]/)[0].trim();
-    const parsed = new Date(rawStart);
-    if (!isNaN(parsed.getTime())) startDate = parsed;
-  }
-  if (startDate) {
-    expenseDatePicker.setDate(startDate, true);
-  } else {
-    expenseDatePicker.clear();
-  }
-}  document.getElementById('modal').classList.add('open');
-}
 function autoCalcSGD(){
   const c = parseFloat(document.getElementById('f-cost').value)||0;
   const cur = document.getElementById('f-currency').value;
