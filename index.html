@@ -1174,85 +1174,6 @@ function openAddTripModal() {
   if (modal) modal.classList.add('open');
 }
 
-function openExpenseModalForTrip(tripKey) {
-  const trip = trips[tripKey];
-  if (!trip) return;
-
-  editingId = null;
-  editingTrip = tripKey;
-
-  const modal = document.getElementById('modal');
-  const titleEl = document.getElementById('modal-title');
-  const submitBtn = document.getElementById('modal-submit-btn');
-
-  if (titleEl) titleEl.textContent = 'Add Expense';
-  if (submitBtn) submitBtn.textContent = 'Save Expense';
-
-  const tripSelect = document.getElementById('f-trip');
-  if (tripSelect) {
-    tripSelect.innerHTML = Object.entries(trips).map(([key, t]) =>
-      `<option value="${key}" ${key === tripKey ? 'selected' : ''}>${t.flag ? t.flag + ' ' : ''}${t.name}</option>`
-    ).join('');
-    tripSelect.value = tripKey;
-  }
-
-  updateExpenseModalPeople();
-
-  const form = modal ? modal.querySelector('form') : null;
-  if (form) form.reset();
-
-  if (tripSelect) tripSelect.value = tripKey;
-
-  const dateInput = document.getElementById('f-date');
-  if (dateInput) dateInput.value = '';
-
-  const typeInput = document.getElementById('f-type');
-  if (typeInput && categories?.length) typeInput.value = categories[0];
-
-  const currencyInput = document.getElementById('f-currency');
-  if (currencyInput) currencyInput.value = trip.currency || 'SGD';
-
-  const statusInput = document.getElementById('f-status');
-  if (statusInput) statusInput.value = 'Paid';
-
-  const splitInput = document.getElementById('f-split');
-  if (splitInput) splitInput.value = 'YES';
-
-  const sgdInput = document.getElementById('f-sgd');
-  if (sgdInput) sgdInput.value = '';
-
-  const costInput = document.getElementById('f-cost');
-  if (costInput) costInput.value = '';
-
-  const locationInput = document.getElementById('f-location');
-  if (locationInput) locationInput.value = '';
-
-  const platformInput = document.getElementById('f-platform');
-  if (platformInput) platformInput.value = '';
-
-  const codeInput = document.getElementById('f-code');
-  if (codeInput) codeInput.value = '';
-
-  const notesInput = document.getElementById('f-notes');
-  if (notesInput) notesInput.value = '';
-
-  const lockNote = document.getElementById('lock-note');
-  if (lockNote) lockNote.style.display = 'none';
-
-  const paidByInput = document.getElementById('f-paidby');
-  if (paidByInput) paidByInput.value = currentUsername || trip.people[0] || '';
-
-  const forWhomInput = document.getElementById('f-forwhom');
-  if (forWhomInput) forWhomInput.value = 'All';
-
-  if (typeof autoCalcSGD === 'function') autoCalcSGD();
-  if (modal) modal.classList.add('open');
-}
-
-function closeAddTripModal() {
-  const modal = document.getElementById('add-trip-modal');
-  if (modal) modal.classList.remove('open');
-}
 </script>
 
 <!-- EDIT TRIP MODAL -->
@@ -1951,17 +1872,22 @@ function fxBanner(){
 }
 
 // ===================== NAVIGATION =====================
-function updateMobileExpenseFab(pageKey){
+function updateMobileExpenseFab(pageKey) {
   const fab = document.getElementById('mobile-expense-fab');
   if (!fab) return;
 
   const isMobile = window.innerWidth <= 768;
-  const isTripPage = !!pageKey && pageKey !== 'overview' && pageKey !== 'settlement' && pageKey !== 'breakdown' && trips[pageKey];
+  const isTripPage =
+    !!pageKey &&
+    pageKey !== 'overview' &&
+    pageKey !== 'settlement' &&
+    pageKey !== 'breakdown' &&
+    trips[pageKey];
 
   let shouldShow = false;
 
   if (isMobile && isTripPage) {
-    const topBtn = document.querySelector('#page-' + pageKey + ' .trip-add-expense-btn');
+    const topBtn = document.querySelector(`#page-${pageKey} .trip-add-expense-btn`);
     if (topBtn) {
       const rect = topBtn.getBoundingClientRect();
       const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
@@ -1973,7 +1899,7 @@ function updateMobileExpenseFab(pageKey){
 
   fab.onclick = () => {
     if (!isTripPage) return;
-    openExpenseModalForTrip(pageKey);
+    openAddModal(pageKey);
   };
 }
 
@@ -2185,11 +2111,11 @@ function renderTrip(k){
           <p class="page-subtitle" id="${k}-subtitle">${trip.dates} · ${trip.expenses.length} bookings</p>
         </div>
 
-        <button
-          type="button"
-          class="btn btn-primary trip-add-expense-btn"
-          onclick="openExpenseModalForTrip('${k}')"
-        >
+      <button
+        type="button"
+        class="btn btn-primary trip-add-expense-btn"
+        onclick="openAddModal('${k}')"
+      >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
