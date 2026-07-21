@@ -1896,26 +1896,23 @@ function updateMobileExpenseFab(pageKey) {
   }
 
   fab.classList.toggle('show', shouldShow);
-
   fab.onclick = () => {
     if (!isTripPage) return;
     openAddModal(pageKey);
   };
 }
 
-function showPage(k){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+k).classList.add('active');
-
-  const nav = document.querySelector('[data-page="'+k+'"]');
+function showPage(k) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + k).classList.add('active');
+  const nav = document.querySelector(`[data-page="${k}"]`);
   if (nav) nav.classList.add('active');
-
   document.getElementById('sidebar').classList.remove('open');
 
-  if(k==='overview') renderOverview();
-  else if(k==='settlement') renderSettlement();
-  else if(k==='breakdown') renderSidebarPieChart();
+  if (k === 'overview') renderOverview();
+  else if (k === 'settlement') renderSettlement();
+  else if (k === 'breakdown') renderSidebarPieChart();
   else renderTrip(k);
 
   updateMobileExpenseFab(k);
@@ -1927,6 +1924,17 @@ window.addEventListener('resize', () => {
   const pageKey = activePage.id.replace('page-', '');
   updateMobileExpenseFab(pageKey);
 });
+
+const mainContent = document.querySelector('.main-content');
+
+if (mainContent) {
+  mainContent.addEventListener('scroll', () => {
+    const activePage = document.querySelector('.page.active');
+    if (!activePage) return;
+    const pageKey = activePage.id.replace('page-', '');
+    updateMobileExpenseFab(pageKey);
+  });
+}
 
 
 // ===================== USERNAME =====================
