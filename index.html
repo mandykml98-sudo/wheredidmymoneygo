@@ -1028,14 +1028,18 @@ input, textarea {
   <div style="padding:0 var(--space-6)"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openAddTripModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"></svg> Add Trip</button></div>
   <div class="nav-divider"></div>
   <p class="sidebar-label">Tools</p>
-  <div class="nav-item" onclick="showPage('settlement')" data-page="settlement"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
-<div class="nav-item" onclick="showPage('breakdown')" data-page="breakdown">
+  <div class="nav-item" onclick="showPage('settlement')" data-page="settlement">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
+  <div class="nav-item" onclick="showPage('breakdown')" data-page="breakdown">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 2v9l8 4a10 10 0 1 1-8-13z"/><path d="M20 12h-9"/></svg> Breakdown</div></nav>
+  <div class="nav-item" onclick="showPage('trend')" data-page="trend">
   <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <path d="M11 2v9l8 4a10 10 0 1 1-8-13z"/><path d="M20 12h-9"/>
-  </svg>
-  Breakdown
-</div>
-</nav>
+    <path d="M3 17l6-6 4 4 7-8"></path>
+    <path d="M21 7v6h-6"></path>
+  </svg> Spending Trend</div>
+  
 
 <!-- MAIN -->
 <main class="main-content">
@@ -1059,6 +1063,14 @@ input, textarea {
     </div>
     <div id="pie-chart-tab"></div>
   </div>
+
+  <div class="page" id="page-trend">
+  <div class="page-header">
+    <h1 class="page-title">Spending Trend</h1>
+    <p class="page-subtitle">Your spending over time</p>
+  </div>
+  <div id="trend-chart-tab"></div>
+</div>
 
   <div class="page" id="page-settlement">
     <div class="page-header"><h1 class="page-title">💸 Settlement</h1><p class="page-subtitle">Who owes what across all trips</p></div>
@@ -1970,14 +1982,18 @@ function updateMobileExpenseFab(pageKey) {
 function showPage(k) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
   document.getElementById('page-' + k).classList.add('active');
-  const nav = document.querySelector(`[data-page="${k}"]`);
+
+  const nav = document.querySelector('[data-page="' + k + '"]');
   if (nav) nav.classList.add('active');
+
   document.getElementById('sidebar').classList.remove('open');
 
   if (k === 'overview') renderOverview();
   else if (k === 'settlement') renderSettlement();
   else if (k === 'breakdown') renderSidebarPieChart();
+  else if (k === 'trend') renderSpendingTrend();
   else renderTrip(k);
 
   updateMobileExpenseFab(k);
@@ -2160,6 +2176,68 @@ container.innerHTML = `
     </div>
   </div>
 `;
+}
+
+function renderSpendingTrend() {
+  const container = document.getElementById('trend-chart-tab');
+  if (!container) return;
+
+  const byDate = {};
+
+  Object.values(trips).forEach(trip => {
+    trip.expenses.forEach(e => {
+      if (!e.date) return;
+
+      const share = personCost(e, currentUsername, trip.people);
+      if (!share) return;
+
+      byDate[e.date] = (byDate[e.date] || 0) + share;
+    });
+  });
+
+  const entries = Object.entries(byDate)
+    .filter(([_, v]) => v > 0)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  if (!entries.length) {
+    container.innerHTML = `<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0;">No dated expenses yet.</p>`;
+    return;
+  }
+
+  const values = entries.map(([, v]) => v);
+  const max = Math.max(...values, 1);
+  const w = 760, h = 280, pad = 36;
+
+  const points = entries.map(([date, val], i) => {
+    const x = pad + (i * (w - pad * 2)) / Math.max(entries.length - 1, 1);
+    const y = h - pad - ((val / max) * (h - pad * 2));
+    return { date, val, x, y };
+  });
+
+  const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+
+  container.innerHTML = `
+    <div class="card">
+      <h3 class="card-title">Daily spend (SGD)</h3>
+      <div style="overflow-x:auto">
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="280" aria-label="Spending trend chart">
+          <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="var(--color-divider)" />
+          <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h-pad}" stroke="var(--color-divider)" />
+          <path d="${path}" fill="none" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+          ${points.map(p => `
+            <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--color-primary)">
+              <title>${p.date}: SGD ${fmt(p.val)}</title>
+            </circle>
+          `).join('')}
+          ${points.map((p, i) => i % Math.ceil(entries.length / 6 || 1) === 0 ? `
+            <text x="${p.x}" y="${h - 10}" text-anchor="middle" font-size="10" fill="var(--color-text-muted)">
+              ${p.date.slice(5)}
+            </text>
+          ` : '').join('')}
+        </svg>
+      </div>
+    </div>
+  `;
 }
 
 function showPieTooltip(el){
