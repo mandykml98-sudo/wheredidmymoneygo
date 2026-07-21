@@ -1020,18 +1020,17 @@ input, textarea {
 </main>
 
 <button
-    id="mobile-expense-fab"
-    class="mobile-expense-fab"
-    type="button"
-    aria-label="Add expense"
-    onclick="openModal()"
-  >
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-    <span>Add Expense</span>
-  </button>
+  id="mobile-expense-fab"
+  class="mobile-expense-fab"
+  type="button"
+  aria-label="Add expense"
+>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+  <span>Add Expense</span>
+</button>
 
 
 <!-- DELETE TRIP MODAL -->
@@ -1884,15 +1883,22 @@ function updateMobileExpenseFab(pageKey){
   const isMobile = window.innerWidth <= 768;
   const isTripPage = !!pageKey && pageKey !== 'overview' && pageKey !== 'settlement' && pageKey !== 'breakdown' && trips[pageKey];
 
-  fab.classList.toggle('show', isMobile && isTripPage);
+  let shouldShow = false;
+
+  if (isMobile && isTripPage) {
+    const topBtn = document.querySelector('#page-' + pageKey + ' .trip-add-expense-btn');
+    if (topBtn) {
+      const rect = topBtn.getBoundingClientRect();
+      const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+      shouldShow = !isVisible;
+    }
+  }
+
+  fab.classList.toggle('show', shouldShow);
+
   fab.onclick = () => {
     if (!isTripPage) return;
-    openModal();
-    const tripSelect = document.getElementById('f-trip');
-    if (tripSelect) {
-      tripSelect.value = pageKey;
-      updateExpenseModalPeople();
-    }
+    openExpenseModalForTrip(pageKey);
   };
 }
 
@@ -2089,31 +2095,77 @@ function renderTrip(k){
   const trip = trips[k];
   if (!trip) return;
 
+  const page = document.getElementById(`page-${k}`);
+  if (!page) return;
+
   const tSGD = trip.expenses.reduce((s,e)=>s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
   const uCount = trip.expenses.filter(e => e.status === 'Unpaid').length;
   const tUnpaid = trip.expenses.reduce((s,e)=>s + personUnpaid(e, currentUsername, trip.people), 0);
 
-  const subtitleEl = document.getElementById(`${k}-subtitle`);
-  if (subtitleEl) {
-    subtitleEl.textContent = `${trip.dates} · ${trip.expenses.length} bookings`;
-  }
+  page.innerHTML = `
+    <div class="page-header">
+      <div class="flex items-center justify-between" style="flex-wrap:wrap; gap:var(--space-4);">
+        <div>
+          <h1 class="page-title">${trip.name}</h1>
+          <p class="page-subtitle" id="${k}-subtitle">${trip.dates} · ${trip.expenses.length} bookings</p>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary trip-add-expense-btn"
+          onclick="openExpenseModalForTrip('${k}')"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Expense
+        </button>
+      </div>
+    </div>
+
+    <div id="${k}-fx-banner"></div>
+
+    <div class="kpi-grid" id="${k}-kpis">
+      ${kpiDiv('Total (SGD)', fmt(tSGD), 'accent', 'At current FX rates')}
+      ${kpiDiv('Bookings', trip.expenses.length, '', '')}
+      ${kpiDiv('Unpaid Items', uCount, 'warning', '')}
+      ${kpiDiv('Owed to ' + currentUsername, fmt(tUnpaid), 'warning', '')}
+    </div>
+
+    <div class="card">
+      <div class="filter-bar">
+        <select class="filter-select" onchange="filterTable('${k}','type',this.value)">
+          <option value="">All Types</option>
+          ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+
+        <select class="filter-select" onchange="filterTable('${k}','status',this.value)">
+          <option value="">All Statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Unpaid">Unpaid</option>
+        </select>
+
+        <input
+          class="form-input expense-search-input"
+          type="text"
+          placeholder="Search description / platform / code"
+          oninput="filterTable('${k}','search',this.value)"
+        />
+      </div>
+
+      <div class="table-wrap" id="${k}-table-wrap"></div>
+      </div>
+  `;
 
   renderFxBanners();
-
-  const kpiEl = document.getElementById(`${k}-kpis`);
-  if (kpiEl) {
-    kpiEl.innerHTML =
-      kpiDiv('Total (SGD)', fmt(tSGD), 'accent', 'At current FX rates') +
-      kpiDiv('Bookings', trip.expenses.length, '', '') +
-      kpiDiv('Unpaid Items', uCount, 'warning', '') +
-      kpiDiv('Owed to ' + currentUsername, fmt(tUnpaid), 'warning', '');
-  }
-
   renderTable(k);
   renderSidebarPieChart();
 
   const badge = document.getElementById(`badge-${k}`);
   if (badge) badge.textContent = trip.expenses.length;
+
+  updateMobileExpenseFab(k);
 }
 
 function refreshTripUI(key) {
@@ -2450,6 +2502,13 @@ if (e.to && e.to !== e.from) {
   if(lockNote) lockNote.style.display = isLocked ? 'block' : 'none';
   document.getElementById('modal').classList.add('open');
 }
+
+function openModal(){
+  const modal = document.getElementById('modal');
+  if (!modal) return;
+  modal.classList.add('open');
+}
+
 function closeModal()
 { document.getElementById('modal').classList.remove('open');
   expenseFx = null;
