@@ -2189,7 +2189,7 @@ function renderSpendingTrend() {
   const container = document.getElementById('trend-chart-tab');
   if (!container) return;
 
-  const byDate = {};
+  const byMonth = {};
 
   Object.values(trips).forEach(trip => {
     trip.expenses.forEach(e => {
@@ -2202,43 +2202,111 @@ function renderSpendingTrend() {
       const dateKey = (e.from || '').trim();
       if (!dateKey) return;
 
-      byDate[dateKey] = (byDate[dateKey] || 0) + share;
+      const monthKey = dateKey.slice(0, 7); // YYYY-MM
+      byMonth[monthKey] = (byMonth[monthKey] || 0) + share;
     });
   });
 
-  const entries = Object.entries(byDate)
+  const entries = Object.entries(byMonth)
     .filter(([, v]) => v > 0)
-    .sort((a, b) => a[0].localeCompare(b[0]));
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .slice(-12);
 
   if (!entries.length) {
-    container.innerHTML = `<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0;">No dated expenses yet.</p>`;
+    container.innerHTML = `
+      <div class="card">
+        <h3 class="card-title">Monthly spend (SGD)</h3>
+        <p class="text-sm text-muted">No dated expenses yet.</p>
+      </div>
+    `;
     return;
   }
 
   const values = entries.map(([, v]) => v);
   const max = Math.max(...values, 1);
-  const w = 760, h = 280, pad = 36;
 
-  const points = entries.map(([date, val], i) => {
-    const x = pad + (i * (w - pad * 2)) / Math.max(entries.length - 1, 1);
-    const y = h - pad - ((val / max) * (h - pad * 2));
-    return { date, val, x, y };
+  const w = 820;
+  const h = 320;
+  const padL = 56;
+  const padR = 20;
+  const padT = 20;
+  const padB = 48;
+
+  const innerW = w - padL - padR;
+  const innerH = h - padT - padB;
+
+  const points = entries.map(([month, val], i) => {
+    const x = padL + (i * innerW) / Math.max(entries.length - 1, 1);
+    const y = padT + innerH - (val / max) * innerH;
+    return { month, val, x, y };
   });
 
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
+  const yTicks = 4;
+  const yLines = Array.from({ length: yTicks + 1 }, (_, i) => {
+    const val = max * (1 - i / yTicks);
+    const y = padT + (innerH * i) / yTicks;
+    return { val, y };
+  });
+
+  const formatMonth = (ym) => {
+    const [y, m] = ym.split('-');
+    const d = new Date(Number(y), Number(m) - 1, 1);
+    return d.toLocaleDateString('en-SG', { month: 'short', year: '2-digit' });
+  };
+
   container.innerHTML = `
     <div class="card">
-      <h3 class="card-title">Daily spend (SGD)</h3>
-      <div style="overflow-x:auto">
-        <svg viewBox="0 0 ${w} ${h}" width="100%" height="280" aria-label="Spending trend chart">
-          <line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="var(--color-divider)" />
-          <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h-pad}" stroke="var(--color-divider)" />
-          <path d="${path}" fill="none" stroke="var(--color-primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      <h3 class="card-title">Monthly spend (SGD)</h3>
+      <div style="overflow-x:auto;">
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="320" aria-label="Monthly spending trend">
+          
+          ${yLines.map(t => `
+            <g>
+              <line
+                x1="${padL}"
+                y1="${t.y}"
+                x2="${w - padR}"
+                y2="${t.y}"
+                stroke="var(--color-divider)"
+                stroke-dasharray="4 4"
+              />
+              <text
+                x="${padL - 10}"
+                y="${t.y + 4}"
+                text-anchor="end"
+                font-size="11"
+                fill="var(--color-text-muted)"
+              >${fmt(t.val)}</text>
+            </g>
+          `).join('')}
+
+          <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${h - padB}" stroke="var(--color-border)" />
+          <line x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}" stroke="var(--color-border)" />
+
+          <path
+            d="${path}"
+            fill="none"
+            stroke="var(--color-primary)"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></path>
+
           ${points.map(p => `
-            <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--color-primary)">
-              <title>${p.date}: SGD ${fmt(p.val)}</title>
-            </circle>
+            <g>
+              <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--color-primary)">
+                <title>${formatMonth(p.month)}: SGD ${fmt(p.val)}</title>
+              </circle>
+              <text
+                x="${p.x}"
+                y="${h - padB + 20}"
+                text-anchor="middle"
+                font-size="11"
+                fill="var(--color-text-muted)"
+              >${formatMonth(p.month)}</text>
+            </g>
           `).join('')}
         </svg>
       </div>
