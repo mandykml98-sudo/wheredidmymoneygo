@@ -266,6 +266,53 @@ input,select,textarea{font:inherit;color:inherit;}
     font-size: 13px;
   }
 }
+
+.breakdown-legend {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.breakdown-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.breakdown-legend-left,
+.breakdown-legend-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.breakdown-legend-label {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.breakdown-legend-value,
+.breakdown-legend-pct {
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.breakdown-legend-pct {
+  color: var(--color-text-muted);
+}
+
+.breakdown-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .table-wrap{overflow-x:auto;border-radius:var(--radius-xl);border:1px solid var(--color-border);box-shadow:var(--shadow-sm);}
 @media(max-width:768px){.table-wrap{border:none;box-shadow:none;border-radius:0;margin:0 calc(var(--space-4) * -1);}
 table{font-size:clamp(.7rem,.65rem + .2vw,.8rem);}
@@ -1874,7 +1921,8 @@ function fxBanner(){
 // ===================== NAVIGATION =====================
 function updateMobileExpenseFab(pageKey) {
   const fab = document.getElementById('mobile-expense-fab');
-  if (!fab) return;
+  const mainContent = document.querySelector('.main-content');
+  if (!fab || !mainContent) return;
 
   const isMobile = window.innerWidth <= 768;
   const isTripPage =
@@ -1882,16 +1930,22 @@ function updateMobileExpenseFab(pageKey) {
     pageKey !== 'overview' &&
     pageKey !== 'settlement' &&
     pageKey !== 'breakdown' &&
-    trips[pageKey];
+    !!trips[pageKey];
 
   let shouldShow = false;
 
   if (isMobile && isTripPage) {
     const topBtn = document.querySelector(`#page-${pageKey} .trip-add-expense-btn`);
+
     if (topBtn) {
-      const rect = topBtn.getBoundingClientRect();
-      const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
-      shouldShow = !isVisible;
+      const btnRect = topBtn.getBoundingClientRect();
+      const containerRect = mainContent.getBoundingClientRect();
+
+      const isVisibleInMainContent =
+        btnRect.bottom > containerRect.top + 10 &&
+        btnRect.top < containerRect.bottom - 10;
+
+      shouldShow = !isVisibleInMainContent;
     }
   }
 
@@ -2062,29 +2116,39 @@ function renderSidebarPieChart(){
   const [firstType, firstVal] = entries[0];
   const firstPct = ((firstVal / total) * 100).toFixed(1);
 
-  const legend = entries.map(([type,val],i)=>{
-    const color = colors[i % colors.length];
-    const pct = (val / total * 100).toFixed(0);
-    return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px">
-      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
-      <span style="color:var(--color-text-muted);flex:1">${eIcon(type)}${type}</span>
-      <span style="font-weight:600;color:var(--color-text)">${fmt(val)}</span>
-      <span style="font-weight:600;min-width:34px;text-align:right">${pct}%</span>
-    </div>`;
-  }).join('');
+const legend = entries.map(([type, val], i) => {
+  const color = colors[i % colors.length];
+  const pct = ((val / total) * 100).toFixed(0);
+  return `
+    <div class="breakdown-legend-item">
+      <div class="breakdown-legend-left">
+        <span class="breakdown-legend-dot" style="background:${color}"></span>
+        <span class="breakdown-legend-label">${type}</span>
+      </div>
+      <div class="breakdown-legend-right">
+        <span class="breakdown-legend-value">${fmt(val)}</span>
+        <span class="breakdown-legend-pct">${pct}%</span>
+      </div>
+    </div>
+  `;
+}).join('');
 
-  container.innerHTML = `
+container.innerHTML = `
+  <div class="card">
     <div style="text-align:center">
       <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="margin:0 auto">
         ${slices}
       </svg>
-      <div id="pie-chart-tooltip" style="margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-xs);text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
+      <div id="pie-chart-tooltip" style="margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface-offset);border:1px solid var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-xs);text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
         <div style="font-weight:700;color:var(--color-text)">${firstType}</div>
         <div style="color:var(--color-text-muted);margin-top:4px">${firstPct}% · ${fmt(firstVal)}</div>
       </div>
     </div>
-    <div style="margin-top:var(--space-2)">${legend}</div>
-  `;
+    <div class="breakdown-legend">
+      ${legend}
+    </div>
+  </div>
+`;
 }
 
 function showPieTooltip(el){
