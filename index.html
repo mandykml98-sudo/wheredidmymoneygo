@@ -1856,6 +1856,17 @@ function updatePaidBack(tripKey, expId, person, newVal) {
   if (document.getElementById('page-overview').classList.contains('active')) renderOverview();
 }
 
+function delExp(tripKey, expenseId) {
+  const trip = trips[tripKey];
+  if (!trip) return;
+  if (!confirm('Delete this expense?')) return;
+
+  trip.expenses = trip.expenses.filter(e => Number(e.id) !== Number(expenseId));
+  saveTripsToStorage();
+  renderTable(tripKey);
+  updateTripKpis(tripKey);
+}
+
 function updateTripKpis(k) {
   const trip = trips[k];
   if(!trip) return;
@@ -2362,10 +2373,20 @@ const pbVals = people.map(p=>{
       <td style="--no-label:1"><div class="flex gap-2">
         <button class="${e.locked?'lock-btn locked':'lock-btn'}" onclick="toggleLock('${k}',${e.id})" title="${e.locked?'Unlock transaction':'Lock transaction'}">${e.locked?'🔒':'🔓'}</button>
         <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked?'disabled title="Unlock to edit"':''}>✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="delExp('${k}',${e.id})" ${e.locked?'disabled title="Unlock to delete"':''}>🗑</button>
-      </div></td>
+      <button
+        type="button"
+        class="btn btn-danger btn-sm"
+        onclick="event.stopPropagation(); delExp('${k}', ${e.id})"
+        ${e.locked ? 'disabled title="Unlock to delete"' : 'title="Delete expense"'}
+        aria-label="Delete expense"
+      >
+        🗑
+      </button>     
+       </div></td>
     </tr>`;
   }).join('');
+
+
   const tSGD=data.reduce((s,e)=>s+toSGD(e.cost, e.cur, e.fxRateUsed),0);
   const currentUser=currentUsername||'You';
   const unpaidToUser=data.reduce((s,e)=>s+personUnpaid(e,currentUser,people),0);
