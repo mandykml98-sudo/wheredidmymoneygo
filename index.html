@@ -1935,7 +1935,7 @@ function updateMobileExpenseFab(pageKey) {
   let shouldShow = false;
 
   if (isMobile && isTripPage) {
-    const topBtn = document.querySelector(`#page-${pageKey} .trip-add-expense-btn`);
+    const topBtn = document.querySelector('#page-' + pageKey + ' .trip-add-expense-btn');
 
     if (topBtn) {
       const btnRect = topBtn.getBoundingClientRect();
