@@ -165,6 +165,11 @@ input,select,textarea{font:inherit;color:inherit;}
 .fx-no-results{color:var(--color-text-muted);font-size:var(--text-sm);padding:8px 0;}
 .fx-edit-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);background:var(--color-primary);color:#fff;font-size:var(--text-xs);font-weight:600;border:none;cursor:pointer;transition:background var(--transition);}
 .fx-edit-btn:hover{background:var(--color-primary-hover);}
+.fx-collapse-btn{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;color:inherit;}
+.fx-chevron{transition:transform var(--transition);flex-shrink:0;}
+.fx-chevron.open{transform:rotate(180deg);}
+.fx-banner-body{margin-top:var(--space-3);}
+
 @media (max-width: 768px){
 .fx-chip{
   width: 104px;
@@ -911,6 +916,9 @@ input, textarea {
   <div class="nav-divider"></div>
   <p class="sidebar-label">Tools</p>
   <div class="nav-item" onclick="showPage('settlement')" data-page="settlement"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
+  <div class="nav-divider"></div>
+  <div class="sidebar-label">Spending Breakdown</div>
+  <div id="sidebar-pie-chart" style="padding:0 var(--space-6);"></div>
 </nav>
 
 <!-- MAIN -->
@@ -1417,6 +1425,15 @@ function renderFxBanners(){
       }).join('');
     })();
 
+    el.innerHTML = fxBanner();
+    const input = el.querySelector('.fx-search-input');
+    if(input){
+      input.addEventListener('input', (e)=>{ fxSearchTerm = e.target.value || ''; renderFxBanners(); });
+    }
+    el.dataset.fxInit = '1';
+  });
+}
+
     // Initial render: create structure and wire input handler once
     if(!el.dataset.fxInit){
       el.innerHTML = fxBanner();
@@ -1746,6 +1763,14 @@ function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt
 function formatTripDate(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'2-digit'});} 
 
 // ===================== FX BANNER =====================
+let fxBannerCollapsed = localStorage.getItem('wdmmg_fx_collapsed') !== 'false';
+
+function toggleFxBannerCollapse(){
+  fxBannerCollapsed = !fxBannerCollapsed;
+  localStorage.setItem('wdmmg_fx_collapsed', fxBannerCollapsed);
+  renderFxBanners();
+}
+
 function fxBanner(){
   const codes = getFilteredFxCodes();
   const chips = codes.length ? codes.map(c=>{
@@ -1765,17 +1790,23 @@ function fxBanner(){
   return `
     <div class="fx-banner">
       <div class="fx-banner-top">
-        <span class="fx-banner-label">💱 Live Rates</span>
+        <button class="fx-collapse-btn" onclick="toggleFxBannerCollapse()" aria-label="Toggle FX rates">
+          <span class="fx-banner-label">💱 Live Rates</span>
+          <svg class="fx-chevron ${fxBannerCollapsed ? '' : 'open'}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
         <span class="fx-date">${fxLastUpdated}</span>
         <button class="fx-edit-btn" onclick="openFxModal()">✏️ Edit</button>
       </div>
-      <div class="fx-search">
-        <input class="fx-search-input" type="search" value="${htmlEscape(fxSearchTerm)}" placeholder="Search currency code or name">
+      <div class="fx-banner-body" style="display:${fxBannerCollapsed ? 'none' : 'block'}">
+        <div class="fx-search">
+          <input class="fx-search-input" type="search" value="${htmlEscape(fxSearchTerm)}" placeholder="Search currency code or name">
+        </div>
+        <div class="fx-banner-chips">${chips}</div>
       </div>
-      <div class="fx-banner-chips">${chips}</div>
     </div>
   `;
 }
+
 // ===================== NAVIGATION =====================
 function showPage(k){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1795,6 +1826,7 @@ function updateUsername(){
   currentUsername = input.value.trim() || 'Mandy';
   input.value = currentUsername;
   localStorage.setItem('currentUsername', currentUsername);
+  renderSidebarPieChart();
   const activePage = document.querySelector('.page.active');
   if(activePage.id === 'page-overview') renderOverview();
   else {
@@ -1836,6 +1868,7 @@ function renderOverview(){
     kpiDiv('Total Spent (SGD)',fmt(tSGD),'accent','At current FX rates')+
     kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','Pending repayment');
 document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).map(([k,t])=>{
+  renderSidebarPieChart();
     const sgd=t.expenses.reduce((s,e)=>s+toSGD(e.cost,e.cur),0);
     const owed=t.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,t.people),0);
     return`<div class="trip-overview-card" onclick="showPage('${k}')">
@@ -1851,6 +1884,62 @@ document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).
       </div></div>`;
   }).join('');
  // icons inline
+}
+
+function renderSidebarPieChart(){
+  const container = document.getElementById('sidebar-pie-chart');
+  if(!container) return;
+
+  const byType = {};
+  Object.values(trips).forEach(trip=>{
+    trip.expenses.forEach(e=>{
+      const sp = getSplitPeople(e, trip.people);
+      if(!sp.includes(currentUsername)) return;
+      const share = personCost(e, currentUsername, trip.people);
+      byType[e.type] = (byType[e.type]||0) + share;
+    });
+  });
+
+  const entries = Object.entries(byType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((s,[,v])=>s+v,0);
+
+  if(!total){
+    container.innerHTML = '<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0;">No expenses yet.</p>';
+    return;
+  }
+
+  const colors = ['#c0622a','#2e6fa3','#4a7c3f','#b87d1a','#b82a6a','#6b5542','#7a6452','#e05c4a'];
+  let cumulative = 0;
+  const size = 120, radius = 55, cx = size/2, cy = size/2;
+
+  const slices = entries.map(([type,val],i)=>{
+    const frac = val/total;
+    const startAngle = cumulative * 2*Math.PI - Math.PI/2;
+    cumulative += frac;
+    const endAngle = cumulative * 2*Math.PI - Math.PI/2;
+    const x1 = cx + radius*Math.cos(startAngle), y1 = cy + radius*Math.sin(startAngle);
+    const x2 = cx + radius*Math.cos(endAngle), y2 = cy + radius*Math.sin(endAngle);
+    const largeArc = frac > 0.5 ? 1 : 0;
+    const color = colors[i % colors.length];
+    return `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${color}"></path>`;
+  }).join('');
+
+  const legend = entries.map(([type,val],i)=>{
+    const color = colors[i % colors.length];
+    const pct = ((val/total)*100).toFixed(0);
+    return `<div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);margin-top:4px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
+      <span style="color:var(--color-text-muted);flex:1;">${eIcon(type)}${type}</span>
+      <span style="font-weight:600;">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="text-align:center;">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${slices}</svg>
+    </div>
+    <div style="margin-top:var(--space-2);">${legend}</div>
+  `;
 }
 
 // ===================== TRIP =====================
@@ -1879,6 +1968,7 @@ function renderTrip(k){
   }
 
   renderTable(k);
+  renderSidebarPieChart();
 
   const badge = document.getElementById(`badge-${k}`);
   if (badge) badge.textContent = trip.expenses.length;
