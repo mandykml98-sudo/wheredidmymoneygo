@@ -2110,12 +2110,22 @@ function renderTable(k){
     const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
 const pbVals = people.map(p=>{
   const splitPeople = getSplitPeople(e, people);
-  if (p === e.paidBy) return `<td data-label="Paid back">${p}<span class="badge badge-neutral">Paid upfront</span></td>`;
-  if (e.split === 'NO') return `<td data-label="Paid back">${p}" class="tabular text-muted"></td>`;
-  if (!splitPeople.includes(p)) return `<td data-label="Paid back">${p}" class="tabular text-muted"></td>`;
-      
-      return `<td data-label="Paid back ${p}">${pbDropdown(k, e.id, p, e.paidBack?.[p])}</td>`;
-    }).join('');
+
+  if (p === e.paidBy) {
+    return `<td data-label="Paid back ${p}" class="tabular"><span class="badge badge-neutral">Paid upfront</span></td>`;
+  }
+
+  if (e.split === 'NO') {
+    return `<td data-label="Paid back ${p}" class="tabular text-muted">—</td>`;
+  }
+
+  if (!splitPeople.includes(p)) {
+    return `<td data-label="Paid back ${p}" class="tabular text-muted">—</td>`;
+  }
+
+  return `<td data-label="Paid back ${p}" class="tabular">${pbDropdown(k, e.id, p, e.paidBack?.[p])}</td>`;
+}).join('');
+
     const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
     const costCellClass = e.locked ? 'locked-cell' : '';
 
