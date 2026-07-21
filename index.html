@@ -1031,16 +1031,22 @@ input, textarea {
   <div class="nav-item" onclick="showPage('settlement')" data-page="settlement">
     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M20 12a2 2 0 0 0-2-2h-2a2 2 0 0 0 0 4h2a2 2 0 0 0 2-2z"></svg>Settlement<span class="nav-badge alert">!</span></div>
-  <div class="nav-item" onclick="showPage('breakdown')" data-page="breakdown">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M11 2v9l8 4a10 10 0 1 1-8-13z"/><path d="M20 12h-9"/></svg> Breakdown</div>
-  <div class="nav-item" onclick="showPage('trend')" data-page="trend">
+<div class="nav-item" onclick="showPage('breakdown')" data-page="breakdown">
+  <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M11 2v9l8 4a10 10 0 1 1-8-13z"/>
+    <path d="M20 12h-9"></path>
+  </svg>
+  Breakdown
+</div>
+
+<div class="nav-item" onclick="showPage('trend')" data-page="trend">
   <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M3 17l6-6 4 4 7-8"></path>
     <path d="M21 7v6h-6"></path>
-  </svg> Spending Trend</div>
+  </svg>
+  Spending Trend
+</div>
 </nav>
-
 
 <!-- MAIN -->
 <main class="main-content">
@@ -2187,17 +2193,21 @@ function renderSpendingTrend() {
 
   Object.values(trips).forEach(trip => {
     trip.expenses.forEach(e => {
-      if (!e.date) return;
+      const sp = getSplitPeople(e, trip.people);
+      if (!sp.includes(currentUsername)) return;
 
       const share = personCost(e, currentUsername, trip.people);
       if (!share) return;
 
-      byDate[e.date] = (byDate[e.date] || 0) + share;
+      const dateKey = (e.from || '').trim();
+      if (!dateKey) return;
+
+      byDate[dateKey] = (byDate[dateKey] || 0) + share;
     });
   });
 
   const entries = Object.entries(byDate)
-    .filter(([_, v]) => v > 0)
+    .filter(([, v]) => v > 0)
     .sort((a, b) => a[0].localeCompare(b[0]));
 
   if (!entries.length) {
@@ -2230,26 +2240,9 @@ function renderSpendingTrend() {
               <title>${p.date}: SGD ${fmt(p.val)}</title>
             </circle>
           `).join('')}
-          ${points.map((p, i) => i % Math.ceil(entries.length / 6 || 1) === 0 ? `
-            <text x="${p.x}" y="${h - 10}" text-anchor="middle" font-size="10" fill="var(--color-text-muted)">
-              ${p.date.slice(5)}
-            </text>
-          ` : '').join('')}
         </svg>
       </div>
     </div>
-  `;
-}
-
-function showPieTooltip(el){
-  const box = document.getElementById('pie-chart-tooltip');
-  if(!box) return;
-  const type = el.dataset.type || '';
-  const pct = el.dataset.pct || '';
-  const amount = el.dataset.amount || '';
-  box.innerHTML = `
-    <div style="font-weight:700;color:var(--color-text)">${type}</div>
-    <div style="color:var(--color-text-muted);margin-top:4px">${pct}% · ${amount}</div>
   `;
 }
 
@@ -2788,7 +2781,18 @@ if (editingId !== null) {
 saveTripsToStorage();
 closeModal();
 renderTrip(k);
-if (document.getElementById('page-overview').classList.contains('active')) renderOverview();
+
+if (document.getElementById('page-overview').classList.contains('active')) {
+  renderOverview();
+}
+
+if (document.getElementById('page-breakdown')?.classList.contains('active')) {
+  renderSidebarPieChart();
+}
+
+if (document.getElementById('page-trend')?.classList.contains('active')) {
+  renderSpendingTrend();
+}
 }
 
 // ===================== DYNAMIC EXPENSE MODAL =====================
