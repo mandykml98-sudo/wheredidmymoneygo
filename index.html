@@ -2251,17 +2251,18 @@ function renderSidebarPieChart(){
     const color = colors[i % colors.length];
 
   return `<path
-    d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
-fill="${color}"
-    stroke="var(--color-bg)"
-    stroke-width="2"
-    style="cursor:pointer"
-    data-type="${type}"
-    data-pct="${pct}"
-    data-amount="${fmt(val)}">
-    <title>${type}: ${pct}% (${fmt(val)})</title>
-  </path`;
-}).join('');
+      d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+      fill="${color}"
+      stroke="var(--color-bg)"
+      stroke-width="2"
+      style="cursor:pointer"
+      data-type="${type}"
+      data-pct="${pct}"
+      data-amount="${fmt(val)}"
+      onclick="showPieTooltip(this)">
+      <title>${type}: ${pct}% (${fmt(val)})</title>
+    </path>`;
+  }).join('');
 
   const [firstType, firstVal] = entries[0];
   const firstPct = ((firstVal / total) * 100).toFixed(1);
