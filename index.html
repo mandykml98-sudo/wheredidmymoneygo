@@ -498,6 +498,52 @@ table td,table th{white-space:nowrap;}
 .suggestion-item:hover,.suggestion-item.active{background:var(--color-primary-highlight);color:var(--color-primary);}
 .suggestion-flag{font-size:1.2rem;min-width:24px;}
 
+.more-details {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-offset);
+  margin-top: var(--space-2);
+  overflow: hidden;
+}
+
+.more-details-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--space-4) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.more-details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-details-summary::after {
+  content: '▾';
+  color: var(--color-text-muted);
+  transition: transform var(--transition);
+}
+
+.more-details[open] .more-details-summary::after {
+  transform: rotate(180deg);
+}
+
+.more-details-body {
+  padding: 0 var(--space-4) var(--space-4);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .more-details-body {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ═══════════════════════════════════════════
    IPHONE / MOBILE UX IMPROVEMENTS
@@ -946,6 +992,7 @@ input, textarea {
     height: 14px;
   }
 }
+
 
 /* Improve card spacing for single column layout */
 @media (max-width: 480px) {
@@ -1474,37 +1521,57 @@ function saveTripDetails(ev){
           <select class="form-select" id="f-split"><option value="YES">Yes</option><option value="NO">No</option></select></div>
         <div class="form-group"><label class="form-label">For Whom</label>
           <select class="form-select" id="f-forwhom"></select></div>
-<div class="form-group">
-  <label class="form-label">Platform</label>
-  <input class="form-input" type="text" id="f-platform" list="platform-options" placeholder="e.g. Agoda, Booking.com, Airbnb, Scoot">
-  <datalist id="platform-options">
-    <option value="AGODA">
-    <option value="SCOOT">
-    <option value="TRIP.COM">
-    <option value="BOOKING.COM">
-    <option value="AIRBNB">
-    <option value="EXPEDIA">
-    <option value="KLOOK">
-    <option value="Misc">
-  </datalist>
-</div>
+<details class="more-details">
+  <summary class="more-details-summary">More details</summary>
 
-<div class="form-group">
-  <label class="form-label">Booking Code</label>
-  <input class="form-input" type="text" id="f-code">
-</div>
+  <div class="more-details-body">
+    <div class="form-group">
+      <label class="form-label">Platform</label>
+      <input class="form-input" type="text" id="f-platform" list="platform-options" placeholder="e.g. Agoda, Booking.com, Airbnb, Scoot">
+      <datalist id="platform-options">
+      <option value="Agoda">
+        <option value="AirAsia Website">
+        <option value="Airbnb">
+        <option value="Booking.com">
+        <option value="Emirates Website">
+        <option value="Expedia">
+        <option value="Google">
+        <option value="Hotels.com">
+        <option value="Hopper">
+        <option value="Kiwi.com">
+        <option value="Klook">
+        <option value="Priceline">
+        <option value="Qatar Airways Website">
+        <option value="Scoot Website">
+        <option value="Singapore Airlines Website">
+        <option value="Traveloka">
+        <option value="Travelocity">
+        <option value="Trip.com">       
+        <option value="Cash">  
+        <option value="Miscellaneous"> 
+      </datalist>
+    </div>
 
-<div class="form-group full">
-  <label class="form-label">Notes</label>
-  <textarea class="form-textarea" id="f-notes"></textarea>
-</div>
+    <div class="form-group">
+      <label class="form-label">Booking Code</label>
+      <input class="form-input" type="text" id="f-code">
+    </div>
+
+    <div class="form-group full">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="f-notes"></textarea>
+    </div>
+
+    <div class="form-group full" id="costs-per-person-wrap" style="display:none;">
+      <label class="form-label">Costs to each person</label>
+      <div id="costs-per-person"></div>
+    </div>
+  </div>
+</details>
 
 <div class="modal-footer">
   <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
   <button type="submit" class="btn btn-primary" id="modal-submit-btn">Save Expense</button>
-</div>
-</form>
-</div>
 </div>
 
 <!-- FX MODAL -->
@@ -1894,6 +1961,14 @@ document.addEventListener('change', function(e) {
   }
 });
 
+document.addEventListener('change', function (e) {
+  if (e.target.matches('.status-select')) {
+    const tripKey = e.target.dataset.tripKey;
+    const expId = Number(e.target.dataset.expId);
+    updateExpenseStatus(tripKey, expId, e.target.value);
+  }
+});
+
 function updatePaidBack(tripKey, expId, person, newVal) {
   const trip = trips[tripKey];
   if (!trip) return;
@@ -2167,19 +2242,19 @@ function renderSidebarPieChart(){
     const largeArc = frac > 0.5 ? 1 : 0;
     const color = colors[i % colors.length];
 
-    return `<path
-      d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
-      fill="${color}"
-      stroke="var(--color-bg)"
-      stroke-width="2"
-      style="cursor:pointer"
-      data-type="${type}"
-      data-pct="${pct}"
-      data-amount="${fmt(val)}"
-      onclick="showPieTooltip(this)"
-    >
-      <title>${type}: ${pct}% · ${fmt(val)}</title>
-    </path>`;
+  return `<path
+    d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+    fill="${color}"
+    stroke="var(--color-bg)"
+    stroke-width="2"
+    style="cursor:pointer"
+    data-type="${type}"
+    data-pct="${pct}"
+    data-amount="${fmt(val)}"
+    onmouseenter="showPieTooltip(this)"
+    ontouchstart="showPieTooltip(this)"
+    title="${type}: ${pct}% · ${fmt(val)}"
+  ></path>`;
   }).join('');
 
   const [firstType, firstVal] = entries[0];
@@ -2589,7 +2664,11 @@ const pbVals = people.map(p=>{
       <td data-label="Description"><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
       <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
       ${sgdCell}
-      <td data-label="Status">${sBadge(e.status)}</td>
+      <td data-label="Status">
+        <select class="status-select" data-trip-key="${k}" data-exp-id="${e.id}">
+          <option value="Paid" ${e.status === 'Paid' ? 'selected' : ''}>Paid</option>
+          <option value="Unpaid" ${e.status === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
+        </select> </td>      
       <td data-label="Split"><span class="badge badge-neutral">${e.split||'—'}</span></td>
       <td data-label="For"><span class="tag">${e.forWhom||'—'}</span></td>
       <td data-label="Paid by">${e.paidBy||'—'}</td>
@@ -2951,57 +3030,74 @@ if (document.getElementById('page-trend')?.classList.contains('active')) {
 }
 
 // ===================== DYNAMIC EXPENSE MODAL =====================
-function populateTripDropdown(selectedKey) {
-  const sel = document.getElementById('f-trip');
-  sel.innerHTML = Object.entries(trips).map(([k,t]) =>
-    `<option value="${k}" ${k===selectedKey?'selected':''}>${t.flag} ${t.name}</option>`
-  ).join('');
-}
-
 function updateExpenseModalPeople(selectedPaidBy, selectedForWhom) {
   const k = document.getElementById('f-trip').value;
   const trip = trips[k];
-  if(!trip) return;
+  if (!trip) return;
+
   const people = trip.people;
 
-  // Update Paid by
   const pbSel = document.getElementById('f-paidby');
   const curPb = selectedPaidBy || pbSel.value;
-  pbSel.innerHTML = people.map(p => `<option value="${p}" ${p===curPb?'selected':''}>${p}</option>`).join('');
-  if(!people.includes(curPb)) pbSel.value = people[0];
+  pbSel.innerHTML = people.map(p =>
+    `<option value="${p}" ${p === curPb ? 'selected' : ''}>${p}</option>`
+  ).join('');
+  if (!people.includes(curPb)) pbSel.value = people[0];
 
-  // Update For Whom — generate all subsets
   const fwSel = document.getElementById('f-forwhom');
   const curFw = selectedForWhom || fwSel.value;
   const groupLabel = people.length === 2 ? 'Both' : 'All';
 
-  // Build all non-empty subsets sorted by size desc
   function subsets(arr) {
     const result = [];
-    for(let i=1;i<(1<<arr.length);i++){
-      const sub=arr.filter((_,j)=>i&(1<<j));
-      result.push(sub);
+    for (let i = 1; i < (1 << arr.length); i++) {
+      result.push(arr.filter((_, j) => i & (1 << j)));
     }
-    return result.sort((a,b)=>b.length-a.length);
+    return result.sort((a, b) => b.length - a.length);
   }
-  const subs = subsets(people);
-  const opts = subs.map(sub => {
-    const val = sub.length === people.length ? groupLabel : sub.join(', ');
-    const label = sub.length === people.length ? `Everyone (${groupLabel})` :
-                  sub.length === 1 ? `${sub[0]} only` : sub.join(' & ');
-    const sel = (curFw === val || (!curFw && sub.length === people.length)) ? 'selected' : '';
-    return `<option value="${val}" ${sel}>${label}</option>`;
-  }).join('');
-  fwSel.innerHTML = opts;
-  if(curFw) fwSel.value = curFw;
 
-  // Auto-set currency to trip's default currency
-  if(trip.defaultCur) {
+  const opts = subsets(people).map(sub => {
+    const val = sub.length === people.length ? groupLabel : sub.join(', ');
+    const label =
+      sub.length === people.length ? `Everyone (${groupLabel})` :
+      sub.length === 1 ? `${sub[0]} only` :
+      sub.join(' & ');
+    const selected = (curFw === val || (!curFw && sub.length === people.length)) ? 'selected' : '';
+    return `<option value="${val}" ${selected}>${label}</option>`;
+  }).join('');
+
+  fwSel.innerHTML = opts;
+  fwSel.value = curFw;
+  if (!fwSel.value) fwSel.value = groupLabel;
+
+  if (trip.currency) {
     const curSel = document.getElementById('f-currency');
-    if(curSel) { curSel.value = trip.defaultCur; autoCalcSGD(); }
+    if (curSel) {
+      curSel.value = trip.currency;
+      autoCalcSGD();
+    }
   }
 }
 
+function updateExpenseStatus(tripKey, expId, newStatus) {
+  const trip = trips[tripKey];
+  if (!trip) return;
+
+  const exp = trip.expenses.find(x => x.id === expId);
+  if (!exp) return;
+
+  exp.status = newStatus;
+  saveTripsToStorage();
+  renderTable(tripKey);
+  updateTripKpis(tripKey);
+
+  if (document.getElementById('page-overview').classList.contains('active')) {
+    renderOverview();
+  }
+  if (document.getElementById('page-settlement').classList.contains('active')) {
+    renderSettlement();
+  }
+}
 
 // ===================== LOCK / UNLOCK =====================
 function toggleLock(k, id) {
