@@ -2655,6 +2655,7 @@ function sBadges(s) {
   return `<span class="badge badge-neutral">${s || '—'}</span>`;
 }
 
+
 function renderTable(k){
   const trip = trips[k];
   const people = trip.people;
@@ -2698,15 +2699,15 @@ function renderTable(k){
   const costH=people.map(p=>`<th>Cost (${p})</th>`).join('');
   const pbH=people.map(p=>`<th>${p} paid back?</th>`).join('');
   const upH=people.map(p=>`<th>Unpaid to ${p}</th>`).join('');
-  const rows=data.map(e=>{
-    const sgd=toSGD(e.cost, e.cur, e.fxRateUsed);
-    const isFX=e.cur!=='SGD';
-    const rate=fx[e.cur]||1;
-    const lockClass = e.locked ? 'locked-cell' : '';
-    const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
-    const sgdCell=isFX
-      ?`<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
-      :`<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
+const rows = data.map(e => {
+  const sgd = toSGD(e.cost, e.cur, e.fxRateUsed);
+  const isFX = e.cur !== 'SGD';
+  const rate = fx[e.cur] || 1;
+  const lockClass = e.locked ? 'locked-cell' : '';
+  const lockBadge = e.locked ? '<span class="locked-badge">🔒 Locked</span>' : '';
+  const sgdCell = isFX
+    ? `<td data-label="SGD" class="tabular ${lockClass}"><span class="sgd-foreign">${fmt(sgd)}</span><span class="fx-note">@ 1 ${e.cur} = ${rate.toFixed(4)} SGD</span>${lockBadge}</td>`
+    : `<td data-label="SGD" class="tabular ${lockClass}">${fmt(sgd)}${lockBadge}</td>`;
     const cVals=people.map(p=>`<td data-label="Cost ${p}" class="tabular">${personCost(e,p,people)>0?fmt(personCost(e,p,people)):'—'}</td>`).join('');
 const pbVals = people.map(p=>{
   const splitPeople = getSplitPeople(e, people);
@@ -2729,35 +2730,49 @@ const pbVals = people.map(p=>{
     const uVals=people.map(p=>{const u=personUnpaid(e,p,people);return`<td data-label="Owed ${p}" class="tabular" style="color:${u>0?'var(--color-error)':'var(--color-text-muted)'}">${u>0?fmt(u):'—'}</td>`;}).join('');
     const costCellClass = e.locked ? 'locked-cell' : '';
 
-    return`<tr>
-      <td data-label="Date">${fmtDate(e.from)}</td><td data-label="To">${fmtDate(e.to)}</td>
-      <td data-label="Type"><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
-      <td data-label="Description"><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
-      <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
-      ${sgdCell}
-      <td data-label="Status">${sBadges(e.status)}</td>
-      <td data-label="Split"><span class="badge badge-neutral">${e.split||'—'}</span></td>
-      <td data-label="For"><span class="tag">${e.forWhom||'—'}</span></td>
-      <td data-label="Paid by">${e.paidBy||'—'}</td>
-      ${cVals}${pbVals}${uVals}
-      <td data-label="Code"><span class="booking-code">${e.code||'—'}</span></td>
-      <td data-label="Platform"><span class="tag">${e.platform||'—'}</span></td>
-      <td data-label="Notes" style="max-width:180px;white-space:normal;font-size:var(--text-xs);color:var(--color-text-muted)">${e.notes||'—'}</td>
-      <td style="--no-label:1"><div class="flex gap-2">
-        <button class="${e.locked?'lock-btn locked':'lock-btn'}" onclick="toggleLock('${k}',${e.id})" title="${e.locked?'Unlock transaction':'Lock transaction'}">${e.locked?'🔒':'🔓'}</button>
-        <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked?'disabled title="Unlock to edit"':''}>✏️</button>
-      <button
-        type="button"
-        class="btn btn-danger btn-sm"
-        onclick="event.stopPropagation(); delExp('${k}', ${e.id})"
-        ${e.locked ? 'disabled title="Unlock to delete"' : 'title="Delete expense"'}
-        aria-label="Delete expense"
-      >
-        🗑
-      </button>     
-       </div></td>
-    </tr>`;
-  }).join('');
+    const moreDetailsCell = `
+    <td data-label="More details">
+      <details class="more-details">
+        <summary class="more-details-summary">More details</summary>
+        <div class="more-details-body">
+          <div>
+            <div class="text-xs text-muted">Platform</div>
+            <div>${e.platform || '—'}</div>
+          </div>
+          <div>
+            <div class="text-xs text-muted">Booking Code</div>
+            <div>${e.code || '—'}</div>
+          </div>
+          <div style="grid-column:1 / -1;">
+            <div class="text-xs text-muted">Notes</div>
+            <div>${e.notes || '—'}</div>
+          </div>
+        </div>
+      </details>
+    </td>
+  `;
+
+
+ return `<tr>
+    <td data-label="Date">${fmtDate(e.from)}</td>
+    <td data-label="To">${fmtDate(e.to)}</td>
+    <td data-label="Type"><div class="flex items-center gap-2">${eIcon(e.type)}<span>${e.type}</span></div></td>
+    <td data-label="Description"><span class="location-text" title="${e.location || ''}">${e.location || '—'}</span></td>
+    <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
+    ${sgdCell}
+    <td data-label="Status">${sBadges(e.status)}</td>
+    <td data-label="Split"><span class="badge badge-neutral">${e.split || '—'}</span></td>
+    <td data-label="For"><span class="tag">${e.forWhom || '—'}</span></td>
+    <td data-label="Paid by">${e.paidBy || '—'}</td>
+    ${cVals}${pbVals}${uVals}
+    ${moreDetailsCell}
+    <td style="--no-label:1"><div class="flex gap-2">
+      <button class="${e.locked ? 'lock-btn locked' : 'lock-btn'}" onclick="toggleLock('${k}',${e.id})">${e.locked ? '🔒' : '🔓'}</button>
+      <button class="btn btn-ghost btn-sm" onclick="openEdit('${k}',${e.id})" ${e.locked ? 'disabled title="Unlock to edit"' : ''}>✏️</button>
+      <button type="button" class="btn btn-danger btn-sm" onclick="event.stopPropagation(); delExp('${k}', ${e.id})" ${e.locked ? 'disabled title="Unlock to delete"' : 'title="Delete expense"'}>🗑</button>
+    </div></td>
+  </tr>`;
+}).join('');
 
 
   const tSGD = data.reduce((s, e) => s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
