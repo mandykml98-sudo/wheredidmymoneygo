@@ -2203,6 +2203,14 @@ document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).
  // icons inline
 }
 
+function showPieTooltip(el) {
+  if (!el) return;
+  const type = el.dataset.type || '';
+  const pct = el.dataset.pct || '';
+  const amount = el.dataset.amount || '';
+  console.log(`${type}: ${pct}% (${amount})`);
+}
+
 function renderSidebarPieChart(){
   const container = document.getElementById('pie-chart-tab');
   if(!container) return;
@@ -2244,18 +2252,16 @@ function renderSidebarPieChart(){
 
   return `<path
     d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
-    fill="${color}"
+fill="${color}"
     stroke="var(--color-bg)"
     stroke-width="2"
     style="cursor:pointer"
     data-type="${type}"
     data-pct="${pct}"
-    data-amount="${fmt(val)}"
-    onmouseenter="showPieTooltip(this)"
-    ontouchstart="showPieTooltip(this)"
-    title="${type}: ${pct}% · ${fmt(val)}"
-  ></path>`;
-  }).join('');
+    data-amount="${fmt(val)}">
+    <title>${type}: ${pct}% (${fmt(val)})</title>
+  </path`;
+}).join('');
 
   const [firstType, firstVal] = entries[0];
   const firstPct = ((firstVal / total) * 100).toFixed(1);
@@ -2664,11 +2670,7 @@ const pbVals = people.map(p=>{
       <td data-label="Description"><span class="location-text" title="${e.location||''}">${e.location||'—'}</span></td>
       <td data-label="Amount" class="tabular ${costCellClass}">${fmtN(e.cost)} ${e.cur}</td>
       ${sgdCell}
-      <td data-label="Status">
-        <select class="status-select" data-trip-key="${k}" data-exp-id="${e.id}">
-          <option value="Paid" ${e.status === 'Paid' ? 'selected' : ''}>Paid</option>
-          <option value="Unpaid" ${e.status === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
-        </select> </td>      
+      <td data-label="Status">${sBadges(e.status)}</td>
       <td data-label="Split"><span class="badge badge-neutral">${e.split||'—'}</span></td>
       <td data-label="For"><span class="tag">${e.forWhom||'—'}</span></td>
       <td data-label="Paid by">${e.paidBy||'—'}</td>
@@ -2868,6 +2870,20 @@ function openAddModal(tripKey){
   if(lockNote2) lockNote2.style.display='none';
   document.getElementById('modal').classList.add('open');
 }
+
+function populateTripDropdown(selectedKey = '') {
+  const sel = document.getElementById('f-trip');
+  if (!sel) return;
+
+  sel.innerHTML = Object.entries(trips).map(([key, trip]) => `
+    <option value="${key}" ${key === selectedKey ? 'selected' : ''}>
+      ${trip.flag ? trip.flag + ' ' : ''}${trip.name}
+    </option>
+  `).join('');
+
+  updateExpenseModalPeople();
+}
+
 function openEdit(k,id){
   const e=trips[k].expenses.find(x=>x.id===id); if(!e) return;
   editingId=id; editingTrip=k;expenseFx = null;
