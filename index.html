@@ -2158,91 +2158,144 @@ if(localStorage.getItem('currentUsername')) {
 }
 // ===================== OVERVIEW =====================
 
-function kpiFont(val){
-  var len=(val||'').toString().length;
-  if(len<=4)  return '2rem';
-  if(len<=6)  return '1.6rem';
-  if(len<=8)  return '1.35rem';
-  if(len<=10) return '1.1rem';
+function kpiFont(val) {
+  const len = (val || '').toString().length;
+  if (len <= 4) return '2rem';
+  if (len <= 6) return '1.6rem';
+  if (len <= 8) return '1.35rem';
+  if (len <= 10) return '1.1rem';
   return '0.95rem';
 }
-function kpiDiv(label,val,cls,sub){
-  var s=kpiFont(val);
-  var c=cls?' '+cls:'';
-  var subHtml=sub?'<div class="kpi-sub">'+sub+'</div>':'';
-  return '<div class="kpi-card"><div class="kpi-label">'+label+'</div><div class="kpi-value'+c+'" style="font-size:'+s+'">'+val+'</div>'+subHtml+'</div>';
+
+function kpiDiv(label, val, cls, sub) {
+  const s = kpiFont(val);
+  const c = cls ? ' ' + cls : '';
+  const subHtml = sub ? `<div class="kpi-sub">${sub}</div>` : '';
+  return `<div class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-value${c}" style="font-size:${s}">${val}</div>${subHtml}</div>`;
 }
-function renderOverview(){
-  let tSGD=0,tExp=0,tUnpaid=0;
-  Object.entries(trips).forEach(([k,trip])=>{
-    trip.expenses.forEach(e=>{ tSGD+=toSGD(e.cost, e.cur, e.fxRateUsed); tExp++; tUnpaid+=personUnpaid(e,currentUsername,trip.people); });
+
+function renderOverview() {
+  let tSGD = 0;
+  let tExp = 0;
+  let tUnpaid = 0;
+
+  Object.entries(trips).forEach(([k, trip]) => {
+    trip.expenses.forEach(e => {
+      tSGD += toSGD(e.cost, e.cur, e.fxRateUsed);
+      tExp++;
+      tUnpaid += personUnpaid(e, currentUsername, trip.people);
+    });
   });
+
   renderFxBanners();
+
   const tripCount = Object.keys(trips).length;
-  document.getElementById('overview-kpis').innerHTML=
-    kpiDiv('Total Trips',tripCount,'accent','')+
-    kpiDiv('Bookings',tExp,'','Across all trips')+
-    kpiDiv('Total Spent (SGD)',fmt(tSGD),'accent','At current FX rates')+
-    kpiDiv('Owed to '+currentUsername,fmt(tUnpaid),'warning','Pending repayment');
-document.getElementById('trips-overview-cards').innerHTML=Object.entries(trips).map(([k,t])=>{
-  renderSidebarPieChart();
-    const sgd=t.expenses.reduce((s,e)=>s+toSGD(e.cost, e.cur, e.fxRateUsed),0);
-    const owed=t.expenses.reduce((s,e)=>s+personUnpaid(e,currentUsername,t.people),0);
-    return`<div class="trip-overview-card" onclick="showPage('${k}')">
-      <div class="trip-card-header ${t.style}" style="position:relative">
-        <button type="button" onclick="event.stopPropagation();openEditTripModal('${k}')" title="Edit trip" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:var(--radius-full);background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;border:none;cursor:pointer;">✏️</button>
-        <div class="trip-card-flag">${t.flag}</div><div class="trip-card-name">${t.name}</div><div class="trip-card-dates">${t.dates}</div>
+
+  document.getElementById('overview-kpis').innerHTML =
+    kpiDiv('Total Trips', tripCount, 'accent', '') +
+    kpiDiv('Bookings', tExp, '', 'Across all trips') +
+    kpiDiv('Total Spent (SGD)', fmt(tSGD), 'accent', 'At current FX rates') +
+    kpiDiv('Owed to ' + currentUsername, fmt(tUnpaid), 'warning', 'Pending repayment');
+
+  document.getElementById('trips-overview-cards').innerHTML = Object.entries(trips).map(([k, t]) => {
+    const sgd = t.expenses.reduce((s, e) => s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
+    const owed = t.expenses.reduce((s, e) => s + personUnpaid(e, currentUsername, t.people), 0);
+
+    return `
+      <div class="trip-overview-card" onclick="showPage('${k}')">
+        <div class="trip-card-header ${t.style}" style="position:relative">
+          <button
+            type="button"
+            onclick="event.stopPropagation(); openEditTripModal('${k}')"
+            title="Edit trip"
+            style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:var(--radius-full);background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;border:none;cursor:pointer;"
+          >✏️</button>
+
+          <div class="trip-card-flag">${t.flag}</div>
+          <div class="trip-card-name">${t.name}</div>
+          <div class="trip-card-dates">${t.dates}</div>
+        </div>
+
+        <div class="trip-card-body">
+          <div class="trip-stat-row">
+            <span class="trip-stat-label">Travellers</span>
+            <span class="trip-stat-value">${t.people.join(', ')}</span>
+          </div>
+          <div class="trip-stat-row">
+            <span class="trip-stat-label">Bookings</span>
+            <span class="trip-stat-value">${t.expenses.length}</span>
+          </div>
+          <div class="trip-stat-row">
+            <span class="trip-stat-label">Total (SGD)</span>
+            <span class="trip-stat-value">${fmt(sgd)}</span>
+          </div>
+          <div class="trip-stat-row">
+            <span class="trip-stat-label">Owed to ${currentUsername}</span>
+            <span class="trip-stat-value" style="color:var(--color-warning)">${fmt(owed)}</span>
+          </div>
+        </div>
       </div>
-      <div class="trip-card-body">
-        <div class="trip-stat-row"><span class="trip-stat-label">Travellers</span><span class="trip-stat-value">${t.people.join(', ')}</span></div>
-        <div class="trip-stat-row"><span class="trip-stat-label">Bookings</span><span class="trip-stat-value">${t.expenses.length}</span></div>
-        <div class="trip-stat-row"><span class="trip-stat-label">Total (SGD)</span><span class="trip-stat-value">${fmt(sgd)}</span></div>
-        <div class="trip-stat-row"><span class="trip-stat-label">Owed to ${currentUsername}</span><span class="trip-stat-value" style="color:var(--color-warning)">${fmt(owed)}</span></div>
-      </div></div>`;
+    `;
   }).join('');
- // icons inline
 }
 
 function showPieTooltip(el) {
   if (!el) return;
+
   const type = el.dataset.type || '';
   const pct = el.dataset.pct || '';
   const amount = el.dataset.amount || '';
-  console.log(`${type}: ${pct}% (${amount})`);
+
+  const tooltip = document.getElementById('pie-chart-tooltip');
+  if (!tooltip) return;
+
+  tooltip.innerHTML = `
+    <div style="font-weight:700;color:var(--color-text)">${type}</div>
+    <div style="color:var(--color-text-muted);margin-top:4px">${pct}% · ${amount}</div>
+  `;
 }
 
-function renderSidebarPieChart(){
+function renderSidebarPieChart() {
   const container = document.getElementById('pie-chart-tab');
-  if(!container) return;
+  if (!container) return;
 
   const byType = {};
-  Object.values(trips).forEach(trip=>{
-    trip.expenses.forEach(e=>{
+
+  Object.values(trips).forEach(trip => {
+    trip.expenses.forEach(e => {
       const sp = getSplitPeople(e, trip.people);
-      if(!sp.includes(currentUsername)) return;
+      if (!sp.includes(currentUsername)) return;
+
       const share = personCost(e, currentUsername, trip.people);
       byType[e.type] = (byType[e.type] || 0) + share;
     });
   });
 
-  const entries = Object.entries(byType).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-  const total = entries.reduce((s,[,v])=>s+v,0);
+  const entries = Object.entries(byType)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1]);
 
-  if(!total){
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+
+  if (!total) {
     container.innerHTML = `<p style="font-size:var(--text-xs);color:var(--color-text-muted);padding:var(--space-2) 0">No expenses yet.</p>`;
     return;
   }
 
-  const colors = ['#f4b8a0','#a8c8e8','#b8dcb0','#f5d9a0','#e8b0cc','#c9b8a8','#c5c0b8','#f2a89a'];
+  const colors = ['#f4b8a0', '#a8c8e8', '#b8dcb0', '#f5d9a0', '#e8b0cc', '#c9b8a8', '#c5c0b8', '#f2a89a'];
   let cumulative = 0;
-  const size = 160, radius = 72, cx = size / 2, cy = size / 2;
+  const size = 160;
+  const radius = 72;
+  const cx = size / 2;
+  const cy = size / 2;
 
-  const slices = entries.map(([type,val],i)=>{
+  const slices = entries.map(([type, val], i) => {
     const frac = val / total;
     const pct = (frac * 100).toFixed(1);
     const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
     cumulative += frac;
     const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+
     const x1 = cx + radius * Math.cos(startAngle);
     const y1 = cy + radius * Math.sin(startAngle);
     const x2 = cx + radius * Math.cos(endAngle);
@@ -2250,56 +2303,62 @@ function renderSidebarPieChart(){
     const largeArc = frac > 0.5 ? 1 : 0;
     const color = colors[i % colors.length];
 
-  return `<path
-      d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
-      fill="${color}"
-      stroke="var(--color-bg)"
-      stroke-width="2"
-      style="cursor:pointer"
-      data-type="${type}"
-      data-pct="${pct}"
-      data-amount="${fmt(val)}"
-      onclick="showPieTooltip(this)">
-      <title>${type}: ${pct}% (${fmt(val)})</title>
-    </path>`;
+    return `
+      <path
+        d="M ${cx},${cy} L ${x1.toFixed(2)},${y1.toFixed(2)} A ${radius},${radius} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z"
+        fill="${color}"
+        stroke="var(--color-bg)"
+        stroke-width="2"
+        style="cursor:pointer"
+        data-type="${type}"
+        data-pct="${pct}"
+        data-amount="${fmt(val)}"
+        onclick="showPieTooltip(this)"
+      >
+        <title>${type}: ${pct}% (${fmt(val)})</title>
+      </path>
+    `;
   }).join('');
 
   const [firstType, firstVal] = entries[0];
   const firstPct = ((firstVal / total) * 100).toFixed(1);
 
-const legend = entries.map(([type, val], i) => {
-  const color = colors[i % colors.length];
-  const pct = ((val / total) * 100).toFixed(0);
-  return `
-    <div class="breakdown-legend-item">
-      <div class="breakdown-legend-left">
-        <span class="breakdown-legend-dot" style="background:${color}"></span>
-        <span class="breakdown-legend-label">${type}</span>
+  const legend = entries.map(([type, val], i) => {
+    const color = colors[i % colors.length];
+    const pct = ((val / total) * 100).toFixed(0);
+
+    return `
+      <div class="breakdown-legend-item">
+        <div class="breakdown-legend-left">
+          <span class="breakdown-legend-dot" style="background:${color}"></span>
+          <span class="breakdown-legend-label">${type}</span>
+        </div>
+        <div class="breakdown-legend-right">
+          <span class="breakdown-legend-value">${fmt(val)}</span>
+          <span class="breakdown-legend-pct">${pct}%</span>
+        </div>
       </div>
-      <div class="breakdown-legend-right">
-        <span class="breakdown-legend-value">${fmt(val)}</span>
-        <span class="breakdown-legend-pct">${pct}%</span>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="card">
+      <div style="text-align:center">
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="margin:0 auto">
+          ${slices}
+        </svg>
+
+        <div id="pie-chart-tooltip" style="margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface-offset);border:1px solid var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-xs);text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
+          <div style="font-weight:700;color:var(--color-text)">${firstType}</div>
+          <div style="color:var(--color-text-muted);margin-top:4px">${firstPct}% · ${fmt(firstVal)}</div>
+        </div>
+      </div>
+
+      <div class="breakdown-legend">
+        ${legend}
       </div>
     </div>
   `;
-}).join('');
-
-container.innerHTML = `
-  <div class="card">
-    <div style="text-align:center">
-      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="margin:0 auto">
-        ${slices}
-      </svg>
-      <div id="pie-chart-tooltip" style="margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-surface-offset);border:1px solid var(--color-border);border-radius:var(--radius-lg);font-size:var(--text-xs);text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
-        <div style="font-weight:700;color:var(--color-text)">${firstType}</div>
-        <div style="color:var(--color-text-muted);margin-top:4px">${firstPct}% · ${fmt(firstVal)}</div>
-      </div>
-    </div>
-    <div class="breakdown-legend">
-      ${legend}
-    </div>
-  </div>
-`;
 }
 
 function renderSpendingTrend() {
@@ -2319,7 +2378,7 @@ function renderSpendingTrend() {
       const dateKey = (e.from || '').trim();
       if (!dateKey) return;
 
-      const monthKey = dateKey.slice(0, 7); // YYYY-MM
+      const monthKey = dateKey.slice(0, 7);
       byMonth[monthKey] = (byMonth[monthKey] || 0) + share;
     });
   });
@@ -2378,7 +2437,6 @@ function renderSpendingTrend() {
       <h3 class="card-title">Monthly spend (SGD)</h3>
       <div style="overflow-x:auto;">
         <svg viewBox="0 0 ${w} ${h}" width="100%" height="320" aria-label="Monthly spending trend">
-          
           ${yLines.map(t => `
             <g>
               <line
@@ -2431,11 +2489,12 @@ function renderSpendingTrend() {
                 fill="var(--color-text-muted)"
               >${formatMonth(p.month)}</text>
             </g>
-          `).join('')}       
-         </svg>
+          `).join('')}
+        </svg>
       </div>
     </div>
   `;
+
   const tooltip = document.getElementById('chart-tooltip');
   if (!tooltip) return;
 
@@ -2484,16 +2543,16 @@ function renderSpendingTrend() {
 }
 
 // ===================== TRIP =====================
-function renderTrip(k){
+function renderTrip(k) {
   const trip = trips[k];
   if (!trip) return;
 
   const page = document.getElementById(`page-${k}`);
   if (!page) return;
 
-  const tSGD = trip.expenses.reduce((s,e)=>s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
+  const tSGD = trip.expenses.reduce((s, e) => s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
   const uCount = trip.expenses.filter(e => e.status === 'Unpaid').length;
-  const tUnpaid = trip.expenses.reduce((s,e)=>s + personUnpaid(e, currentUsername, trip.people), 0);
+  const tUnpaid = trip.expenses.reduce((s, e) => s + personUnpaid(e, currentUsername, trip.people), 0);
 
   page.innerHTML = `
     <div class="page-header">
@@ -2503,11 +2562,11 @@ function renderTrip(k){
           <p class="page-subtitle" id="${k}-subtitle">${trip.dates} · ${trip.expenses.length} bookings</p>
         </div>
 
-      <button
-        type="button"
-        class="btn btn-primary trip-add-expense-btn"
-        onclick="openAddModal('${k}')"
-      >
+        <button
+          type="button"
+          class="btn btn-primary trip-add-expense-btn"
+          onclick="openAddModal('${k}')"
+        >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -2548,12 +2607,11 @@ function renderTrip(k){
       </div>
 
       <div class="table-wrap" id="${k}-table-wrap"></div>
-      </div>
+    </div>
   `;
 
   renderFxBanners();
   renderTable(k);
-  renderSidebarPieChart();
 
   const badge = document.getElementById(`badge-${k}`);
   if (badge) badge.textContent = trip.expenses.length;
@@ -2696,34 +2754,47 @@ const pbVals = people.map(p=>{
   }).join('');
 
 
-  const tSGD=data.reduce((s,e)=>s+toSGD(e.cost, e.cur, e.fxRateUsed),0);
-  const currentUser=currentUsername||'You';
-  const unpaidToUser=data.reduce((s,e)=>s+personUnpaid(e,currentUser,people),0);
-  const perPersonTotals = people.map(p=>({
-    name:p,
-    total:trip.expenses.reduce((sum,e)=>sum+personCost(e,p,people),0)
+  const tSGD = data.reduce((s, e) => s + toSGD(e.cost, e.cur, e.fxRateUsed), 0);
+  const currentUser = currentUsername;
+  const currentUserLabel = currentUsername || 'You';
+  const unpaidToUser = data.reduce((s, e) => s + personUnpaid(e, currentUser, people), 0);
+
+  const perPersonTotals = people.map(p => ({
+    name: p,
+    total: data.reduce((sum, e) => sum + personCost(e, p, people), 0)
   }));
-  const perPersonHtml = perPersonTotals.map(item=>`<div>
+
+  const perPersonHtml = perPersonTotals.map(item => `
+    <div>
       <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">${item.name}</div>
       <div class="tabular fw-700" style="color:var(--color-text);font-size:var(--text-lg);">${fmt(item.total)}</div>
-    </div>`).join('');
-  document.getElementById(prefix+'-table-wrap').innerHTML=`<table>
-    <thead><tr><th>From</th><th>To</th><th>Type</th><th>Description</th><th>Cost</th><th>In SGD ↗</th><th>Status</th><th>Split</th><th>For</th><th>Paid by</th>${costH}${pbH}${upH}<th>Booking Code</th><th>Platform</th><th>Notes</th><th>Actions</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div style="margin-top:var(--space-4);padding:var(--space-4);background:var(--color-surface);border-radius:var(--radius-xl);border:1px solid var(--color-border);display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-4);">
-    <div>
-      <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">Total Spent</div>
-      <div class="tabular fw-700" style="color:var(--color-primary);font-size:var(--text-lg);">${fmt(tSGD)}</div>
     </div>
-    
-    <div>
-      <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">Unpaid to ${currentUser}</div>
-      <div class="tabular fw-700" style="color:${unpaidToUser>0?'var(--color-error)':'var(--color-success)'};font-size:var(--text-lg);">${unpaidToUser>0?fmt(unpaidToUser):'—'}</div>
+  `).join('');
+
+  document.getElementById(prefix + '-table-wrap').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>From</th><th>To</th><th>Type</th><th>Description</th><th>Cost</th><th>In SGD ↗</th><th>Status</th><th>Split</th><th>For</th><th>Paid by</th>${costH}${pbH}${upH}<th>Booking Code</th><th>Platform</th><th>Notes</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+
+    <div style="margin-top:var(--space-4);padding:var(--space-4);background:var(--color-surface);border-radius:var(--radius-xl);border:1px solid var(--color-border);display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-4);">
+      <div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">Total Spent</div>
+        <div class="tabular fw-700" style="color:var(--color-primary);font-size:var(--text-lg);">${fmt(tSGD)}</div>
+      </div>
+
+      <div>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--space-2);">Unpaid to ${currentUserLabel}</div>
+        <div class="tabular fw-700" style="color:${unpaidToUser > 0 ? 'var(--color-error)' : 'var(--color-success)'};font-size:var(--text-lg);">${unpaidToUser > 0 ? fmt(unpaidToUser) : '—'}</div>
+      </div>
+
+      ${perPersonHtml}
     </div>
-    ${perPersonHtml}
-  </div>
-  `;
+    `;
   // icons inline
 }
 
