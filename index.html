@@ -2649,6 +2649,12 @@ function refreshTripUI(key) {
   }
 }
 
+function sBadges(s) {
+  if (s === 'Paid') return `<span class="badge badge-success">Paid</span>`;
+  if (s === 'Unpaid') return `<span class="badge badge-warning">Unpaid</span>`;
+  return `<span class="badge badge-neutral">${s || '—'}</span>`;
+}
+
 function renderTable(k){
   const trip = trips[k];
   const people = trip.people;
